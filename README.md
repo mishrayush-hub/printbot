@@ -1,50 +1,43 @@
-# Welcome to your Expo app 👋
+# 🖨️ PrintBot - A Fast, Smart Printing Solution
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Welcome to PrintBot, your one-stop digital printing solution. With the PrintBot app, you can upload your documents, pay online, and get a unique OTP to retrieve your printouts directly from a PrintBot vending machine. No waiting, no queues—just smart printing on the go!
 
-## Get started
+## 🚀 Key Features
 
-1. Install dependencies
+- 📤 **Instant File Upload** (PDF/JPEG)
+- 💸 **Automatic Price Calculation** 
+- 🔐 **Unique OTP Generation** for secure print pickup
+- 🧾 **Order Summary and Checkout**
+- 🤝 Seamless integration with **PrintBot vending machines**
+- 🌐 Web version available at [www.printbot.navstream.in](https://www.printbot.navstream.in)
 
-   ```bash
-   npm install
-   ```
+## 📱 Built With
 
-2. Start the app
+- **React Native + Expo** – for cross-platform mobile development
+- **Tailwind CSS (via NativeWind)** – for consistent, responsive UI
+- **Expo Router** – for file-based routing in the app
 
-   ```bash
-    npx expo start
-   ```
+🔐 OTP Printing Flow
+Upload file via mobile app.
 
-In the output, you'll find options to open the app in a
+Pay based on file type and page count.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Receive a 6-digit OTP.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Enter OTP on a PrintBot vending machine.
 
-## Get a fresh project
+🎉 Collect your print!
 
-When you're ready, run:
+✨ Future Enhancements
+Payment gateway integration (UPI, cards, etc.)
 
-```bash
-npm run reset-project
-```
+User profile and print history
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Admin dashboard for managing orders and machines
 
-## Learn more
+NFC/QR support for print retrieval
 
-To learn more about developing your project with Expo, look at the following resources:
+🙌 Made With ❤️ by Navstream Innovations LLP
+Visit us at www.navstream.in
+Product Page: www.printbot.navstream.in
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

@@ -3,41 +3,75 @@ import React from 'react';
 import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+import { ShoppingBag, House, UserRoundCog } from 'lucide-react-native';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme() ?? 'light';
+  const theme = Colors[colorScheme];
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
+        headerShown: true,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
+        tabBarActiveTintColor: theme.tint,
+        tabBarInactiveTintColor: theme.tabIconDefault,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
             position: 'absolute',
+            backgroundColor: theme.tabBarBackground,
+            height: 90,
+            paddingTop: 10,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            borderTopWidth: 0,
+            shadowOpacity: 0,
+            marginBottom: 0,
           },
-          default: {},
+          android: {
+            position: 'absolute',
+            backgroundColor: theme.tabBarBackground,
+            height: 70,
+            paddingTop: 10,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            borderTopWidth: 0,
+            elevation: 0,
+            marginBottom: 0,
+          },
         }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
+        headerTitleStyle: {
+          fontSize: 24,
+          fontWeight: 'bold',
+          color: 'white',
+        },
+        headerTintColor: 'white',
+      }}
+    >
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Orders',
+          tabBarIcon: ({ color }) => <ShoppingBag size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="index"
+        options={{
+          headerTitle: 'Printbot', // 👈 shown in header
+          tabBarLabel: 'Home',     // 👈 shown in tab bar
+          tabBarIcon: ({ color }) => <House size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="user"
+        options={{
+          title: 'User Profile',
+          tabBarIcon: ({ color }) => <UserRoundCog size={28} color={color} />,
         }}
       />
     </Tabs>

@@ -1,109 +1,134 @@
-import { StyleSheet, Image, Platform } from 'react-native';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+  useColorScheme,
+} from "react-native";
+import {
+  ArrowLeft,
+  ShoppingCart,
+  Trash,
+  ClipboardList,
+} from "lucide-react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-
-export default function TabTwoScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
-  );
+// Define Order Type
+interface Order {
+  id: string;
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+  pages?: number;
+  price: number;
+  otp: number;
 }
 
-const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-});
+export default function OrdersScreen() {
+  const { orders } = useLocalSearchParams();
+  const [cartItems, setCartItems] = useState<Order[]>([]);
+  const colorScheme = useColorScheme();
+
+  const isDark = colorScheme === "dark";
+  const bgColor = isDark ? "bg-black" : "bg-white";
+  const textColor = isDark ? "text-white" : "text-black";
+  const cardBg = isDark ? "bg-gray-800" : "bg-gray-100";
+  const borderColor = isDark ? "border-gray-700" : "border-gray-300";
+  const subText = isDark ? "text-gray-400" : "text-gray-600";
+
+  useEffect(() => {
+    const loadOrders = async () => {
+      try {
+        const storedOrders = await AsyncStorage.getItem("orders");
+        if (storedOrders) {
+          setCartItems(JSON.parse(storedOrders) as Order[]);
+        }
+      } catch (error) {
+        console.error("Failed to load orders:", error);
+      }
+    };
+    loadOrders();
+  }, []);
+
+  useEffect(() => {
+    if (orders) {
+      try {
+        const parsedOrders = typeof orders === "string" ? JSON.parse(orders) : orders;
+
+        if (Array.isArray(parsedOrders)) {
+          const updatedOrders: Order[] = [...cartItems, ...parsedOrders];
+          setCartItems(updatedOrders);
+          AsyncStorage.setItem("orders", JSON.stringify(updatedOrders));
+        } else {
+          console.error("Parsed orders is not an array:", parsedOrders);
+        }
+      } catch (error) {
+        console.error("Failed to save orders:", error);
+      }
+    }
+  }, [orders]);
+
+
+  return (
+    <View className={`flex-1 ${bgColor} p-4 pt-1 pb-24`}>
+      {/* Back Button & Title */}
+      {/* <View className="flex-row items-center mb-8">
+        <TouchableOpacity onPress={() => router.push("/(tabs)")} className="mr-2">
+          <ArrowLeft color={isDark ? "white" : "black"} size={28} />
+        </TouchableOpacity>
+        <Text className={`${textColor} text-3xl font-semibold`}>Orders</Text>
+      </View> */}
+
+      {cartItems.length === 0 ? (
+        <View className="flex-1 items-center justify-center">
+          <ShoppingCart color={isDark ? "gray" : "darkgray"} size={80} />
+          <Text className={`${subText} text-2xl mt-4`}>No Orders</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={cartItems}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View
+              className={`${cardBg} p-5 w-[350px] rounded-lg mb-4 mx-2 border ${borderColor} shadow-md`}
+            >
+              <View className="flex-row justify-between items-center">
+                <Text className={`${textColor} max-w-[300px] text-lg font-bold`}>
+                  {item.fileName.length > 20
+                    ? `${item.fileName.substring(0, 17)}...${item.fileType}`
+                    : item.fileName}
+                </Text>
+                <Text className="text-[#38b6ff] font-semibold text-lg">₹{item.price}</Text>
+              </View>
+
+              {item.fileType === "application/pdf" && (
+                <Text className={`${subText} text-sm mt-1`}>Pages: {item.pages}</Text>
+              )}
+
+              <View
+                className={`mt-3 flex-row items-center justify-between px-4 py-3 rounded-lg border ${borderColor} ${
+                  isDark ? "bg-gray-900" : "bg-gray-200"
+                }`}
+              >
+                <Text className={`${textColor} text-lg font-semibold`}>OTP: {item.otp}</Text>
+                <TouchableOpacity
+                  className="bg-[#38b6ff] px-4 py-2 rounded-full"
+                  onPress={() =>
+                    Alert.alert("Copied", `OTP ${item.otp} copied!`)
+                  }
+                >
+                  <Text className="text-white font-bold">Copy</Text>
+                </TouchableOpacity>
+              </View>
+
+              
+            </View>
+          )}
+        />
+      )}
+    </View>
+  );
+}

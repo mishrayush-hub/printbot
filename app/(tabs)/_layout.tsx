@@ -16,6 +16,9 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: true,
+        headerStyle: {
+            height: 100,
+          },
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarActiveTintColor: theme.tint,
@@ -47,7 +50,8 @@ export default function TabLayout() {
         headerTitleStyle: {
           fontSize: 24,
           fontWeight: 'bold',
-          color: 'white',
+          color: colorScheme === 'dark' ? 'white' : 'black',
+          paddingBottom: 20,
         },
         headerTintColor: 'white',
       }}
@@ -55,23 +59,26 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Orders',
-          tabBarIcon: ({ color }) => <ShoppingBag size={28} color={color} />,
+          title: 'Order History',
+          tabBarIcon: ({ color }) => <ShoppingBag size={26} color={color} />,
+          tabBarLabel: 'Orders', // 👈 shown in tab bar
+          headerTitleAlign: 'center', // 👈 center the header title
         }}
       />
       <Tabs.Screen
         name="index"
         options={{
-          headerTitle: 'Printbot', // 👈 shown in header
+          headerTitle: 'Ayush Mishra 👋', // 👈 shown in header
           tabBarLabel: 'Home',     // 👈 shown in tab bar
-          tabBarIcon: ({ color }) => <House size={28} color={color} />,
+          tabBarIcon: ({ color }) => <House size={26} color={color} />,
+          headerTitleAlign: 'center', // 👈 center the header title
         }}
       />
       <Tabs.Screen
         name="user"
         options={{
-          title: 'User Profile',
-          tabBarIcon: ({ color }) => <UserRoundCog size={28} color={color} />,
+          title: 'Profile',
+          tabBarIcon: ({ color }) => <UserRoundCog size={26} color={color} />,
         }}
       />
     </Tabs>

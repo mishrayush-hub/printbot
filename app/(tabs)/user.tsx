@@ -15,27 +15,27 @@ export default function Cart() {
         <ArrowLeft color={isDark ? "white" : "black"} size={28} />
       </TouchableOpacity> */}
 
-      {/* Profile Header */}
+      {/* Profile Header
       <View className="items-center mt-10">
         <User color={isDark ? "white" : "black"} size={80} />
         <Text className={`text-lg font-semibold mt-2 ${isDark ? 'text-white' : 'text-black'}`}>
           Profile
         </Text>
-      </View>
+      </View> */}
 
       {/* Profile Details */}
       <View className="mt-8">
         {/* Username */}
         <Text className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Username</Text>
         <View className={`${isDark ? 'bg-gray-800' : 'bg-gray-100'} p-5 rounded-xl mt-1`}>
-          <Text className={`font-semibold text-xl ${isDark ? 'text-white' : 'text-black'}`}>Ashwin</Text>
+          <Text className={`font-semibold text-xl ${isDark ? 'text-white' : 'text-black'}`}>Ayush</Text>
         </View>
 
         {/* Email */}
         <Text className={`text-lg mt-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Email</Text>
         <View className={`${isDark ? 'bg-gray-800' : 'bg-gray-100'} p-5 rounded-xl mt-1`}>
           <Text className={`font-semibold text-xl ${isDark ? 'text-white' : 'text-black'}`}>
-            Its.Ashwin.23@Gmail.Com
+            mishrayush.28@gmail.com
           </Text>
         </View>
 

@@ -79,20 +79,6 @@ export default function HomeScreen() {
 
   return (
     <View className={`flex-1 pb-[50px] ${bgColor}`}>
-      {/* Header */}
-      {/* <View className="flex-row justify-between items-center gap-4 mt-8 px-4 pt-10">
-        <Text className={`text-3xl font-semibold ${textColor}`}>Printbot</Text>
-      </View> */}
-
-      {/* Greeting */}
-      <View className="px-4">
-        <Text className={`text-3xl mt-6 ${textColor}`}>
-          Hey <Text className="font-bold">Ashwin</Text> 👋
-        </Text>
-        <Text className={`text-xl mt-2 ${textColor}`}>Welcome back to PrintBot!</Text>
-      </View>
-
-      {/* Upload Box */}
       <View
         className={`border border-dashed ${
           isDarkMode ? "border-gray-500" : "border-gray-400"

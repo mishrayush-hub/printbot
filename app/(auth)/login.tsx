@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, useColorScheme } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, useColorScheme, Image } from "react-native";
 import { router } from "expo-router";
-import Logo from "@/components/logo";
+// import Logo from "@/components/logo";
 
 export default function LoginScreen() {
   const colorScheme = useColorScheme(); // 'light' or 'dark'
@@ -25,12 +25,16 @@ export default function LoginScreen() {
   };
 
   return (
-    <View className={`${isDark ? "bg-black" : "bg-[#38b6ff]"} flex-1`}>
+    <View className={`${isDark ? "bg-black" : "bg-[#008cff]"} flex-1`}>
       {/* Header */}
       <View className="h-56 px-6 pt-12">
         <View className="flex items-center mt-6">
-          <Logo width={100} height={100} color={isDark ? "#fff" : "#000"} />
-          <Text className={`font-bold text-3xl ${isDark ? "text-white" : "text-black"}`}>
+          <Image
+            source={require("../../assets/images/icon-black.png")}
+            style={{ width: 100, height: 100 }}
+            resizeMode="contain"
+          />
+          <Text className={`font-bold text-3xl text-white`}>
             Printbot
           </Text>
         </View>
@@ -55,6 +59,11 @@ export default function LoginScreen() {
           placeholder="Email"
           placeholderTextColor={isDark ? "#aaa" : "#999"}
           value={email}
+          autoCapitalize="none"
+          autoCorrect={false}
+          textContentType="emailAddress"
+          autoComplete="email"
+          keyboardType="email-address"
           onChangeText={setEmail}
         />
 
@@ -66,23 +75,27 @@ export default function LoginScreen() {
           placeholder="Password"
           placeholderTextColor={isDark ? "#aaa" : "#999"}
           secureTextEntry
+          autoCapitalize="none"
+          autoCorrect={false}
+          textContentType="password"
+          autoComplete="password"
           value={password}
           onChangeText={setPassword}
         />
 
         {/* Login Button */}
         <TouchableOpacity
-          className="bg-black w-[326px] h-[51px] rounded-full py-3"
+          className="bg-[#008cff] w-[326px] h-[51px] rounded-full py-3"
           onPress={handleLogin}
         >
           <Text className="text-white text-center text-2xl font-bold">Login</Text>
         </TouchableOpacity>
 
         {/* Sign-up Link */}
-        <Text className={`${isDark ? "text-gray-300" : "text-gray-500"} text-[14px] text-center mt-4`}>
+        <Text className={`${isDark ? "text-gray-300" : "text-gray-500"} text-[16px] text-center mt-4 items-center`}>
           Don’t have an account?{" "}
           <TouchableOpacity onPress={handleSignup}>
-            <Text className={`text-[16px] font-bold ${isDark ? "text-white" : "text-black"}`}>
+            <Text className={`text-[16px] font-bold ${isDark ? "text-white" : "text-black"} items-center -mb-[4px]`}>
               Sign up
             </Text>
           </TouchableOpacity>

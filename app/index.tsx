@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, useColorScheme } from "react-native";
+import { View, Image, useColorScheme } from "react-native";
 import { useRouter } from "expo-router";
-import Logo from "@/components/logo";
 
 const MyScreen = () => {
   const router = useRouter();
@@ -24,11 +23,12 @@ const MyScreen = () => {
 
   if (loading) {
     return (
-      <View className={`flex-1 justify-center items-center ${isDark ? "bg-black" : "bg-[#38b6ff]"}`}>
-        <Logo width={150} height={150} color={isDark ? "#fff" : "#000"} />
-        <Text className={`font-bold text-4xl mt-4 ${isDark ? "text-white" : "text-black"}`}>
-          Printbot
-        </Text>
+      <View className={`flex-1 justify-center items-center bg-[#008cff]`}>
+        <Image
+          source={require("../assets/images/icon.png")}
+          style={{ width: 200, height: 200 }}
+          resizeMode="contain"
+        />
       </View>
     );
   }

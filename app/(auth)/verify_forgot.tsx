@@ -8,10 +8,9 @@ import {
   Image,
   Alert
 } from "react-native";
-import { router } from "expo-router";
-import Logo from "@/components/logo";
+import { router, useLocalSearchParams } from "expo-router";
 
-export default function SignupScreen() {
+export default function VerifyForgotPassword() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
@@ -19,33 +18,21 @@ export default function SignupScreen() {
     router.push("/(auth)/login");
   };
 
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [mobile, setMobile] = useState("");
+  const { email } = useLocalSearchParams();
+  const [forgotToken, setForgotToken] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   const handleSignup = () => {
-    console.log("Values:", {
-      fullName,
-      email,
-      mobile,
-      password,
-      confirmPassword
-    });
 
-    if (!fullName || !email || !mobile || !password || !confirmPassword) {
+    if (!password || !confirmPassword || !forgotToken) {
       setErrorMessage("All fields are required.");
       return;
     }
-    if (!email.includes("@")) {
-      setErrorMessage("Enter a valid email address.");
-      return;
-    }
-    if (mobile.length < 10) {
-      setErrorMessage("Enter a valid mobile number.");
+    if (forgotToken.length < 6) {
+      setErrorMessage("Enter a valid forgot token.");
       return;
     }
     if (password.length < 6) {
@@ -57,30 +44,35 @@ export default function SignupScreen() {
       return;
     }
     setErrorMessage("");
-    sendSignupRequest(email, fullName, mobile, password, confirmPassword);
+    sendForgotPassRequest(email, forgotToken, password, confirmPassword);
   };
 
-  const sendSignupRequest = async (
-    email: string,
-    fullName: string,
-    mobile: string,
-    password: string,
-    confirmPassword: string
+  const sendForgotPassRequest = async (
+    email: any,
+    forgotToken: any,
+    password: any,
+    confirmPassword: any
   ) => {
+
+    console.log("Values:", {
+      email,
+      forgotToken,
+      password,
+      confirmPassword
+    });
     try {
       const response = await fetch(
-        "https://printbot.navstream.in/signup_api.php",
+        "https://printbot.navstream.in/verify_forgot_password_api.php",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
           },
           body: new URLSearchParams({
-            signupEmail: email,
-            signupName: fullName, // ✅ FIXED key name here
-            signupMobile: mobile,
-            signupPassword: password,
-            confirmPassword: confirmPassword // ✅ FIXED key name here too
+            email: email,
+            forgotToken: forgotToken,
+            newPassword: password,
+            confirmPassword: confirmPassword
           }).toString()
         }
       );
@@ -88,21 +80,19 @@ export default function SignupScreen() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        console.log("Signup response:", data.message);
-        setErrorMessage(data.message || "Signup failed. Please try again.");
+        console.log("Forgot Password response:", data.message);
+        setErrorMessage(data.message || "Forgot Password failed. Please try again.");
         return;
       }
 
       Alert.alert(
-        "Signup Successful",
-        "Please Verify your email to complete the signup process.",
+        "Password Reset Successful",
+        "You can now login with your new password.",
         [
           {
             text: "OK",
             onPress: () => {
-              setFullName("");
-              setEmail("");
-              setMobile("");
+              setForgotToken("");
               setPassword("");
               setConfirmPassword("");
               router.push("/(auth)/login");
@@ -155,49 +145,17 @@ export default function SignupScreen() {
           </Text>
         )}
 
-        {/* Full Name Input */}
-        <TextInput
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-          }`}
-          placeholder="Full Name"
-          placeholderTextColor={isDark ? "#aaa" : "#999"}
-          value={fullName}
-          autoCapitalize="none"
-          autoCorrect={false}
-          textContentType="name"
-          autoComplete="name"
-          onChangeText={setFullName}
-        />
-
-        {/* Email Input */}
-        <TextInput
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-          }`}
-          placeholder="Email"
-          placeholderTextColor={isDark ? "#aaa" : "#999"}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoCorrect={false}
-          textContentType="emailAddress"
-          autoComplete="email"
-          value={email}
-          onChangeText={setEmail}
-        />
-
         {/* Mobile Input */}
         <TextInput
           className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
             isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
           }`}
-          placeholder="Mobile Number"
+          placeholder="Reset Token"
           placeholderTextColor={isDark ? "#aaa" : "#999"}
-          keyboardType="phone-pad"
           autoCapitalize="none"
           autoCorrect={false}
-          value={mobile}
-          onChangeText={setMobile}
+          value={forgotToken}
+          onChangeText={setForgotToken}
         />
 
         {/* Password Input */}
@@ -232,7 +190,7 @@ export default function SignupScreen() {
           onPress={handleSignup}
         >
           <Text className="text-white text-center text-2xl font-bold">
-            Sign Up
+            Reset Password
           </Text>
         </TouchableOpacity>
 
@@ -242,7 +200,7 @@ export default function SignupScreen() {
             isDark ? "text-gray-300" : "text-gray-500"
           } text-[14px] text-center mt-4`}
         >
-          Already have an account?{" "}
+          Go Back to{" "}
           <TouchableOpacity onPress={handleLogin}>
             <Text
               className={`text-[16px] font-bold ${

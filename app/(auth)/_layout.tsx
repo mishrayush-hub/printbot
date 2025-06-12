@@ -11,6 +11,8 @@ function authlayout() {
         >
             <Stack.Screen name='signup' options={{ headerShown: false}} />
             <Stack.Screen name='login' options={{ headerShown: false}} />
+            <Stack.Screen name='verify_forgot' options={{ headerShown: false}} />
+            <Stack.Screen name='request_forgot' options={{ headerShown: false}} />
         </Stack>
     );
 }

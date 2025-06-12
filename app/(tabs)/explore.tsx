@@ -5,35 +5,23 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
-  useColorScheme,
+  useColorScheme
 } from "react-native";
 import {
   ArrowLeft,
   ShoppingCart,
   Trash,
-  ClipboardList,
+  ClipboardList
 } from "lucide-react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Define Order Type
-interface Order {
-  id: string;
-  fileName: string;
-  fileSize: number;
-  fileType: string;
-  pages?: number;
-  price: number;
-  otp: number;
-}
-
 export default function OrdersScreen() {
-  const { orders } = useLocalSearchParams();
-  const [cartItems, setCartItems] = useState<Order[]>([]);
+  const [files, setFiles] = useState([]);
   const colorScheme = useColorScheme();
 
   const isDark = colorScheme === "dark";
-  const bgColor = isDark ? "bg-black" : "bg-white";
+  // const bgColor = isDark ? "bg-black" : "bg-white";
   const textColor = isDark ? "text-white" : "text-black";
   const cardBg = isDark ? "bg-gray-800" : "bg-gray-100";
   const borderColor = isDark ? "border-gray-700" : "border-gray-300";
@@ -42,10 +30,27 @@ export default function OrdersScreen() {
   useEffect(() => {
     const loadOrders = async () => {
       try {
-        const storedOrders = await AsyncStorage.getItem("orders");
-        if (storedOrders) {
-          setCartItems(JSON.parse(storedOrders) as Order[]);
+        const authToken = await AsyncStorage.getItem("authToken");
+        const userId = await AsyncStorage.getItem("userId");
+        const response = await fetch(
+          "https://printbot.navstream.in/get_user_files_api.php",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+              authToken: authToken || "",
+              user_id: userId || ""
+            }).toString()
+          }
+        );
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          console.error("Failed to fetch orders:", data.message);
+          return;
         }
+        setFiles(data.files);
       } catch (error) {
         console.error("Failed to load orders:", error);
       }
@@ -53,80 +58,69 @@ export default function OrdersScreen() {
     loadOrders();
   }, []);
 
-  useEffect(() => {
-    if (orders) {
-      try {
-        const parsedOrders = typeof orders === "string" ? JSON.parse(orders) : orders;
-
-        if (Array.isArray(parsedOrders)) {
-          const updatedOrders: Order[] = [...cartItems, ...parsedOrders];
-          setCartItems(updatedOrders);
-          AsyncStorage.setItem("orders", JSON.stringify(updatedOrders));
-        } else {
-          console.error("Parsed orders is not an array:", parsedOrders);
-        }
-      } catch (error) {
-        console.error("Failed to save orders:", error);
-      }
-    }
-  }, [orders]);
-
+  const items = (item: any) => {
+    return (
+      <View
+        className={`${cardBg} p-5 w-full rounded-lg mb-4 border ${borderColor} shadow-sm`}
+      >
+        <View className="flex-row justify-between items-center">
+          <Text className={`${textColor} max-w-[300px] text-lg font-bold`}>
+            {item.file_name.split(".")[0].split("_").join(" ")}
+          </Text>
+          <Text className="text-[#008cff] font-semibold text-lg">
+            ₹{item.page_count * 3}
+          </Text>
+        </View>
+        <Text className={`${subText} text-sm mb-2`}>
+          Pages: {item.page_count}
+        </Text>
+          <Text className={`${textColor} text-sm`}>
+            Uploaded Date: {new Date(item.uploaded_date).toLocaleDateString()}
+          </Text>
+          <Text className={`${textColor} text-sm`}>
+            Payment: {item.payment_success ? "Payment Complete" : "Pending"}
+          </Text>
+          <Text className={`${textColor} text-sm`}>
+            Payment ID: {item.payment_id}
+          </Text>
+        <View className="flex-row items-center justify-between mt-3">
+          <Text className={`${textColor} text-sm`}>
+            Printed: {item.printed ? "Yes" : "No"}
+          </Text>
+          {!item.printed && !item.payment_success && item.magic_code !== "N/A" && (
+          <Text className={`${textColor} text-lg font-semibold`}>
+            OTP: {item.magic_code}
+          </Text>
+          )}
+          {!item.printed && !item.payment_success && item.magic_code !== "N/A" && (
+          <TouchableOpacity
+            className="bg-[#008cff] px-4 py-2 rounded-full"
+            onPress={() =>
+              Alert.alert("Copied", `OTP ${item.magic_code} copied!`)
+            }
+          >
+            <Text className="text-white font-bold">Copy</Text>
+          </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    );
+  };
 
   return (
-    <View className={`flex-1 ${bgColor} p-4 pt-1 pb-24`}>
-      {/* Back Button & Title */}
-      {/* <View className="flex-row items-center mb-8">
-        <TouchableOpacity onPress={() => router.push("/(tabs)")} className="mr-2">
-          <ArrowLeft color={isDark ? "white" : "black"} size={28} />
-        </TouchableOpacity>
-        <Text className={`${textColor} text-3xl font-semibold`}>Orders</Text>
-      </View> */}
-
-      {cartItems.length === 0 ? (
+    <View className={`flex-1 px-2 pb-24 w-full`}>
+      {files.length === 0 ? (
         <View className="flex-1 items-center justify-center">
           <ShoppingCart color={isDark ? "gray" : "darkgray"} size={80} />
           <Text className={`${subText} text-2xl mt-4`}>No Orders</Text>
         </View>
       ) : (
         <FlatList
-          data={cartItems}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View
-              className={`${cardBg} p-5 w-[350px] rounded-lg mb-4 mx-2 border ${borderColor} shadow-md`}
-            >
-              <View className="flex-row justify-between items-center">
-                <Text className={`${textColor} max-w-[300px] text-lg font-bold`}>
-                  {item.fileName.length > 20
-                    ? `${item.fileName.substring(0, 17)}...${item.fileType}`
-                    : item.fileName}
-                </Text>
-                <Text className="text-[#38b6ff] font-semibold text-lg">₹{item.price}</Text>
-              </View>
-
-              {item.fileType === "application/pdf" && (
-                <Text className={`${subText} text-sm mt-1`}>Pages: {item.pages}</Text>
-              )}
-
-              <View
-                className={`mt-3 flex-row items-center justify-between px-4 py-3 rounded-lg border ${borderColor} ${
-                  isDark ? "bg-gray-900" : "bg-gray-200"
-                }`}
-              >
-                <Text className={`${textColor} text-lg font-semibold`}>OTP: {item.otp}</Text>
-                <TouchableOpacity
-                  className="bg-[#38b6ff] px-4 py-2 rounded-full"
-                  onPress={() =>
-                    Alert.alert("Copied", `OTP ${item.otp} copied!`)
-                  }
-                >
-                  <Text className="text-white font-bold">Copy</Text>
-                </TouchableOpacity>
-              </View>
-
-              
-            </View>
-          )}
+          data={files}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item : any) => item.id}
+          renderItem={({ item }) => items(item)}
+          contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 5, marginTop: 15 }}
         />
       )}
     </View>

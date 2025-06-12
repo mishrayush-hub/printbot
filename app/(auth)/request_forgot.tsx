@@ -13,26 +13,24 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // import { AuthLogin } from "../../hooks/authLogin";
 // import Logo from "@/components/logo";
 
-export default function LoginScreen() {
+export default function RequestForgotPassword() {
   const colorScheme = useColorScheme(); // 'light' or 'dark'
   const isDark = colorScheme === "dark";
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleLogin = async () => {
+  const handleRequest = async () => {
     try {
       const response = await fetch(
-        "https://printbot.navstream.in/login_api.php",
+        "https://printbot.navstream.in/request_forgot_password_api.php",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
           },
           body: new URLSearchParams({
-            loginEmail: email,
-            loginPassword: password
+            email: email,
           }).toString()
         }
       );
@@ -41,29 +39,22 @@ export default function LoginScreen() {
 
       if (!response.ok || !data.success) {
         setErrorMessage(data.message || "Login failed. Please try again.");
-        Alert.alert("Login Failed", data.message || "Login failed.");
+        Alert.alert("Request Failed", data.message || "Request failed.");
         return;
       }
-      console.log("Login response:", data.data.name);
-      await AsyncStorage.setItem("authToken", data.data.authToken);
-      await AsyncStorage.setItem("userName", data.data.name);
-      await AsyncStorage.setItem("userEmail", data.data.email);
-      await AsyncStorage.setItem("userPhone", data.data.phone_number);
-      await AsyncStorage.setItem("userId", data.data.user_id.toString());
-      // console.log("Login successful!");
-      router.push("/(tabs)");
+      // console.log("Request successful!");
+      router.push({
+        pathname: "/(auth)/verify_forgot",
+        params: { email },
+      });
     } catch (error) {
       console.error("Login error:", error);
       setErrorMessage("An error occurred while logging in. Please try again.");
     }
   };
 
-  const handleSignup = () => {
-    router.push("/(auth)/signup");
-  };
-
-  const handleForgotPassword = () => {
-    router.push("/(auth)/request_forgot");
+  const handleLogin = () => {
+    router.push("/(auth)/login");
   };
 
   return (
@@ -91,7 +82,7 @@ export default function LoginScreen() {
             isDark ? "text-white" : "text-black"
           }`}
         >
-          Login
+          Reset Passowrd
         </Text>
 
         {/* Error Message */}
@@ -114,27 +105,10 @@ export default function LoginScreen() {
           keyboardType="email-address"
           onChangeText={setEmail}
         />
-
-        {/* Password Input */}
-        <TextInput
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-10 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-          }`}
-          placeholder="Password"
-          placeholderTextColor={isDark ? "#aaa" : "#999"}
-          secureTextEntry
-          autoCapitalize="none"
-          autoCorrect={false}
-          textContentType="password"
-          autoComplete="password"
-          value={password}
-          onChangeText={setPassword}
-        />
-
         {/* Login Button */}
         <TouchableOpacity
           className="bg-[#008cff] w-[326px] h-[51px] rounded-full py-3"
-          onPress={handleLogin}
+          onPress={handleRequest}
         >
           <Text className="text-white text-center text-2xl font-bold">
             Login
@@ -148,7 +122,7 @@ export default function LoginScreen() {
           } text-[16px] text-center mt-4 items-center`}
         >
           Don’t have an account?{" "}
-          <TouchableOpacity onPress={handleSignup}>
+          <TouchableOpacity onPress={handleLogin}>
             <Text
               className={`text-[16px] font-bold ${
                 isDark ? "text-white" : "text-black"
@@ -158,21 +132,6 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
         </Text>
-        <View
-          className={`${
-            isDark ? "text-gray-300" : "text-gray-500"
-          } text-[14px] text-center mt-4 items-center justify-center`}
-        >
-          <TouchableOpacity onPress={handleForgotPassword}>
-            <Text
-              className={`text-[16px] font-bold ${
-                isDark ? "text-white" : "text-black"
-              } -mb-[4px] items-center justify-center`}
-            >
-              Forgot Password?
-            </Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </View>
   );

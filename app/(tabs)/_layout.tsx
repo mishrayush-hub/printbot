@@ -1,5 +1,5 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
@@ -7,10 +7,23 @@ import { ShoppingBag, House, UserRoundCog } from 'lucide-react-native';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
+  const [userName, setUserName] = useState('');
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const name = await AsyncStorage.getItem('userName') || 'User';
+      setUserName(name);
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <Tabs
@@ -72,7 +85,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          headerTitle: 'Ayush Mishra 👋', // 👈 shown in header
+          headerTitle: `${userName} 👋`, // 👈 shown in header
           tabBarLabel: 'Home',     // 👈 shown in tab bar
           tabBarIcon: ({ color }) => <House size={26} color={color} />,
           headerTitleAlign: 'center', // 👈 center the header title
@@ -83,6 +96,18 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => <UserRoundCog size={26} color={color} />,
+          headerRight: () => (
+            <HapticTab
+              onPress={() => {
+                AsyncStorage.clear();
+                console.log('User logged out');
+                router.push('/(auth)/login');
+              }}
+            >
+              <MaterialIcons name="logout" size={24} color={colorScheme === 'dark' ? 'white' : 'black'} style={{ marginRight: 10 }} />
+            </HapticTab>
+          ),
+          headerTitleAlign: 'center', // 👈 center the header title
         }}
       />
     </Tabs>

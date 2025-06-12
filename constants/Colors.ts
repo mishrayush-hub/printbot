@@ -10,7 +10,7 @@ export const Colors = {
     background: '#fff',
     tint: '#000',
     icon: '#000',
-    tabIconDefault: '#aaa',
+    tabIconDefault: '#aeaeae',
     tabIconSelected: '#000',
     tabBarBackground: '#fff', // ✅ Add this
   },
@@ -19,7 +19,7 @@ export const Colors = {
     background: '#000',
     tint: '#fff',
     icon: '#fff',
-    tabIconDefault: '#555',
+    tabIconDefault: '#878787',
     tabIconSelected: '#fff',
     tabBarBackground: '#1f2937', // ✅ Add this
   },

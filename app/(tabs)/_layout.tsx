@@ -54,14 +54,18 @@ export default function TabLayout() {
           paddingBottom: 20,
         },
         headerTintColor: 'white',
+        tabBarLabelStyle: {
+          fontSize: 11,
+          marginBottom: 5,
+        }
       }}
     >
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Order History',
+          title: 'Upload History',
           tabBarIcon: ({ color }) => <ShoppingBag size={26} color={color} />,
-          tabBarLabel: 'Orders', // 👈 shown in tab bar
+          tabBarLabel: 'History', // 👈 shown in tab bar
           headerTitleAlign: 'center', // 👈 center the header title
         }}
       />

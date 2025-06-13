@@ -1,6 +1,6 @@
 import { Tabs, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
+import { Platform, Text } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { ShoppingBag, House, UserRoundCog } from 'lucide-react-native';
@@ -8,13 +8,11 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialIcons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
   const [userName, setUserName] = useState('');
-  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,7 +59,7 @@ export default function TabLayout() {
           },
         }),
         headerTitleStyle: {
-          fontSize: 24,
+          fontSize: 20,
           fontWeight: 'bold',
           color: colorScheme === 'dark' ? 'white' : 'black',
           paddingBottom: 20,
@@ -92,22 +90,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="user"
+        name="(user)"
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => <UserRoundCog size={26} color={color} />,
-          headerRight: () => (
-            <HapticTab
-              onPress={() => {
-                AsyncStorage.clear();
-                console.log('User logged out');
-                router.push('/(auth)/login');
-              }}
-            >
-              <MaterialIcons name="logout" size={24} color={colorScheme === 'dark' ? 'white' : 'black'} style={{ marginRight: 10 }} />
-            </HapticTab>
-          ),
-          headerTitleAlign: 'center', // 👈 center the header title
+          headerShown: false
         }}
       />
     </Tabs>

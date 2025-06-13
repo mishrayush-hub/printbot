@@ -6,22 +6,26 @@ import {
   TouchableOpacity,
   useColorScheme,
   Image,
-  Alert
+  Alert,
+  Modal,
+  ActivityIndicator
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// import { AuthLogin } from "../../hooks/authLogin";
-// import Logo from "@/components/logo";
 
 export default function LoginScreen() {
-  const colorScheme = useColorScheme(); // 'light' or 'dark'
+  const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
       const response = await fetch(
         "https://printbot.navstream.in/login_api.php",
@@ -42,32 +46,39 @@ export default function LoginScreen() {
       if (!response.ok || !data.success) {
         setErrorMessage(data.message || "Login failed. Please try again.");
         Alert.alert("Login Failed", data.message || "Login failed.");
+        setLoading(false);
         return;
       }
-      console.log("Login response:", data.data.name);
+
       await AsyncStorage.setItem("authToken", data.data.authToken);
       await AsyncStorage.setItem("userName", data.data.name);
       await AsyncStorage.setItem("userEmail", data.data.email);
       await AsyncStorage.setItem("userPhone", data.data.phone_number);
       await AsyncStorage.setItem("userId", data.data.user_id.toString());
-      // console.log("Login successful!");
+
       router.push("/(tabs)");
     } catch (error) {
       console.error("Login error:", error);
+      setLoading(false);
+      Alert.alert("Login Error", "An error occurred while logging in. Please try again.");
       setErrorMessage("An error occurred while logging in. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSignup = () => {
-    router.push("/(auth)/signup");
-  };
-
-  const handleForgotPassword = () => {
-    router.push("/(auth)/request_forgot");
-  };
+  const handleSignup = () => router.push("/(auth)/signup");
+  const handleForgotPassword = () => router.push("/(auth)/request_forgot");
 
   return (
     <View className={`${isDark ? "bg-black" : "bg-[#008cff]"} flex-1`}>
+      {/* Loading Modal */}
+      <Modal transparent={true} animationType="fade" visible={loading}>
+        <View className="flex-1 justify-center items-center bg-black/40">
+          <ActivityIndicator size="large" color="#ffffff" />
+        </View>
+      </Modal>
+
       {/* Header */}
       <View className="h-56 px-6 pt-12">
         <View className="flex items-center mt-6">
@@ -76,7 +87,7 @@ export default function LoginScreen() {
             style={{ width: 100, height: 100 }}
             resizeMode="contain"
           />
-          <Text className={`font-bold text-3xl text-white`}>Printbot</Text>
+          <Text className="font-bold text-3xl text-white">Printbot</Text>
         </View>
       </View>
 
@@ -115,21 +126,32 @@ export default function LoginScreen() {
           onChangeText={setEmail}
         />
 
-        {/* Password Input */}
-        <TextInput
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-10 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+        {/* Password Input with toggle */}
+        <View
+          className={`flex-row items-center rounded-full w-[326px] h-[51px] px-4 mb-10 ${
+            isDark ? "bg-[#2a2a2a]" : "bg-gray-100"
           }`}
-          placeholder="Password"
-          placeholderTextColor={isDark ? "#aaa" : "#999"}
-          secureTextEntry
-          autoCapitalize="none"
-          autoCorrect={false}
-          textContentType="password"
-          autoComplete="password"
-          value={password}
-          onChangeText={setPassword}
-        />
+        >
+          <TextInput
+            className={`flex-1 text-xl ${isDark ? "text-white" : "text-black"}`}
+            placeholder="Password"
+            placeholderTextColor={isDark ? "#aaa" : "#999"}
+            secureTextEntry={!showPassword}
+            autoCapitalize="none"
+            autoCorrect={false}
+            textContentType="password"
+            autoComplete="password"
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons
+              name={showPassword ? "eye-off" : "eye"}
+              size={24}
+              color={isDark ? "#fff" : "#000"}
+            />
+          </TouchableOpacity>
+        </View>
 
         {/* Login Button */}
         <TouchableOpacity
@@ -145,29 +167,27 @@ export default function LoginScreen() {
         <Text
           className={`${
             isDark ? "text-gray-300" : "text-gray-500"
-          } text-[16px] text-center mt-4 items-center`}
+          } text-[16px] text-center mt-4`}
         >
           Don’t have an account?{" "}
           <TouchableOpacity onPress={handleSignup}>
             <Text
-              className={`text-[16px] font-bold ${
+              className={`text-[16px] font-bold -mb-1 ${
                 isDark ? "text-white" : "text-black"
-              } items-center -mb-[4px]`}
+              }`}
             >
               Sign up
             </Text>
           </TouchableOpacity>
         </Text>
-        <View
-          className={`${
-            isDark ? "text-gray-300" : "text-gray-500"
-          } text-[14px] text-center mt-4 items-center justify-center`}
-        >
+
+        {/* Forgot Password */}
+        <View className="items-center mt-4">
           <TouchableOpacity onPress={handleForgotPassword}>
             <Text
               className={`text-[16px] font-bold ${
                 isDark ? "text-white" : "text-black"
-              } -mb-[4px] items-center justify-center`}
+              }`}
             >
               Forgot Password?
             </Text>

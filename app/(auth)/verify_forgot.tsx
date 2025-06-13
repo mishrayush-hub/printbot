@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   useColorScheme,
   Image,
-  Alert
+  Alert,
+  Modal,
+  ActivityIndicator
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 
@@ -24,9 +26,9 @@ export default function VerifyForgotPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false); // <-- Added
 
   const handleSignup = () => {
-
     if (!password || !confirmPassword || !forgotToken) {
       setErrorMessage("All fields are required.");
       return;
@@ -53,7 +55,6 @@ export default function VerifyForgotPassword() {
     password: any,
     confirmPassword: any
   ) => {
-
     console.log("Values:", {
       email,
       forgotToken,
@@ -61,6 +62,7 @@ export default function VerifyForgotPassword() {
       confirmPassword
     });
     try {
+      setLoading(true);
       const response = await fetch(
         "https://printbot.navstream.in/verify_forgot_password_api.php",
         {
@@ -81,10 +83,18 @@ export default function VerifyForgotPassword() {
 
       if (!response.ok || !data.success) {
         console.log("Forgot Password response:", data.message);
-        setErrorMessage(data.message || "Forgot Password failed. Please try again.");
+        setErrorMessage(
+          data.message || "Forgot Password failed. Please try again."
+        );
+        setLoading(false);
+        Alert.alert(
+          "Forgot Password Failed",
+          data.message || "Forgot Password failed."
+        );
         return;
       }
 
+      setLoading(false);
       Alert.alert(
         "Password Reset Successful",
         "You can now login with your new password.",
@@ -102,6 +112,12 @@ export default function VerifyForgotPassword() {
         { cancelable: false }
       );
     } catch (error) {
+      setLoading(false);
+      console.error("Forgot Password error:", error);
+      Alert.alert(
+        "Error",
+        "An error occurred while processing your request. Please try again."
+      );
       console.error("Signup error:", error);
       setErrorMessage("An error occurred while signing up. Please try again.");
     }
@@ -109,6 +125,11 @@ export default function VerifyForgotPassword() {
 
   return (
     <View className={`flex-1 ${isDark ? "bg-black" : "bg-[#008cff]"}`}>
+      <Modal transparent={true} visible={loading}>
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      </Modal>
       {/* Header */}
       <View className="h-56 px-6 pt-12">
         <View className="flex items-center mt-6">
@@ -177,7 +198,6 @@ export default function VerifyForgotPassword() {
           }`}
           placeholder="Confirm Password"
           placeholderTextColor={isDark ? "#aaa" : "#999"}
-          secureTextEntry
           autoCapitalize="none"
           autoCorrect={false}
           value={confirmPassword}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { View, Image, useColorScheme } from "react-native";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const MyScreen = () => {
   const router = useRouter();
@@ -8,11 +9,38 @@ const MyScreen = () => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
-  // Splash timeout
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
+    const checkAuth = async () => {
+      try {
+        const authToken = await AsyncStorage.getItem("authToken");
+        const userId = await AsyncStorage.getItem("userId");
+        const response = await fetch(
+          "https://printbot.navstream.in/verify_token_api.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+              authToken: authToken || "",
+              user_id: userId || ""
+            }).toString()
+          }
+        );
+        const data = await response.json();
+        if (data.success) {
+          // User is authenticated, redirect to the main app
+          router.replace("/(tabs)");
+        } else {
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Error checking auth token:", error);
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   useEffect(() => {
     if (!loading) {

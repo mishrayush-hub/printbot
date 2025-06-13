@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,18 +6,15 @@ import {
   TouchableOpacity,
   useColorScheme,
   Image,
-  Alert
+  Alert,
+  Modal,
+  ActivityIndicator
 } from "react-native";
 import { router } from "expo-router";
-import Logo from "@/components/logo";
 
 export default function SignupScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-
-  const handleLogin = () => {
-    router.push("/(auth)/login");
-  };
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -26,16 +23,13 @@ export default function SignupScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false); // <-- Added
+
+  const handleLogin = () => {
+    router.push("/(auth)/login");
+  };
 
   const handleSignup = () => {
-    console.log("Values:", {
-      fullName,
-      email,
-      mobile,
-      password,
-      confirmPassword
-    });
-
     if (!fullName || !email || !mobile || !password || !confirmPassword) {
       setErrorMessage("All fields are required.");
       return;
@@ -56,6 +50,7 @@ export default function SignupScreen() {
       setErrorMessage("Passwords do not match.");
       return;
     }
+
     setErrorMessage("");
     sendSignupRequest(email, fullName, mobile, password, confirmPassword);
   };
@@ -67,6 +62,7 @@ export default function SignupScreen() {
     password: string,
     confirmPassword: string
   ) => {
+    setLoading(true); // <-- Start loading
     try {
       const response = await fetch(
         "https://printbot.navstream.in/signup_api.php",
@@ -77,25 +73,25 @@ export default function SignupScreen() {
           },
           body: new URLSearchParams({
             signupEmail: email,
-            signupName: fullName, // ✅ FIXED key name here
+            signupName: fullName,
             signupMobile: mobile,
             signupPassword: password,
-            confirmPassword: confirmPassword // ✅ FIXED key name here too
+            confirmPassword: confirmPassword
           }).toString()
         }
       );
 
       const data = await response.json();
+      setLoading(false); // <-- Stop loading
 
       if (!response.ok || !data.success) {
-        console.log("Signup response:", data.message);
         setErrorMessage(data.message || "Signup failed. Please try again.");
         return;
       }
 
       Alert.alert(
         "Signup Successful",
-        "Please Verify your email to complete the signup process.",
+        "Please verify your email to complete the signup process.",
         [
           {
             text: "OK",
@@ -112,6 +108,11 @@ export default function SignupScreen() {
         { cancelable: false }
       );
     } catch (error) {
+      setLoading(false); // <-- Stop loading on error
+      Alert.alert(
+        "Signup Error",
+        "An error occurred while signing up. Please try again later."
+      );
       console.error("Signup error:", error);
       setErrorMessage("An error occurred while signing up. Please try again.");
     }
@@ -119,6 +120,13 @@ export default function SignupScreen() {
 
   return (
     <View className={`flex-1 ${isDark ? "bg-black" : "bg-[#008cff]"}`}>
+      {/* Loading Modal */}
+      <Modal transparent={true} visible={loading}>
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      </Modal>
+
       {/* Header */}
       <View className="h-56 px-6 pt-12">
         <View className="flex items-center mt-6">
@@ -127,11 +135,11 @@ export default function SignupScreen() {
             style={{ width: 100, height: 100 }}
             resizeMode="contain"
           />
-          <Text className={`font-bold text-3xl text-white`}>Printbot</Text>
+          <Text className="font-bold text-3xl text-white">Printbot</Text>
         </View>
       </View>
 
-      {/* Signup Form */}
+      {/* Form */}
       <View
         className={`flex-1 p-8 mt-4 rounded-t-[58] ${
           isDark ? "bg-[#1a1a1a]" : "bg-white"
@@ -145,7 +153,6 @@ export default function SignupScreen() {
           Sign Up
         </Text>
 
-        {/* Error & Success Messages */}
         {errorMessage !== "" && (
           <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
         )}
@@ -219,7 +226,6 @@ export default function SignupScreen() {
           }`}
           placeholder="Confirm Password"
           placeholderTextColor={isDark ? "#aaa" : "#999"}
-          secureTextEntry
           autoCapitalize="none"
           autoCorrect={false}
           value={confirmPassword}

@@ -119,7 +119,7 @@ export default function SignupScreen() {
   };
 
   return (
-    <View className={`flex-1 ${isDark ? "bg-black" : "bg-[#008cff]"}`}>
+    <View className={`bg-[#008cff] flex-1`}>
       {/* Loading Modal */}
       <Modal transparent={true} visible={loading}>
         <View className="flex-1 justify-center items-center bg-black/50">

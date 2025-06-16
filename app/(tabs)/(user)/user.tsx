@@ -9,17 +9,13 @@ import {
   Modal,
   ActivityIndicator
 } from "react-native";
-import { ChevronRight } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { HapticTab } from "@/components/HapticTab";
 import {
   AntDesign,
-  Entypo,
   Feather,
   FontAwesome,
-  FontAwesome6,
-  Ionicons,
   MaterialCommunityIcons,
   MaterialIcons
 } from "@expo/vector-icons";
@@ -31,8 +27,11 @@ export default function Cart() {
   const [uid, setUid] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [name, setName] = useState("");
+  const [newName, setNewName] = useState("");
   const [email, setEmail] = useState("");
+  const [newEmail, setNewEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [newPhone, setNewPhone] = useState("");
   const navigation = useNavigation();
   const [editProfile, setEditProfile] = useState(false);
   const router = useRouter();
@@ -86,46 +85,59 @@ export default function Cart() {
     }
   };
   const handleEditProfile = async () => {
-    try {
-      setLoading(true);
-      const sendData: { [key: string]: string } = {};
-      if (name.trim() !== "") sendData.user_name = name;
-      if (email.trim() !== "") sendData.user_email = email;
-      if (phone.trim() !== "") sendData.user_phone = phone;
-      if (authToken.trim() !== "") sendData.authToken = authToken;
-      if (uid.trim() !== "") sendData.user_id = uid;
-      
-      const response = await fetch(
-        "https://printbot.navstream.in/update_profile_api.php",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          body: new URLSearchParams(sendData).toString()
-        }
-      );
-      const data = await response.json();
-      if (!response.ok || !data.success) {
-        setLoading(false);
-        Alert.alert(
-          "Error",
-          data.message || "Failed to update profile."
-        );
-        return;
-      } else {
-        setLoading(false);
-        setEditProfile(false);
-        await AsyncStorage.setItem("userName", name);
-        await AsyncStorage.setItem("userEmail", email);
-        await AsyncStorage.setItem("userPhone", phone);
-      }
-    } catch (error) {
+  try {
+    setLoading(true);
+    const sendData: { [key: string]: string } = {};
+
+    // Only include fields that have changed
+    if (newName.trim() !== "" && newName !== name) sendData.user_name = newName;
+    if (newEmail.trim() !== "" && newEmail !== email) sendData.user_email = newEmail;
+    if (newPhone.trim() !== "" && newPhone !== phone) sendData.user_phone = newPhone;
+
+    if (Object.keys(sendData).length === 0) {
       setLoading(false);
-      console.error("Error updating profile:", error);
-      Alert.alert("Error", "Failed to update profile.");
+      setEditProfile(false);
+      return; // Nothing changed
     }
-  };
+
+    sendData.authToken = authToken;
+    sendData.user_id = uid;
+
+    const response = await fetch(
+      "https://printbot.navstream.in/update_profile_api.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams(sendData).toString()
+      }
+    );
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      setLoading(false);
+      Alert.alert("Error", data.message || "Failed to update profile.");
+      return;
+    }
+
+    // Update states and AsyncStorage with new values
+    setName(newName);
+    setEmail(newEmail);
+    setPhone(newPhone);
+    await AsyncStorage.setItem("userName", newName);
+    await AsyncStorage.setItem("userEmail", newEmail);
+    await AsyncStorage.setItem("userPhone", newPhone);
+    
+    setEditProfile(false);
+    setLoading(false);
+  } catch (error) {
+    setLoading(false);
+    console.error("Error updating profile:", error);
+    Alert.alert("Error", "Failed to update profile.");
+  }
+};
+
 
   const handleDeleteAccount = async () => {
     try {
@@ -251,7 +263,6 @@ export default function Cart() {
               "Save Changes",
               "Do you want to save changes before exiting?",
               [
-                { text: "Cancel", style: "cancel" },
                 {
                   text: "Save",
                   onPress: () => {
@@ -318,8 +329,11 @@ export default function Cart() {
       setUid(userId);
       setAuthToken(userAuthToken);
       setName(userName);
+      setNewName(userName);
       setEmail(userEmail);
+      setNewEmail(userEmail);
       setPhone(userPhone);
+      setNewPhone(userPhone);
     };
 
     fetchData();

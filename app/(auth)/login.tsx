@@ -71,7 +71,7 @@ export default function LoginScreen() {
   const handleForgotPassword = () => router.push("/(auth)/request_forgot");
 
   return (
-    <View className={`${isDark ? "bg-black" : "bg-[#008cff]"} flex-1`}>
+    <View className={`bg-[#008cff] flex-1`}>
       {/* Loading Modal */}
       <Modal transparent={true} animationType="fade" visible={loading}>
         <View className="flex-1 justify-center items-center bg-black/40">

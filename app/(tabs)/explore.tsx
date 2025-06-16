@@ -16,6 +16,11 @@ export default function OrdersScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [authToken, setAuthToken] = useState("");
+  const [userId, setUserId] = useState("");
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [userPhone, setUserPhone] = useState("");
 
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -25,11 +30,37 @@ export default function OrdersScreen() {
   const borderColor = isDark ? "border-gray-700" : "border-gray-300";
   const subText = isDark ? "text-gray-400" : "text-gray-600";
 
-  const loadOrders = useCallback(async () => {
-    try {
-      const authToken = await AsyncStorage.getItem("authToken");
-      const userId = await AsyncStorage.getItem("userId");
+  useEffect(() => {
+    const getTokenDetails = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        const id = await AsyncStorage.getItem("userId");
+        const name = await AsyncStorage.getItem("userName");
+        const email = await AsyncStorage.getItem("userEmail");
+        const phone = await AsyncStorage.getItem("userPhone");
 
+        if (token && id && name && email && phone) {
+          setAuthToken(token);
+          setUserId(id);
+          setUserName(name);
+          setUserEmail(email);
+          setUserPhone(phone);
+          console.log("User info loaded:", { token, id });
+        } else {
+          console.log("User details missing from storage.");
+        }
+      } catch (error) {
+        console.error("Error fetching token details:", error);
+      }
+    };
+
+    getTokenDetails();
+  }, []);
+
+  const loadOrders = useCallback(async () => {
+    if (!authToken || !userId) return;
+
+    try {
       const response = await fetch(
         "https://printbot.navstream.in/get_user_files_api.php",
         {
@@ -38,13 +69,14 @@ export default function OrdersScreen() {
             "Content-Type": "application/x-www-form-urlencoded"
           },
           body: new URLSearchParams({
-            authToken: authToken || "",
-            user_id: userId || ""
+            authToken,
+            user_id: userId
           }).toString()
         }
       );
 
       const data = await response.json();
+
       if (!response.ok || !data.success) {
         setErrorMessage(data.message || "Failed to load orders.");
         setFiles([]);
@@ -60,11 +92,13 @@ export default function OrdersScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [authToken, userId]);
 
   useEffect(() => {
-    loadOrders();
-  }, [loadOrders]);
+    if (authToken && userId) {
+      loadOrders();
+    }
+  }, [authToken, userId, loadOrders]);
 
   const renderItem = (item: any) => (
     <View
@@ -116,14 +150,16 @@ export default function OrdersScreen() {
   );
 
   return (
-    <View className="flex-1 px-2 pb-24 w-full">
+    <View className="flex-1 px-2 pb-20 w-full">
       {loading ? (
         <View className="flex-1 justify-center items-center mt-20">
           <ActivityIndicator size="large" color="#008cff" />
         </View>
       ) : errorMessage ? (
         <View className="flex-1 justify-center items-center mt-20">
-          <Text className={`${subText} text-center text-lg`}>{errorMessage}</Text>
+          <Text className={`${subText} text-center text-lg`}>
+            {errorMessage}
+          </Text>
         </View>
       ) : files.length === 0 ? (
         <View className="flex-1 justify-center items-center mt-20">
@@ -142,7 +178,7 @@ export default function OrdersScreen() {
             loadOrders();
           }}
           contentContainerStyle={{
-            paddingBottom: 20,
+            paddingBottom: 10,
             paddingHorizontal: 5,
             marginTop: 15
           }}

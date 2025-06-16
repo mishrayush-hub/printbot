@@ -124,7 +124,7 @@ export default function VerifyForgotPassword() {
   };
 
   return (
-    <View className={`flex-1 ${isDark ? "bg-black" : "bg-[#008cff]"}`}>
+    <View className={`bg-[#008cff] flex-1`}>
       <Modal transparent={true} visible={loading}>
         <View className="flex-1 justify-center items-center bg-black/50">
           <ActivityIndicator size="large" color="#fff" />

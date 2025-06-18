@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.archerxcode.printbot",
+      "bundleIdentifier": "com.navstream.printbot",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Allow PrintBot to access your photos to upload and print documents.",
         "NSPhotoLibraryAddUsageDescription": "Allow PrintBot to save printed documents to your photo library."
@@ -21,7 +21,7 @@
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#008cff"
       },
-      "package": "com.archerxcode.printbot",
+      "package": "com.navstream.printbot",
       "permissions": [
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",

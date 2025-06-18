@@ -1,4 +1,4 @@
-package com.archerxcode.printbot
+package com.navstream.printbot
 
 import android.app.Application
 import android.content.res.Configuration

@@ -1,4 +1,4 @@
-package com.archerxcode.printbot
+package com.navstream.printbot
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

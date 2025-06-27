@@ -118,14 +118,14 @@ export default function HomeScreen() {
 
   try {
     setLoading(true);
-    // const environment = "PRODUCTION"; // or "SANDBOX"
-    // const merchantId = "M22MXCSHVPHOY";
-    // const appId = "";
-    // const salt_key = "5ef6e9e9-07e9-4d45-a583-cbe550893d61";
-    const environment = "SANDBOX"; // Use SANDBOX for testing
-    const merchantId = "PGTESTPAYUAT86"; // Replace with your actual merchant ID
-    const appId = "com.navstream.printbot"; // Replace with your actual app ID
-    const salt_key = "96434309-7796-489d-8924-ab56988a6076";
+    const environment = "PRODUCTION"; // or "SANDBOX"
+    const merchantId = "M22MXCSHVPHOY";
+    const appId = "";
+    const salt_key = "5ef6e9e9-07e9-4d45-a583-cbe550893d61";
+    // const environment = "SANDBOX"; // Use SANDBOX for testing
+    // const merchantId = "PGTESTPAYUAT86"; // Replace with your actual merchant ID
+    // const appId = "com.navstream.printbot"; // Replace with your actual app ID
+    // const salt_key = "96434309-7796-489d-8924-ab56988a6076";
     const salt_index = 1;
     const callbackUrl = ""; // Use temporary URL for testing
     await phonepeSDK.init(environment, merchantId, appId, true);

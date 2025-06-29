@@ -40,7 +40,7 @@ export default function ChangePassword() {
         setLoading(true);
         const email = await AsyncStorage.getItem("userEmail") || "";
       const response = await fetch(
-        "https://printbot.navstream.in/verify_change_password_api.php",
+        "https://printbot.cloud/api/v1/verify_change_password_api.php",
         {
           method: "POST",
           headers: {

@@ -65,7 +65,7 @@ const MyScreen = () => {
       const userId = await AsyncStorage.getItem("userId");
       
       const response = await fetch(
-        "https://printbot.navstream.in/verify_token_api.php", 
+        "https://printbot.cloud/api/v1/verify_token_api.php", 
         {
           method: "POST",
           headers: {

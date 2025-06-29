@@ -34,7 +34,7 @@ export default function DeleteAccount() {
       setDeleteLoading(true);
       const userId = (await AsyncStorage.getItem("userId")) || "";
       const response = await fetch(
-        "https://printbot.navstream.in/verify_delete_account_api.php",
+        "https://printbot.cloud/api/v1/verify_delete_account_api.php",
         {
           method: "POST",
           headers: {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -8,9 +8,14 @@ import {
   Image,
   Alert,
   Modal,
-  ActivityIndicator
+  ActivityIndicator,
+  ScrollView,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function SignupScreen() {
   const colorScheme = useColorScheme();
@@ -24,6 +29,29 @@ export default function SignupScreen() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false); // <-- Added
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+
+  // Refs for auto-scroll and focus
+  const scrollViewRef = useRef<ScrollView>(null);
+  const fullNameRef = useRef<TextInput>(null);
+  const emailRef = useRef<TextInput>(null);
+  const mobileRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+  const confirmPasswordRef = useRef<TextInput>(null);
+
+  // Auto-scroll function
+  const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
+    setTimeout(() => {
+      if (inputRef.current && scrollViewRef.current) {
+        inputRef.current.measure((x, y, width, height, pageX, pageY) => {
+          scrollViewRef.current?.scrollTo({
+            y: pageY - 150, // Offset to show input clearly above keyboard
+            animated: true,
+          });
+        });
+      }
+    }, 100); // Small delay to ensure the keyboard animation has started
+  };
 
   const handleLogin = () => {
     router.push("/(auth)/login");
@@ -50,6 +78,10 @@ export default function SignupScreen() {
       setErrorMessage("Passwords do not match.");
       return;
     }
+    if (!acceptedTerms) {
+      setErrorMessage("Please accept the Terms & Conditions and Privacy Policy.");
+      return;
+    }
 
     setErrorMessage("");
     sendSignupRequest(email, fullName, mobile, password, confirmPassword);
@@ -65,7 +97,7 @@ export default function SignupScreen() {
     setLoading(true); // <-- Start loading
     try {
       const response = await fetch(
-        "https://printbot.navstream.in/signup_api.php",
+        "https://printbot.cloud/api/v1/signup_api.php",
         {
           method: "POST",
           headers: {
@@ -101,6 +133,7 @@ export default function SignupScreen() {
               setMobile("");
               setPassword("");
               setConfirmPassword("");
+              setAcceptedTerms(false);
               router.push("/(auth)/login");
             }
           }
@@ -119,32 +152,40 @@ export default function SignupScreen() {
   };
 
   return (
-    <View className={`bg-[#008cff] flex-1`}>
-      {/* Loading Modal */}
-      <Modal transparent={true} visible={loading}>
-        <View className="flex-1 justify-center items-center bg-black/50">
-          <ActivityIndicator size="large" color="#fff" />
-        </View>
-      </Modal>
+    <KeyboardAvoidingView 
+      className="flex-1" 
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View className={`bg-[#008cff] flex-1`}>
+        {/* Loading Modal */}
+        <Modal transparent={true} visible={loading}>
+          <View className="flex-1 justify-center items-center bg-black/50">
+            <ActivityIndicator size="large" color="#fff" />
+          </View>
+        </Modal>
 
-      {/* Header */}
-      <View className="h-56 px-6 pt-12">
-        <View className="flex items-center mt-6">
-          <Image
-            source={require("../../assets/images/icon-black.png")}
-            style={{ width: 100, height: 100 }}
-            resizeMode="contain"
-          />
-          <Text className="font-bold text-3xl text-white">Printbot</Text>
+        {/* Header */}
+        <View className="h-56 px-6 pt-12">
+          <View className="flex items-center mt-6">
+            <Image
+              source={require("../../assets/images/icon-black.png")}
+              style={{ width: 100, height: 100 }}
+              resizeMode="contain"
+            />
+            <Text className="font-bold text-3xl text-white">Printbot</Text>
+          </View>
         </View>
-      </View>
 
-      {/* Form */}
-      <View
-        className={`flex-1 p-8 mt-4 rounded-t-[58] ${
-          isDark ? "bg-[#1a1a1a]" : "bg-white"
-        }`}
-      >
+        {/* Form */}
+        <ScrollView
+          ref={scrollViewRef}
+          className={`flex-1 rounded-t-[58] ${
+            isDark ? "bg-[#1a1a1a]" : "bg-white"
+          }`}
+          contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 16 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
         <Text
           className={`text-[30px] font-bold text-center mb-6 ${
             isDark ? "text-white" : "text-black"
@@ -164,6 +205,7 @@ export default function SignupScreen() {
 
         {/* Full Name Input */}
         <TextInput
+          ref={fullNameRef}
           className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
             isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
           }`}
@@ -174,11 +216,15 @@ export default function SignupScreen() {
           autoCorrect={false}
           textContentType="name"
           autoComplete="name"
+          returnKeyType="next"
           onChangeText={setFullName}
+          onFocus={() => scrollToInput(fullNameRef)}
+          onSubmitEditing={() => emailRef.current?.focus()}
         />
 
         {/* Email Input */}
         <TextInput
+          ref={emailRef}
           className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
             isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
           }`}
@@ -189,12 +235,16 @@ export default function SignupScreen() {
           autoCorrect={false}
           textContentType="emailAddress"
           autoComplete="email"
+          returnKeyType="next"
           value={email}
           onChangeText={setEmail}
+          onFocus={() => scrollToInput(emailRef)}
+          onSubmitEditing={() => mobileRef.current?.focus()}
         />
 
         {/* Mobile Input */}
         <TextInput
+          ref={mobileRef}
           className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
             isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
           }`}
@@ -203,12 +253,16 @@ export default function SignupScreen() {
           keyboardType="phone-pad"
           autoCapitalize="none"
           autoCorrect={false}
+          returnKeyType="next"
           value={mobile}
           onChangeText={setMobile}
+          onFocus={() => scrollToInput(mobileRef)}
+          onSubmitEditing={() => passwordRef.current?.focus()}
         />
 
         {/* Password Input */}
         <TextInput
+          ref={passwordRef}
           className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
             isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
           }`}
@@ -217,20 +271,58 @@ export default function SignupScreen() {
           secureTextEntry
           autoCapitalize="none"
           autoCorrect={false}
+          returnKeyType="next"
           value={password}
           onChangeText={setPassword}
+          onFocus={() => scrollToInput(passwordRef)}
+          onSubmitEditing={() => confirmPasswordRef.current?.focus()}
         />
         <TextInput
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-10 ${
+          ref={confirmPasswordRef}
+          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
             isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
           }`}
           placeholder="Confirm Password"
           placeholderTextColor={isDark ? "#aaa" : "#999"}
+          secureTextEntry
           autoCapitalize="none"
           autoCorrect={false}
+          returnKeyType="done"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
+          onFocus={() => scrollToInput(confirmPasswordRef)}
+          onSubmitEditing={() => Keyboard.dismiss()}
         />
+
+        {/* Terms and Privacy Policy Acceptance */}
+        <View className="flex-row items-start mb-6 w-[326px]">
+          <TouchableOpacity
+            onPress={() => setAcceptedTerms(!acceptedTerms)}
+            className="mr-3 mt-3"
+          >
+            <Ionicons
+              name={acceptedTerms ? "checkbox" : "square-outline"}
+              size={20}
+              color={acceptedTerms ? "#008cff" : (isDark ? "#aaa" : "#999")}
+            />
+          </TouchableOpacity>
+          <View className="flex-1">
+            <Text className={`text-sm leading-5 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+              I agree to the{" "}
+              <TouchableOpacity onPress={() => router.push("/(legal)/terms-and-conditions")}>
+                <Text className="text-[#008cff] font-semibold underline -mb-1">
+                  Terms & Conditions
+                </Text>
+              </TouchableOpacity>
+              {" "}and{" "}
+              <TouchableOpacity onPress={() => router.push("/(legal)/privacy-policy")}>
+                <Text className="text-[#008cff] font-semibold underline -mb-1">
+                  Privacy Policy
+                </Text>
+              </TouchableOpacity>
+            </Text>
+          </View>
+        </View>
 
         {/* Signup Button */}
         <TouchableOpacity
@@ -259,7 +351,8 @@ export default function SignupScreen() {
             </Text>
           </TouchableOpacity>
         </Text>
+        </ScrollView>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,11 @@ import {
   Image,
   Alert,
   Modal,
-  ActivityIndicator
+  ActivityIndicator,
+  ScrollView,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 import { router } from "expo-router";
 
@@ -20,11 +24,29 @@ export default function RequestForgotPassword() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Refs for auto-scroll and focus
+  const scrollViewRef = useRef<ScrollView>(null);
+  const emailRef = useRef<TextInput>(null);
+
+  // Auto-scroll function
+  const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
+    setTimeout(() => {
+      if (inputRef.current && scrollViewRef.current) {
+        inputRef.current.measure((x, y, width, height, pageX, pageY) => {
+          scrollViewRef.current?.scrollTo({
+            y: pageY - 150, // Offset to show input clearly above keyboard
+            animated: true,
+          });
+        });
+      }
+    }, 100);
+  };
+
   const handleRequest = async () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://printbot.navstream.in/request_forgot_password_api.php",
+        "https://printbot.cloud/api/v1/request_forgot_password_api.php",
         {
           method: "POST",
           headers: {
@@ -77,37 +99,45 @@ export default function RequestForgotPassword() {
   };
 
   return (
-    <View className={`bg-[#008cff] flex-1`}>
-      <Modal transparent={true} visible={loading}>
-        <View className="flex-1 justify-center items-center bg-black/50">
-          <ActivityIndicator size="large" color="#fff" />
+    <KeyboardAvoidingView 
+      className="flex-1" 
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View className={`bg-[#008cff] flex-1`}>
+        <Modal transparent={true} visible={loading}>
+          <View className="flex-1 justify-center items-center bg-black/50">
+            <ActivityIndicator size="large" color="#fff" />
+          </View>
+        </Modal>
+        {/* Header */}
+        <View className="h-56 px-6 pt-12">
+          <View className="flex items-center mt-6">
+            <Image
+              source={require("../../assets/images/icon-black.png")}
+              style={{ width: 100, height: 100 }}
+              resizeMode="contain"
+            />
+            <Text className="font-bold text-3xl text-white">Printbot</Text>
+          </View>
         </View>
-      </Modal>
-      {/* Header */}
-      <View className="h-56 px-6 pt-12">
-        <View className="flex items-center mt-6">
-          <Image
-            source={require("../../assets/images/icon-black.png")}
-            style={{ width: 100, height: 100 }}
-            resizeMode="contain"
-          />
-          <Text className="font-bold text-3xl text-white">Printbot</Text>
-        </View>
-      </View>
 
-      {/* Forgot Password Box */}
-      <View
-        className={`flex-1 p-8 mt-4 rounded-t-[58] ${
-          isDark ? "bg-[#1a1a1a]" : "bg-white"
-        }`}
-      >
-        <Text
-          className={`text-[30px] font-bold text-center mb-14 ${
-            isDark ? "text-white" : "text-black"
+        {/* Forgot Password Box */}
+        <ScrollView
+          ref={scrollViewRef}
+          className={`flex-1 rounded-t-[58] ${
+            isDark ? "bg-[#1a1a1a]" : "bg-white"
           }`}
+          contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 16 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          Reset Password
-        </Text>
+          <Text
+            className={`text-[30px] font-bold text-center mb-14 ${
+              isDark ? "text-white" : "text-black"
+            }`}
+          >
+            Reset Password
+          </Text>
 
         {/* Error Message */}
         {errorMessage !== "" && (
@@ -116,6 +146,7 @@ export default function RequestForgotPassword() {
 
         {/* Email Input */}
         <TextInput
+          ref={emailRef}
           className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
             isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
           }`}
@@ -127,7 +158,10 @@ export default function RequestForgotPassword() {
           textContentType="emailAddress"
           autoComplete="email"
           keyboardType="email-address"
+          returnKeyType="done"
           onChangeText={setEmail}
+          onFocus={() => scrollToInput(emailRef)}
+          onSubmitEditing={() => Keyboard.dismiss()}
         />
 
         {/* Submit Button */}
@@ -146,18 +180,19 @@ export default function RequestForgotPassword() {
             isDark ? "text-gray-300" : "text-gray-500"
           }`}
         >
-          Don’t have an account?{" "}
+          Back to{" "}
           <TouchableOpacity onPress={handleLogin}>
             <Text
               className={`text-[16px] font-bold -mb-1 ${
                 isDark ? "text-white" : "text-black"
               }`}
             >
-              Sign up
+              Login
             </Text>
           </TouchableOpacity>
         </Text>
+        </ScrollView>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

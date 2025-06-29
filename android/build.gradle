@@ -13,6 +13,10 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        // PhonePe SDK repository for buildscript
+        maven { 
+            url 'https://phonepe.mycloudrepo.io/public/repositories/phonepe-intentsdk-android'
+        }
     }
     dependencies {
         classpath('com.android.tools.build:gradle')
@@ -37,5 +41,9 @@ allprojects {
         google()
         mavenCentral()
         maven { url 'https://www.jitpack.io' }
+        // PhonePe SDK repository
+        maven { 
+            url 'https://phonepe.mycloudrepo.io/public/repositories/phonepe-intentsdk-android'
+        }
     }
 }

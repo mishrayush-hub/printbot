@@ -42,7 +42,7 @@ export default function Cart() {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://printbot.navstream.in/request_change_password_api.php",
+        "https://printbot.cloud/api/v1/request_change_password_api.php",
         {
           method: "POST",
           headers: {
@@ -104,7 +104,7 @@ export default function Cart() {
     sendData.user_id = uid;
 
     const response = await fetch(
-      "https://printbot.navstream.in/update_profile_api.php",
+      "https://printbot.cloud/api/v1/update_profile_api.php",
       {
         method: "POST",
         headers: {
@@ -143,7 +143,7 @@ export default function Cart() {
     try {
       setDeleteLoading(true);
       const response = await fetch(
-        "https://printbot.navstream.in/request_delete_account_api.php",
+        "https://printbot.cloud/api/v1/request_delete_account_api.php",
         {
           method: "POST",
           headers: {
@@ -446,6 +446,45 @@ export default function Cart() {
               Change Password
             </Text>
           </TouchableOpacity>
+        )}
+
+        {/* Legal Documents */}
+        {!editProfile && (
+          <View className="mt-6">
+            <TouchableOpacity
+              className={`flex-row items-center justify-start py-[15px] px-5 rounded-xl mb-3 ${
+                isDark ? "bg-[#1f2937]" : "bg-[#f3f4f6]"
+              }`}
+              onPress={() => router.push("/(legal)/privacy-policy")}
+            >
+              <MaterialIcons
+                name="privacy-tip"
+                size={24}
+                color={isDark ? "#60a5fa" : "#3b82f6"}
+                style={{ marginRight: 10 }}
+              />
+              <Text className={`font-semibold text-xl ${isDark ? "text-white" : "text-black"}`}>
+                Privacy Policy
+              </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              className={`flex-row items-center justify-start py-[15px] px-5 rounded-xl ${
+                isDark ? "bg-[#1f2937]" : "bg-[#f3f4f6]"
+              }`}
+              onPress={() => router.push("/(legal)/terms-and-conditions")}
+            >
+              <MaterialIcons
+                name="description"
+                size={24}
+                color={isDark ? "#60a5fa" : "#3b82f6"}
+                style={{ marginRight: 10 }}
+              />
+              <Text className={`font-semibold text-xl ${isDark ? "text-white" : "text-black"}`}>
+                Terms & Conditions
+              </Text>
+            </TouchableOpacity>
+          </View>
         )}
 
         {/* Delete Account */}

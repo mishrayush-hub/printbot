@@ -56,7 +56,7 @@ export default function HomeScreen() {
 
   const generateMagicCode = async (orderId: string, cost: string) => {
   try {
-    const response = await fetch("https://printbot.navstream.in/callback_api.php", {
+    const response = await fetch("https://printbot.cloud/api/v1/callback_api.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -239,7 +239,7 @@ export default function HomeScreen() {
       type: file.type || "application/pdf",
     } as any);
 
-    const response = await fetch("https://printbot.navstream.in/file_upload_api.php", {
+    const response = await fetch("https://printbot.cloud/api/v1/file_upload_api.php", {
       method: "POST",
       headers: {
         "Content-Type": "multipart/form-data",

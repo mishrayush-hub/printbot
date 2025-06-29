@@ -64,7 +64,7 @@ export default function VerifyForgotPassword() {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://printbot.navstream.in/verify_forgot_password_api.php",
+        "https://printbot.cloud/api/v1/verify_forgot_password_api.php",
         {
           method: "POST",
           headers: {

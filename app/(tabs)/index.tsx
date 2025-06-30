@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, FlatList, Alert, useColorScheme, Clipboard, Platform } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Alert, useColorScheme, Clipboard, Platform } from "react-native";
 import { Upload } from "lucide-react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
@@ -169,7 +169,7 @@ export default function HomeScreen() {
       });
 
     const txnId = generateTransactionId();
-    const amount = (returnedPageCount * 2) * 100; // e.g. ₹2 per page → in paisa
+    const amount = (uploadedFiles.reduce((sum, file) => sum + file.price, 0)) * 100; // Convert to paisa
 
     const requestBody = {
       merchantId: merchantId,
@@ -201,7 +201,7 @@ export default function HomeScreen() {
     if (result.success) {
       console.log("Payment Success:", result);
       setPaid(true);
-      generateMagicCode(txnId, (returnedPageCount * 2).toString());
+      generateMagicCode(txnId, uploadedFiles.reduce((sum, file) => sum + file.price, 0).toString());
     } else {
       console.error("Payment Failed:", result);
       Alert.alert("Payment Failed", result.message || "Payment did not complete.");
@@ -289,6 +289,28 @@ export default function HomeScreen() {
     }
   };
 
+  // Function to calculate tiered pricing
+  const calculatePrice = (pageCount: number) => {
+    if (pageCount < 10) {
+      return pageCount * 4; // ₹4 per page for less than 10 pages
+    } else if (pageCount >= 10 && pageCount <= 50) {
+      return pageCount * 3; // ₹3 per page for 10-50 pages
+    } else {
+      return pageCount * 2; // ₹2 per page for 50+ pages
+    }
+  };
+
+  // Function to get price per page based on tier
+  const getPricePerPage = (pageCount: number) => {
+    if (pageCount < 10) {
+      return 4;
+    } else if (pageCount >= 10 && pageCount <= 50) {
+      return 3;
+    } else {
+      return 2;
+    }
+  };
+
   // File Upload Handler
   const handleFileUpload = async () => {
     try {
@@ -310,7 +332,7 @@ export default function HomeScreen() {
 
         if (fileType === "application/pdf") {
           pageCount = await getPdfPageCount(file.uri);
-          price = pageCount * 2;
+          price = calculatePrice(pageCount); // Use tiered pricing
         } else if (fileType === "image/jpeg") {
           price = 10;
         } else {
@@ -343,126 +365,230 @@ export default function HomeScreen() {
   const cardBg = isDarkMode ? "bg-neutral-900 border-gray-700" : "bg-neutral-100 border-gray-300";
 
   return (
-    <View className={`flex-1 pb-[50px] ${bgColor}`}>
-      <View
-        className={`border border-dashed ${
-          isDarkMode ? "border-gray-500" : "border-gray-400"
-        } rounded-lg mt-8 p-6 py-14 gap-3 flex items-center justify-center mx-4`}
-      >
-        <Upload color="#38b6ff" size={60} />
-        <Text className={`font-semibold text-3xl mt-2 ${textColor}`}>Drop your files to print</Text>
-        <TouchableOpacity
-          className={`mt-4 border ${
-            isDarkMode ? "border-gray-400" : "border-gray-600"
-          } px-4 py-2 rounded-full`}
-          onPress={handleFileUpload}
-        >
-          <Text className={`text-2xl ${textColor}`}>Select files</Text>
-        </TouchableOpacity>
-      </View>
+    <View className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        {/* Upload Documents Section - Matching Web */}
+        <View className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+          <Text className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+            Upload Documents
+          </Text>
+          <Text className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            Upload and manage your documents for printing
+          </Text>
+          
+          {/* Pricing Info */}
+          <View className={`mb-4 p-3 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-blue-50'} border ${isDarkMode ? 'border-gray-600' : 'border-blue-200'}`}>
+            <Text className={`text-xs font-medium mb-1 ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>
+              Tiered Pricing:
+            </Text>
+            <Text className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              • Less than 10 pages: ₹4/page  • 10-50 pages: ₹3/page  • 50+ pages: ₹2/page
+            </Text>
+          </View>
+          
+          {/* Upload Area - Web Style */}
+          <View className={`border-2 border-dashed ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} rounded-lg p-6 items-center justify-center ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+            <Upload size={40} color={isDarkMode ? '#60a5fa' : '#3b82f6'} />
+            <Text className={`text-base font-medium mt-3 mb-1 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+              Drop files here or click to browse
+            </Text>
+            <Text className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              Supports PDF up to 50MB
+            </Text>
+            <TouchableOpacity
+              className="bg-blue-500 px-6 py-2 rounded-lg"
+              onPress={handleFileUpload}
+            >
+              <Text className="text-white font-medium">Select Files</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
-      {/* Uploaded Files List */}
-      {uploadedFiles.length > 0 && (
-        <FlatList
-          data={uploadedFiles}
-          contentContainerStyle={{ paddingBottom: 50 }}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={({ item, index }) => {
-            const handleCopiesChange = (delta: number) => {
-              setUploadedFiles((prev) =>
-                prev.map((file, i) =>
-                  i === index
-                    ? {
-                        ...file,
-                        copies: Math.max(1, (file.copies || 1) + delta),
-                      }
-                    : file
-                )
-              );
-            };
-
-            const copies = 1;
-            const totalPrice = item.price * copies;
-
-            return (
-              <View className={`${cardBg} px-5 py-3 rounded-lg mt-2 mx-4 border shadow-md`}>
-                <View className="flex-row justify-between items-center">
-                  <Text className={`${textColor} max-w-[300px] text-2xl font-bold`}>
-                    {item.fileName.length > 20
-                      ? `${item.fileName.substring(0, 17)}...${item.fileType}`
-                      : item.fileName}
+        <View className="px-4 pt-4">
+          {/* Quick Stats - Web Style */}
+          <View className="mb-4">
+            <View className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+              <Text className={`text-lg font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                Quick Stats
+              </Text>
+              <View className="space-y-2">
+                <View className="flex-row justify-between">
+                  <Text className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Total Files</Text>
+                  <Text className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                    {uploadedFiles.length}
                   </Text>
-                  <Text className="text-[#38b6ff] font-semibold text-2xl">₹{totalPrice}</Text>
                 </View>
-
-                {item.fileType === "application/pdf" && (
-                  <Text className={`${secondaryTextColor} text-lg mt-1`}>Pages: {item.pages}</Text>
-                )}
-
-                {/* Copies Selector and Print Button */}
-                <View className="flex-row items-center justify-end mt-3 space-x-4">
-                  {/* <View className="flex-row items-center border rounded-full px-3 py-1">
-                    <TouchableOpacity onPress={() => handleCopiesChange(-1)} className="px-2">
-                      <Text className={`text-2xl ${textColor}`}>−</Text>
-                    </TouchableOpacity>
-                    <Text className={`text-lg px-2 ${textColor}`}>{copies} {copies > 1 ? "copies" : "copy"}</Text>
-                    <TouchableOpacity onPress={() => handleCopiesChange(1)} className="px-2">
-                      <Text className={`text-2xl ${textColor}`}>＋</Text>
-                    </TouchableOpacity>
-                  </View> */}
-
-                  <TouchableOpacity
-                    className="bg-[#38b6ff] px-6 py-2 rounded-full"
-                    onPress={() => {
-                      if (!uploaded && !paid) {
-                        Alert.alert(
-                          "Confirm Upload",
-                          "Are you sure you want to upload the file to the cloud?",
-                          [
-                            {
-                              text: "Cancel",
-                              style: "cancel",
-                            },
-                            {
-                              text: "Upload Now",
-                              onPress: () => {
-                                handleFileToCloud();
-                              },
-                            },
-                          ],
-                          { cancelable: true }
-                        );
-                      } else if (uploaded && !paid) {
-                        Alert.alert(
-                          "Confirm Payment",
-                          "You have already uploaded this file. Do you want to pay for printing?",
-                          [
-                            {
-                              text: "Cancel",
-                              style: "cancel",
-                            },
-                            {
-                              text: "Pay Now",
-                              onPress: () => {
-                                paymentHandler();
-                              },
-                            },
-                          ],
-                          { cancelable: true }
-                        );
-                      }
-                    }}
-                  >
-                    <Text className="text-white font-bold text-lg">
-                      {!uploaded && !paid ? "Upload to Cloud" : "Pay to Print"}
-                      </Text>
-                  </TouchableOpacity>
+                <View className="flex-row justify-between">
+                  <Text className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Verified</Text>
+                  <Text className={`font-semibold ${uploaded ? 'text-green-600' : isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                    {uploaded ? uploadedFiles.length : 0}
+                  </Text>
+                </View>
+                <View className="flex-row justify-between">
+                  <Text className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Paid</Text>
+                  <Text className={`font-semibold ${paid ? 'text-green-600' : isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                    {paid ? uploadedFiles.length : 0}
+                  </Text>
+                </View>
+                <View className="flex-row justify-between">
+                  <Text className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Processing</Text>
+                  <Text className={`font-semibold text-blue-600`}>
+                    {loading ? 1 : 0}
+                  </Text>
+                </View>
+                <View className="flex-row justify-between">
+                  <Text className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Errors</Text>
+                  <Text className="font-semibold text-red-600">0</Text>
                 </View>
               </View>
-            );
-          }}
-        />
-      )}
+            </View>
+          </View>
+
+          {/* Payment Summary - Web Style */}
+          {uploadedFiles.length > 0 && (
+            <View className="mb-4">
+              <View className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                <Text className={`text-lg font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                  Payment Summary
+                </Text>
+                <View className="flex-row justify-between items-center mb-4">
+                  <Text className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Total</Text>
+                  <Text className="text-lg font-bold text-green-600">
+                    ₹{uploadedFiles.reduce((sum, file) => sum + file.price, 0).toFixed(2)}
+                  </Text>
+                </View>
+                
+                <View className="border-t border-gray-200 dark:border-gray-700 pt-3">
+                  <Text className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Price Breakdown
+                  </Text>
+                  {uploadedFiles.map((file, index) => (
+                    <View key={index} className="flex-row justify-between py-1">
+                      <Text className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {file.pages || 1} pages × ₹{getPricePerPage(file.pages || 1)}/page
+                      </Text>
+                      <Text className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                        ₹{file.price.toFixed(2)}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+                
+                {uploadedFiles.length > 0 && uploaded && !paid && (
+                  <TouchableOpacity
+                    className="bg-blue-500 py-3 px-4 rounded-lg mt-4 items-center"
+                    onPress={paymentHandler}
+                  >
+                    <Text className="text-white font-medium">
+                      💳 Proceed to Payment
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          )}
+
+          {/* Uploaded Files Section - Web Style */}
+          {uploadedFiles.length > 0 && (
+            <View className="mb-4">
+              <Text className={`text-lg font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                Uploaded Files
+              </Text>
+              
+              {/* Uploaded Files List */}
+              {uploadedFiles.map((item, index) => {
+                const totalPrice = item.price;
+
+                return (
+                  <View key={index} className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4 rounded-lg mb-3 border`}>
+                    {/* File Header - Web Style */}
+                    <View className="flex-row items-start justify-between mb-3">
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded items-center justify-center mr-3">
+                          <Text className="text-blue-600 text-sm font-bold">📄</Text>
+                        </View>
+                        <View className="flex-1">
+                          <Text className={`font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-600'} ${item.fileName.length > 25 ? 'text-sm' : 'text-base'}`} numberOfLines={1}>
+                            {item.fileName}
+                          </Text>
+                          <Text className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            {(item.fileSize / 1024).toFixed(0)} KB
+                          </Text>
+                        </View>
+                      </View>
+                      
+                      {/* Status Badge */}
+                      <View className={`px-2 py-1 rounded-full ${
+                        paid ? 'bg-green-100 dark:bg-green-900' : 
+                        uploaded ? 'bg-blue-100 dark:bg-blue-900' : 
+                        'bg-yellow-100 dark:bg-yellow-900'
+                      }`}>
+                        <Text className={`text-xs font-medium ${
+                          paid ? 'text-green-700 dark:text-green-300' : 
+                          uploaded ? 'text-blue-700 dark:text-blue-300' : 
+                          'text-yellow-700 dark:text-yellow-300'
+                        }`}>
+                          {paid ? 'Paid' : uploaded ? 'Verified' : 'Pending'}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* File Details */}
+                    <View className="flex-row justify-between items-center mb-3">
+                      <Text className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Pages: {item.pages || 1}
+                      </Text>
+                      <Text className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                        ₹ {totalPrice.toFixed(2)}
+                      </Text>
+                    </View>
+
+                    {/* Action Buttons */}
+                    <View className="flex-row justify-end">
+                      {!uploaded && !paid && (
+                        <TouchableOpacity
+                          className="bg-blue-500 px-4 py-2 rounded-lg"
+                          onPress={() => {
+                            Alert.alert(
+                              "Upload File",
+                              `Upload ${item.fileName} to cloud?`,
+                              [
+                                { text: "Cancel", style: "cancel" },
+                                { text: "Upload", onPress: () => handleFileToCloud() }
+                              ]
+                            );
+                          }}
+                        >
+                          <Text className="text-white text-sm font-medium">Upload</Text>
+                        </TouchableOpacity>
+                      )}
+                      
+                      {uploaded && !paid && (
+                        <View className="bg-blue-100 dark:bg-blue-900 px-4 py-2 rounded-lg">
+                          <Text className={`text-sm text-blue-700 dark:text-blue-300`}>
+                            Ready for Payment
+                          </Text>
+                        </View>
+                      )}
+                      
+                      {paid && (
+                        <View className="bg-green-100 dark:bg-green-900 px-4 py-2 rounded-lg">
+                          <Text className={`text-sm text-green-700 dark:text-green-300`}>
+                            Completed ✓
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+        </View>
+        
+        {/* Bottom padding for tab bar */}
+        <View className="h-20" />
+      </ScrollView>
     </View>
   );
 }

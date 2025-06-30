@@ -6,13 +6,16 @@ import {
   FlatList,
   Alert,
   ActivityIndicator,
-  useColorScheme
+  useColorScheme,
+  TextInput,
+  ScrollView
 } from "react-native";
-import { ShoppingCart } from "lucide-react-native";
+import { ShoppingCart, Search, RefreshCw, Filter, FileText, Calendar, DollarSign } from "lucide-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function OrdersScreen() {
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState<any[]>([]);
+  const [filteredFiles, setFilteredFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -21,14 +24,40 @@ export default function OrdersScreen() {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userPhone, setUserPhone] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [showFilters, setShowFilters] = useState(false);
 
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
   const textColor = isDark ? "text-white" : "text-black";
   const cardBg = isDark ? "bg-gray-800" : "bg-white";
-  const borderColor = isDark ? "border-gray-700" : "border-gray-300";
+  const borderColor = isDark ? "border-gray-700" : "border-gray-200";
   const subText = isDark ? "text-gray-400" : "text-gray-600";
+  const bgColor = isDark ? "bg-gray-900" : "bg-gray-50";
+
+  // Function to calculate tiered pricing
+  const calculatePrice = (pageCount: number) => {
+    if (pageCount < 10) {
+      return pageCount * 4; // ₹4 per page for less than 10 pages
+    } else if (pageCount >= 10 && pageCount <= 50) {
+      return pageCount * 3; // ₹3 per page for 10-50 pages
+    } else {
+      return pageCount * 2; // ₹2 per page for 50+ pages
+    }
+  };
+
+  // Function to get price per page based on tier
+  const getPricePerPage = (pageCount: number) => {
+    if (pageCount < 10) {
+      return 4;
+    } else if (pageCount >= 10 && pageCount <= 50) {
+      return 3;
+    } else {
+      return 2;
+    }
+  };
 
   useEffect(() => {
     const getTokenDetails = async () => {
@@ -100,90 +129,236 @@ export default function OrdersScreen() {
     }
   }, [authToken, userId, loadOrders]);
 
+  // Filter files based on search and status
+  useEffect(() => {
+    let filtered = files;
+    
+    if (searchQuery) {
+      filtered = filtered.filter((file: any) => 
+        file.file_name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    if (statusFilter !== "All") {
+      filtered = filtered.filter((file: any) => {
+        if (statusFilter === "Paid") return file.payment_success;
+        if (statusFilter === "Pending") return !file.payment_success;
+        if (statusFilter === "Processing") return !file.payment_success && file.magic_code !== "N/A";
+        return true;
+      });
+    }
+    
+    setFilteredFiles(filtered);
+  }, [files, searchQuery, statusFilter]);
+
+  const getStatusBadge = (file: any) => {
+    if (file.payment_success) {
+      return (
+        <View className="bg-green-100 px-3 py-1 rounded-full">
+          <Text className="text-green-800 font-semibold text-xs">Paid</Text>
+        </View>
+      );
+    } else if (file.magic_code !== "N/A") {
+      return (
+        <View className="bg-yellow-100 px-3 py-1 rounded-full">
+          <Text className="text-yellow-800 font-semibold text-xs">Processing</Text>
+        </View>
+      );
+    } else {
+      return (
+        <View className="bg-red-100 px-3 py-1 rounded-full">
+          <Text className="text-red-800 font-semibold text-xs">Pending</Text>
+        </View>
+      );
+    }
+  };
+
   const renderItem = (item: any) => (
     <View
-      className={`${cardBg} p-5 w-full rounded-lg mb-4 border ${borderColor} shadow-sm`}
+      className={`${cardBg} p-4 w-full rounded-lg mb-3 border ${borderColor} shadow-sm`}
     >
-      <View className="flex-row justify-between items-center">
-        <Text className={`${textColor} max-w-[300px] text-lg font-bold`}>
-          {item.file_name.split(".")[0].split("_").join(" ")}
-        </Text>
-        <Text className="text-[#008cff] font-semibold text-lg">
-          ₹{item.page_count * 3}
-        </Text>
+      {/* Header with file icon and name */}
+      <View className="flex-row items-start justify-between mb-3">
+        <View className="flex-row items-center flex-1">
+          <View className="bg-blue-100 p-2 rounded-lg mr-3">
+            <FileText color="#3B82F6" size={20} />
+          </View>
+          <View className="flex-1">
+            <Text className={`${textColor} text-base font-semibold`} numberOfLines={2}>
+              {item.file_name.replace(/\.[^/.]+$/, "")}
+            </Text>
+            <Text className={`${subText} text-xs mt-1`}>
+              PDF Document
+            </Text>
+          </View>
+        </View>
+        {getStatusBadge(item)}
       </View>
-      <Text className={`${subText} text-sm mb-2`}>
-        Pages: {item.page_count}
-      </Text>
-      <Text className={`${textColor} text-sm`}>
-        Uploaded Date: {new Date(item.uploaded_date).toLocaleDateString()}
-      </Text>
-      <Text className={`${textColor} text-sm`}>
-        Payment: {item.payment_success ? "Payment Complete" : "Pending"}
-      </Text>
-      <Text className={`${textColor} text-sm`}>
-        Payment ID: {item.payment_id}
-      </Text>
-      <View className="flex-row items-center justify-between mt-3">
-        <Text className={`${textColor} text-sm`}>
-          Printed: {item.printed ? "Yes" : "No"}
-        </Text>
-        {!item.printed &&
-          !item.payment_success &&
-          item.magic_code !== "N/A" && (
-            <>
-              <Text className={`${textColor} text-lg font-semibold`}>
-                OTP: {item.magic_code}
-              </Text>
-              <TouchableOpacity
-                className="bg-[#008cff] px-4 py-2 rounded-full"
-                onPress={() =>
-                  Alert.alert("Copied", `OTP ${item.magic_code} copied!`)
-                }
-              >
-                <Text className="text-white font-bold">Pay to Print</Text>
-              </TouchableOpacity>
-            </>
-          )}
+
+      {/* File details */}
+      <View className="flex-row justify-between items-center mb-3">
+        <View className="flex-row items-center">
+          <Calendar color={isDark ? "#9CA3AF" : "#6B7280"} size={16} />
+          <Text className={`${subText} text-sm ml-2`}>
+            {new Date(item.uploaded_date).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            })}
+          </Text>
+        </View>
+        
+        <View className="flex-row items-center">
+          <Text className={`${subText} text-sm`}>
+            {item.page_count} pages @ ₹{getPricePerPage(item.page_count)}/page
+          </Text>
+        </View>
+      </View>
+
+      {/* Price and action */}
+      <View className="flex-row justify-between items-center">
+        <View className="flex-row items-center">
+          {/* <DollarSign color="#10B981" size={16} /> */}
+          <Text className="text-green-600 font-bold text-lg ml-1">
+            ₹{calculatePrice(item.page_count)}
+          </Text>
+        </View>
+
+        {!item.payment_success && (
+          <TouchableOpacity
+            className="bg-blue-500 px-4 py-2 rounded-lg"
+            onPress={() => Alert.alert("Payment", `Pay ₹${calculatePrice(item.page_count)} for ${item.file_name}`)}
+          >
+            <Text className="text-white font-semibold text-sm">Pay Now</Text>
+          </TouchableOpacity>
+        )}
+
+        {item.payment_success && item.magic_code !== "N/A" && (
+          <View className="bg-gray-100 px-3 py-2 rounded-lg">
+            <Text className="text-gray-800 font-mono text-sm">
+              Code: {item.magic_code}
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );
 
   return (
-    <View className="flex-1 px-2 pb-20 w-full">
-      {loading ? (
-        <View className="flex-1 justify-center items-center mt-20">
-          <ActivityIndicator size="large" color="#008cff" />
+    <View className={`flex-1 ${bgColor}`}>
+      {/* Search and Filter Header */}
+      <View className={`${cardBg} px-4 py-4 border-b ${borderColor}`}>
+        {/* Search Bar */}
+        <View className="flex-row items-center mb-4" style={{ gap: 12 }}>
+          <View className={`flex-1 flex-row items-center ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg px-3 py-3`}>
+            <Search color={isDark ? "#9CA3AF" : "#6B7280"} size={20} />
+            <TextInput
+              placeholder="Search files..."
+              placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              className={`flex-1 ml-3 ${textColor} text-base`}
+            />
+          </View>
+          
+          <TouchableOpacity
+            onPress={() => {
+              setRefreshing(true);
+              loadOrders();
+            }}
+            className={`p-3 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+          >
+            <RefreshCw color={isDark ? "#9CA3AF" : "#6B7280"} size={20} />
+          </TouchableOpacity>
         </View>
-      ) : errorMessage ? (
-        <View className="flex-1 justify-center items-center mt-20">
-          <Text className={`${subText} text-center text-lg`}>
-            {errorMessage}
+
+        {/* Filter Buttons */}
+        <View className="flex-row items-center mt-1">
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            className="flex-1"
+            contentContainerStyle={{ paddingRight: 12 }}
+          >
+            <View className="flex-row" style={{ gap: 8 }}>
+              {["All", "Paid", "Processing", "Pending"].map((status) => (
+                <TouchableOpacity
+                  key={status}
+                  onPress={() => setStatusFilter(status)}
+                  className={`px-4 py-2 rounded-full min-w-[80px] items-center ${
+                    statusFilter === status
+                      ? "bg-blue-500"
+                      : isDark ? "bg-gray-700" : "bg-gray-200"
+                  }`}
+                >
+                  <Text
+                    className={`font-medium text-sm ${
+                      statusFilter === status
+                        ? "text-white"
+                        : isDark ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    {status}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+
+        {/* Results Count */}
+        <View className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+          <Text className={`${subText} text-sm`}>
+            {filteredFiles.length} of {files.length} files
           </Text>
         </View>
-      ) : files.length === 0 ? (
-        <View className="flex-1 justify-center items-center mt-20">
-          <ShoppingCart color={isDark ? "gray" : "darkgray"} size={80} />
-          <Text className={`${subText} text-2xl mt-4`}>No Orders</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={files}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(item: any) => item.id}
-          renderItem={({ item }) => renderItem(item)}
-          refreshing={refreshing}
-          onRefresh={() => {
-            setRefreshing(true);
-            loadOrders();
-          }}
-          contentContainerStyle={{
-            paddingBottom: 10,
-            paddingHorizontal: 5,
-            marginTop: 15
-          }}
-        />
-      )}
+      </View>
+
+      {/* Content */}
+      <View className="flex-1 px-4">
+        {loading ? (
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#3B82F6" />
+            <Text className={`${subText} mt-2`}>Loading files...</Text>
+          </View>
+        ) : errorMessage ? (
+          <View className="flex-1 justify-center items-center">
+            <Text className={`${subText} text-center text-lg`}>
+              {errorMessage}
+            </Text>
+          </View>
+        ) : filteredFiles.length === 0 ? (
+          <View className="flex-1 justify-center items-center">
+            <View className="bg-gray-100 p-8 rounded-full mb-4">
+              <ShoppingCart color={isDark ? "#9CA3AF" : "#6B7280"} size={64} />
+            </View>
+            <Text className={`${textColor} text-xl font-semibold mb-2`}>
+              {files.length === 0 ? "No Files Uploaded" : "No Results Found"}
+            </Text>
+            <Text className={`${subText} text-center`}>
+              {files.length === 0
+                ? "Upload your first document to get started"
+                : "Try adjusting your search or filters"}
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            data={filteredFiles}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={(item: any) => item.id}
+            renderItem={({ item }) => renderItem(item)}
+            refreshing={refreshing}
+            onRefresh={() => {
+              setRefreshing(true);
+              loadOrders();
+            }}
+            contentContainerStyle={{
+              paddingVertical: 16,
+              paddingBottom: 100
+            }}
+          />
+        )}
+      </View>
     </View>
   );
 }

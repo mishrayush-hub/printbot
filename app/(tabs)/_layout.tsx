@@ -27,9 +27,9 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: true,
-        headerStyle: {
-            height: 100,
-          },
+        // headerStyle: {
+        //     height: 85,
+        //   },
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarActiveTintColor: theme.tint,
@@ -62,7 +62,7 @@ export default function TabLayout() {
           fontSize: 20,
           fontWeight: 'bold',
           color: colorScheme === 'dark' ? 'white' : 'black',
-          paddingBottom: 20,
+          paddingBottom: 0,
         },
         headerTintColor: 'white',
         tabBarLabelStyle: {
@@ -94,7 +94,7 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => <UserRoundCog size={26} color={color} />,
-          headerShown: false
+          headerShown: false,
         }}
       />
     </Tabs>

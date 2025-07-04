@@ -23,7 +23,10 @@ import {
   Calendar,
   DollarSign,
   FileText,
-  CheckCircle
+  CheckCircle,
+  Scale,
+  Truck,
+  RefreshCw
 } from "lucide-react-native";
 
 export default function ProfileScreen() {
@@ -274,7 +277,7 @@ export default function ProfileScreen() {
     <TouchableOpacity
       key={id}
       onPress={() => setActiveTab(id)}
-      className={`flex-1 flex-row items-center justify-center py-3 px-4 rounded-lg ${
+      className={`flex-row items-center justify-center py-3 px-4 rounded-lg min-w-[100px] ${
         activeTab === id ? "bg-blue-500" : isDark ? "bg-gray-700" : "bg-gray-100"
       }`}
     >
@@ -502,27 +505,104 @@ export default function ProfileScreen() {
     </View>
   );
 
+  const renderLegalTab = () => (
+    <View className="py-6 px-2">
+      <View className={`${cardBg} rounded-lg pt-6 pb-6 px-4 border ${borderColor} shadow-sm`}>
+        <Text className={`${textColor} text-xl font-bold mb-6`}>Legal Information</Text>
+        
+        <View className="space-y-4">
+          <TouchableOpacity
+            onPress={() => router.push("/(legal)/terms-and-conditions")}
+            className={`flex-row items-center justify-between p-4 mb-4 border ${borderColor} rounded-lg`}
+          >
+            <View className="flex-row items-center">
+              <Scale color={isDark ? "#9CA3AF" : "#6B7280"} size={24} />
+              <View className="ml-3">
+                <Text className={`${textColor} font-semibold`}>Terms and Conditions</Text>
+                <Text className={`${subText} text-sm`}>Read our terms of service</Text>
+              </View>
+            </View>
+            <Text className="text-blue-500 font-medium">View</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push("/(legal)/privacy-policy")}
+            className={`flex-row items-center justify-between p-4 mb-4 border ${borderColor} rounded-lg`}
+          >
+            <View className="flex-row items-center">
+              <FileText color={isDark ? "#9CA3AF" : "#6B7280"} size={24} />
+              <View className="ml-3">
+                <Text className={`${textColor} font-semibold`}>Privacy Policy</Text>
+                <Text className={`${subText} text-sm`}>Learn how we protect your data</Text>
+              </View>
+            </View>
+            <Text className="text-blue-500 font-medium">View</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push("/(legal)/shipping-policy")}
+            className={`flex-row items-center justify-between p-4 mb-4 border ${borderColor} rounded-lg`}
+          >
+            <View className="flex-row items-center">
+              <Truck color={isDark ? "#9CA3AF" : "#6B7280"} size={24} />
+              <View className="ml-3">
+                <Text className={`${textColor} font-semibold`}>Shipping Policy</Text>
+                <Text className={`${subText} text-sm`}>View our shipping information</Text>
+              </View>
+            </View>
+            <Text className="text-blue-500 font-medium">View</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push("/(legal)/return-refund-exchange-policy")}
+            className={`flex-row items-center justify-between p-4 border ${borderColor} rounded-lg`}
+          >
+            <View className="flex-row items-center">
+              <RefreshCw color={isDark ? "#9CA3AF" : "#6B7280"} size={24} />
+              <View className="ml-3">
+                <Text className={`${textColor} font-semibold`}>Return, Refund & Exchange Policy</Text>
+                <Text className={`${subText} text-sm`}>Learn about returns and refunds</Text>
+              </View>
+            </View>
+            <Text className="text-blue-500 font-medium">View</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <View className={`flex-1 ${bgColor}`}>
       {/* Tab Navigation */}
       <View className={`${cardBg} p-4 border-b ${borderColor}`}>
-        <View className="flex-row" style={{ gap: 8 }}>
-          {renderTabButton(
-            "profile",
-            "Profile",
-            <User color={activeTab === "profile" ? "white" : (isDark ? "#9CA3AF" : "#6B7280")} size={18} />
-          )}
-          {renderTabButton(
-            "payments",
-            "Payments",
-            <CreditCard color={activeTab === "payments" ? "white" : (isDark ? "#9CA3AF" : "#6B7280")} size={18} />
-          )}
-          {renderTabButton(
-            "security",
-            "Security",
-            <Shield color={activeTab === "security" ? "white" : (isDark ? "#9CA3AF" : "#6B7280")} size={18} />
-          )}
-        </View>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 0 }}
+        >
+          <View className="flex-row" style={{ gap: 8 }}>
+            {renderTabButton(
+              "profile",
+              "Profile",
+              <User color={activeTab === "profile" ? "white" : (isDark ? "#9CA3AF" : "#6B7280")} size={18} />
+            )}
+            {renderTabButton(
+              "payments",
+              "Payments",
+              <CreditCard color={activeTab === "payments" ? "white" : (isDark ? "#9CA3AF" : "#6B7280")} size={18} />
+            )}
+            {renderTabButton(
+              "security",
+              "Security",
+              <Shield color={activeTab === "security" ? "white" : (isDark ? "#9CA3AF" : "#6B7280")} size={18} />
+            )}
+            {renderTabButton(
+              "legal",
+              "Legal",
+              <Scale color={activeTab === "legal" ? "white" : (isDark ? "#9CA3AF" : "#6B7280")} size={18} />
+            )}
+          </View>
+        </ScrollView>
       </View>
 
       {/* Tab Content */}
@@ -547,6 +627,7 @@ export default function ProfileScreen() {
         {activeTab === "profile" && renderProfileTab()}
         {activeTab === "payments" && renderPaymentsTab()}
         {activeTab === "security" && renderSecurityTab()}
+        {activeTab === "legal" && renderLegalTab()}
       </ScrollView>
     </View>
   );

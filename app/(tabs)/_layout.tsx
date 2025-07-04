@@ -59,10 +59,9 @@ export default function TabLayout() {
           },
         }),
         headerTitleStyle: {
-          fontSize: 20,
+          fontSize: 24,
           fontWeight: 'bold',
           color: colorScheme === 'dark' ? 'white' : 'black',
-          paddingBottom: 0,
         },
         headerTintColor: 'white',
         tabBarLabelStyle: {
@@ -78,14 +77,21 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <ShoppingBag size={26} color={color} />,
           tabBarLabel: 'History', // 👈 shown in tab bar
           headerTitleAlign: 'center', // 👈 center the header title
+          headerStyle: {
+                backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+            },
+          headerShadowVisible: false, // 👈 remove header shadow
         }}
       />
       <Tabs.Screen
         name="index"
         options={{
-          headerTitle: `${userName} 👋`, // 👈 shown in header
+          headerTitle: `Dashboard`, // 👈 shown in header
           tabBarLabel: 'Home',     // 👈 shown in tab bar
           tabBarIcon: ({ color }) => <House size={26} color={color} />,
+          headerStyle: {
+                backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+            },
           headerTitleAlign: 'center', // 👈 center the header title
         }}
       />
@@ -94,7 +100,11 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => <UserRoundCog size={26} color={color} />,
+          headerStyle: {
+                backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+            },
           headerShown: false,
+          headerShadowVisible: false, // 👈 remove header shadow
         }}
       />
     </Tabs>

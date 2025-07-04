@@ -15,6 +15,7 @@ import {
   Platform
 } from "react-native";
 import { router } from "expo-router";
+import { ArrowLeft } from "lucide-react-native";
 
 export default function RequestForgotPassword() {
   const colorScheme = useColorScheme(); // 'light' or 'dark'
@@ -99,8 +100,8 @@ export default function RequestForgotPassword() {
   };
 
   return (
-    <KeyboardAvoidingView 
-      className="flex-1" 
+    <KeyboardAvoidingView
+      className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View className={`bg-[#008cff] flex-1`}>
@@ -124,74 +125,94 @@ export default function RequestForgotPassword() {
         {/* Forgot Password Box */}
         <ScrollView
           ref={scrollViewRef}
-          className={`flex-1 rounded-t-[58] ${
-            isDark ? "bg-[#1a1a1a]" : "bg-white"
-          }`}
+          className={`flex-1 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"
+            }`}
           contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 16 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
           <Text
-            className={`text-[30px] font-bold text-center mb-14 ${
-              isDark ? "text-white" : "text-black"
-            }`}
+            className={`text-[30px] font-bold text-center mb-14 ${isDark ? "text-white" : "text-black"
+              }`}
           >
             Reset Password
           </Text>
 
-        {/* Error Message */}
-        {errorMessage !== "" && (
-          <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
-        )}
+          {/* Error Message */}
+          {errorMessage !== "" && (
+            <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
+          )}
 
-        {/* Email Input */}
-        <TextInput
-          ref={emailRef}
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-          }`}
-          placeholder="Email"
-          placeholderTextColor={isDark ? "#aaa" : "#999"}
-          value={email}
-          autoCapitalize="none"
-          autoCorrect={false}
-          textContentType="emailAddress"
-          autoComplete="email"
-          keyboardType="email-address"
-          returnKeyType="done"
-          onChangeText={setEmail}
-          onFocus={() => scrollToInput(emailRef)}
-          onSubmitEditing={() => Keyboard.dismiss()}
-        />
-
-        {/* Submit Button */}
-        <TouchableOpacity
-          className="bg-[#008cff] w-[326px] h-[51px] rounded-full py-3"
-          onPress={handleRequest}
-        >
-          <Text className="text-white text-center text-2xl font-bold">
-            Submit
-          </Text>
-        </TouchableOpacity>
-
-        {/* Login Link */}
-        <Text
-          className={`text-center mt-4 text-[16px] ${
-            isDark ? "text-gray-300" : "text-gray-500"
-          }`}
-        >
-          Back to{" "}
-          <TouchableOpacity onPress={handleLogin}>
-            <Text
-              className={`text-[16px] font-bold -mb-1 ${
-                isDark ? "text-white" : "text-black"
+          {/* Email Input */}
+          <TextInput
+            ref={emailRef}
+            className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
               }`}
-            >
-              Login
+            placeholder="Email"
+            placeholderTextColor={isDark ? "#aaa" : "#999"}
+            value={email}
+            autoCapitalize="none"
+            autoCorrect={false}
+            textContentType="emailAddress"
+            autoComplete="email"
+            keyboardType="email-address"
+            returnKeyType="done"
+            onChangeText={setEmail}
+            onFocus={() => scrollToInput(emailRef)}
+            onSubmitEditing={() => Keyboard.dismiss()}
+          />
+
+          {/* Submit Button */}
+          <TouchableOpacity
+            className="bg-[#008cff] w-[326px] h-[51px] rounded-full py-3"
+            onPress={handleRequest}
+          >
+            <Text className="text-white text-center text-2xl font-bold">
+              Submit
             </Text>
           </TouchableOpacity>
-        </Text>
+
+          {/* Login Link */}
+          <Text
+            className={`${isDark ? "text-gray-300" : "text-gray-500"
+              } text-[16px] text-center mt-4`}
+          >
+            Remembered your password?{" "}
+            <TouchableOpacity onPress={handleLogin}>
+              <Text
+                className={`text-[16px] font-bold ${isDark ? "text-white" : "text-black"
+                  } -mb-[4px]`}
+              >
+                Login
+              </Text>
+            </TouchableOpacity>
+          </Text>
         </ScrollView>
+
+        {/* Privacy Policy and Terms Link - Fixed at bottom */}
+        <View className={`px-10 pb-8 pt-4 ${isDark ? "bg-[#1a1a1a]" : "bg-white"
+          }`}>
+          <Text
+            className={`${isDark ? "text-white" : "text-gray-500"
+              } text-[14px] text-center leading-6`}
+          >
+            By clicking the Login button, you agree to our{" "}
+            <Text
+              onPress={() => router.push("/(legal)/terms-and-conditions")}
+              className="text-blue-500"
+            >
+              Terms and Conditions
+            </Text>
+            {" "}and{" "}
+            <Text
+              onPress={() => router.push("/(legal)/privacy-policy")}
+              className="text-blue-500"
+            >
+              Privacy Policy
+            </Text>
+            .
+          </Text>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );

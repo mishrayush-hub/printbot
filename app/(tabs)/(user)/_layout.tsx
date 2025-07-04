@@ -10,7 +10,7 @@ export default function UserLayout() {
         screenOptions={{
             headerShown: true,
             headerTitleStyle: {
-                fontSize: 20,
+                fontSize: 24,
                 fontWeight: 'bold',
                 color: colorScheme === 'dark' ? 'white' : 'black',
             },
@@ -23,7 +23,8 @@ export default function UserLayout() {
             <Stack.Screen 
                 name="index" 
                 options={{ 
-                    title: "Profile",
+                    title: "Settings",
+                    headerShadowVisible: false, // Remove header shadow
                 }} 
             />
             <Stack.Screen 

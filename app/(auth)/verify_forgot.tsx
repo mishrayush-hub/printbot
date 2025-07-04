@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,11 @@ import {
   Image,
   Alert,
   Modal,
-  ActivityIndicator
+  ActivityIndicator,
+  ScrollView,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 
@@ -26,7 +30,27 @@ export default function VerifyForgotPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [loading, setLoading] = useState(false); // <-- Added
+  const [loading, setLoading] = useState(false);
+
+  // Refs for auto-scroll and focus
+  const scrollViewRef = useRef<ScrollView>(null);
+  const forgotTokenRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+  const confirmPasswordRef = useRef<TextInput>(null);
+
+  // Auto-scroll function
+  const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
+    setTimeout(() => {
+      if (inputRef.current && scrollViewRef.current) {
+        inputRef.current.measure((x, y, width, height, pageX, pageY) => {
+          scrollViewRef.current?.scrollTo({
+            y: pageY - 150, // Offset to show input clearly above keyboard
+            animated: true,
+          });
+        });
+      }
+    }, 100);
+  };
 
   const handleSignup = () => {
     if (!password || !confirmPassword || !forgotToken) {
@@ -124,37 +148,41 @@ export default function VerifyForgotPassword() {
   };
 
   return (
-    <View className={`bg-[#008cff] flex-1`}>
-      <Modal transparent={true} visible={loading}>
-        <View className="flex-1 justify-center items-center bg-black/50">
-          <ActivityIndicator size="large" color="#fff" />
+    <KeyboardAvoidingView 
+      className="flex-1" 
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View className={`bg-[#008cff] flex-1`}>
+        <Modal transparent={true} visible={loading}>
+          <View className="flex-1 justify-center items-center bg-black/50">
+            <ActivityIndicator size="large" color="#fff" />
+          </View>
+        </Modal>
+        {/* Header */}
+        <View className="h-56 px-6 pt-12">
+          <View className="flex items-center mt-6">
+            <Image
+              source={require("../../assets/images/icon-black.png")}
+              style={{ width: 100, height: 100 }}
+              resizeMode="contain"
+            />
+            <Text className={`font-bold text-3xl text-white`}>Printbot</Text>
+          </View>
         </View>
-      </Modal>
-      {/* Header */}
-      <View className="h-56 px-6 pt-12">
-        <View className="flex items-center mt-6">
-          <Image
-            source={require("../../assets/images/icon-black.png")}
-            style={{ width: 100, height: 100 }}
-            resizeMode="contain"
-          />
-          <Text className={`font-bold text-3xl text-white`}>Printbot</Text>
-        </View>
-      </View>
 
-      {/* Signup Form */}
-      <View
-        className={`flex-1 p-8 mt-4 rounded-t-[58] ${
-          isDark ? "bg-[#1a1a1a]" : "bg-white"
-        }`}
-      >
-        <Text
-          className={`text-[30px] font-bold text-center mb-6 ${
-            isDark ? "text-white" : "text-black"
-          }`}
+        {/* Reset Password Form */}
+        <ScrollView
+          ref={scrollViewRef}
+          className={`flex-1 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}
+          contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 16 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          Sign Up
-        </Text>
+          <Text
+            className={`text-[30px] font-bold text-center mb-14 ${isDark ? "text-white" : "text-black"}`}
+          >
+            Reset Password
+          </Text>
 
         {/* Error & Success Messages */}
         {errorMessage !== "" && (
@@ -166,42 +194,55 @@ export default function VerifyForgotPassword() {
           </Text>
         )}
 
-        {/* Mobile Input */}
+        {/* Reset Token Input */}
         <TextInput
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-          }`}
+          ref={forgotTokenRef}
+          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+            }`}
           placeholder="Reset Token"
           placeholderTextColor={isDark ? "#aaa" : "#999"}
           autoCapitalize="none"
           autoCorrect={false}
+          keyboardType="numeric"
+          returnKeyType="next"
           value={forgotToken}
           onChangeText={setForgotToken}
+          onFocus={() => scrollToInput(forgotTokenRef)}
+          onSubmitEditing={() => passwordRef.current?.focus()}
         />
 
         {/* Password Input */}
         <TextInput
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-          }`}
+          ref={passwordRef}
+          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+            }`}
           placeholder="Password"
           placeholderTextColor={isDark ? "#aaa" : "#999"}
           secureTextEntry
           autoCapitalize="none"
           autoCorrect={false}
+          textContentType="newPassword"
+          returnKeyType="next"
           value={password}
           onChangeText={setPassword}
+          onFocus={() => scrollToInput(passwordRef)}
+          onSubmitEditing={() => confirmPasswordRef.current?.focus()}
         />
         <TextInput
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-10 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-          }`}
+          ref={confirmPasswordRef}
+          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-10 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+            }`}
           placeholder="Confirm Password"
           placeholderTextColor={isDark ? "#aaa" : "#999"}
+          secureTextEntry
           autoCapitalize="none"
           autoCorrect={false}
+          textContentType="newPassword"
+          returnKeyType="done"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
+          onFocus={() => scrollToInput(confirmPasswordRef)}
+          onSubmitEditing={handleSignup}
         />
 
         {/* Signup Button */}
@@ -216,22 +257,46 @@ export default function VerifyForgotPassword() {
 
         {/* Login Link */}
         <Text
-          className={`${
-            isDark ? "text-gray-300" : "text-gray-500"
-          } text-[14px] text-center mt-4`}
+          className={`${isDark ? "text-gray-300" : "text-gray-500"
+            } text-[16px] text-center mt-4`}
         >
-          Go Back to{" "}
+          Remembered your password?{" "}
           <TouchableOpacity onPress={handleLogin}>
             <Text
-              className={`text-[16px] font-bold ${
-                isDark ? "text-white" : "text-black"
-              } -mb-[4px]`}
+              className={`text-[16px] font-bold ${isDark ? "text-white" : "text-black"
+                } -mb-[4px]`}
             >
               Login
             </Text>
           </TouchableOpacity>
         </Text>
+
+        {/* Privacy Policy and Terms Link - Fixed at bottom */}
+        </ScrollView>
+        <View className={`px-10 pb-8 pt-4 ${isDark ? "bg-[#1a1a1a]" : "bg-white"
+          }`}>
+          <Text
+            className={`${isDark ? "text-white" : "text-gray-500"
+              } text-[14px] text-center leading-6`}
+          >
+            By clicking the Login button, you agree to our{" "}
+            <Text
+              onPress={() => router.push("/(legal)/terms-and-conditions")}
+              className="text-blue-500"
+            >
+              Terms and Conditions
+            </Text>
+            {" "}and{" "}
+            <Text
+              onPress={() => router.push("/(legal)/privacy-policy")}
+              className="text-blue-500"
+            >
+              Privacy Policy
+            </Text>
+            .
+          </Text>
+        </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

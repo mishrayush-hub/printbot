@@ -338,7 +338,7 @@ export default function SignupScreen() {
         <Text
           className={`${
             isDark ? "text-gray-300" : "text-gray-500"
-          } text-[14px] text-center mt-4`}
+          } text-[16px] text-center mt-4`}
         >
           Already have an account?{" "}
           <TouchableOpacity onPress={handleLogin}>

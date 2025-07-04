@@ -43,6 +43,53 @@ export default function LegalLayout() {
             fontWeight: 'bold',
             color: colorScheme === 'dark' ? 'white' : 'black',
           },
+          headerStyle: {
+                backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+            },
+          headerLeft: () => {
+            return (
+              <TouchableOpacity onPress={() => router.back()}>
+                <ChevronLeft size={24} color={colorScheme === 'dark' ? '#fff' : '#000'} />
+              </TouchableOpacity>
+            );
+          }
+        }} 
+      />
+      <Stack.Screen 
+        name="shipping-policy" 
+        options={{ 
+          headerShown: true,
+          title: "Shipping Policy",
+          headerTitleStyle: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: colorScheme === 'dark' ? 'white' : 'black',
+          },
+          headerStyle: {
+                backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+            },
+          headerLeft: () => {
+            return (
+              <TouchableOpacity onPress={() => router.back()}>
+                <ChevronLeft size={24} color={colorScheme === 'dark' ? '#fff' : '#000'} />
+              </TouchableOpacity>
+            );
+          }
+        }} 
+      />
+      <Stack.Screen 
+        name="return-refund-exchange-policy" 
+        options={{ 
+          headerShown: true,
+          title: "Return, Refund & Exchange Policy",
+          headerTitleStyle: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: colorScheme === 'dark' ? 'white' : 'black',
+          },
+          headerStyle: {
+                backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+            },
           headerLeft: () => {
             return (
               <TouchableOpacity onPress={() => router.back()}>

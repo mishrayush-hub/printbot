@@ -233,6 +233,33 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
         </ScrollView>
+
+        {/* Privacy Policy and Terms Link - Fixed at bottom */}
+        <View className={`px-10 pb-8 pt-4 ${
+            isDark ? "bg-[#1a1a1a]" : "bg-white"
+          }`}>
+          <Text
+            className={`${
+              isDark ? "text-white" : "text-gray-500"
+            } text-[14px] text-center leading-6`}
+          >
+            By clicking the Login button, you agree to our{" "}
+            <Text 
+              onPress={() => router.push("/(legal)/terms-and-conditions")}
+              className="text-blue-500"
+            >
+              Terms and Conditions
+            </Text>
+            {" "}and{" "}
+            <Text 
+              onPress={() => router.push("/(legal)/privacy-policy")}
+              className="text-blue-500"
+            >
+              Privacy Policy
+            </Text>
+            .
+          </Text>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );

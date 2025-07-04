@@ -269,7 +269,7 @@ export default function OrdersScreen() {
         
         <View className="flex-row items-center">
           <Text className={`${subText} text-sm`}>
-            {item.page_count} pages
+            {item.page_count <= 1 ? item.page_count + " page" : item.page_count + " pages"}
           </Text>
         </View>
       </View>
@@ -374,11 +374,11 @@ export default function OrdersScreen() {
         </View>
 
         {/* Results Count */}
-        <View className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+        {/* <View className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
           <Text className={`${subText} text-sm`}>
             {filteredFiles.length} of {files.length} files
           </Text>
-        </View>
+        </View> */}
       </View>
 
       {/* Content */}

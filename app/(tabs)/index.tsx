@@ -464,12 +464,7 @@ export default function HomeScreen() {
                       )}
 
                       {paid && (
-                        <View className="flex-col items-end space-y-2">
-                          <View className="bg-green-100 dark:bg-green-900 px-4 py-2 rounded-lg">
-                            <Text className={`text-sm text-green-700 dark:text-green-300`}>
-                              Completed ✓
-                            </Text>
-                          </View>
+                        <View className="flex-row items-end space-y-2">
                           {magicCode && (
                             <View className="bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
                               <Text className={`text-xs font-mono ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
@@ -477,6 +472,11 @@ export default function HomeScreen() {
                               </Text>
                             </View>
                           )}
+                          <View className="bg-green-100 dark:bg-green-900 px-4 py-2 rounded-lg">
+                            <Text className={`text-sm text-green-700 dark:text-green-300`}>
+                              Completed ✓
+                            </Text>
+                          </View>
                         </View>
                       )}
                     </View>

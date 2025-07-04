@@ -33,7 +33,7 @@ export default function OrdersScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
-  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState<{[key: string]: boolean}>({});
   const [GPAYInstalled, setGPAYInstalled] = useState(false);
   const [PhonePeInstalled, setPhonePeInstalled] = useState(false);
   const [PaytmInstalled, setPaytmInstalled] = useState(false);
@@ -55,6 +55,17 @@ export default function OrdersScreen() {
       return pageCount * 3; // ₹3 per page for 10-50 pages
     } else {
       return pageCount * 2; // ₹2 per page for 50+ pages
+    }
+  };
+
+  // Function to get price per page based on tier
+  const getPricePerPage = (pageCount: number) => {
+    if (pageCount < 10) {
+      return 4;
+    } else if (pageCount >= 10 && pageCount <= 50) {
+      return 3;
+    } else {
+      return 2;
     }
   };
 
@@ -162,7 +173,7 @@ export default function OrdersScreen() {
   // Payment handler function
   const handlePayment = async (file: any) => {
     try {
-      setPaymentLoading(true);
+      setPaymentLoading(prev => ({ ...prev, [file.id]: true }));
       const txnId = generateTransactionId();
       const amount = calculatePrice(file.page_count); // Amount in rupees (payment API will convert to paisa)
       
@@ -187,21 +198,6 @@ export default function OrdersScreen() {
         
         // Refresh the file list to get updated payment status
         await loadOrders();
-        
-        Alert.alert(
-          "Payment Successful!",
-          `Payment of ₹${calculatePrice(file.page_count)} for ${file.file_name} completed successfully.${magicCode ? `\n\nMagic Code: ${magicCode}` : ''}`,
-          [
-            { text: "OK" },
-            ...(magicCode ? [{
-              text: "Copy Code",
-              onPress: () => {
-                Clipboard.setString(magicCode);
-                Alert.alert("Copied!", "Magic code copied to clipboard.");
-              }
-            }] : [])
-          ]
-        );
       } else {
         console.error("Payment Failed:", result);
         Alert.alert("Payment Failed", "Payment did not complete. Please try again.");
@@ -210,27 +206,27 @@ export default function OrdersScreen() {
       console.error("Payment Error:", error);
       Alert.alert("Payment Error", error?.message || "Error processing payment. Please try again.");
     } finally {
-      setPaymentLoading(false);
+      setPaymentLoading(prev => ({ ...prev, [file.id]: false }));
     }
   };
 
   const getStatusBadge = (file: any) => {
     if (file.payment_success) {
       return (
-        <View className="bg-green-100 px-3 py-1 rounded-full">
-          <Text className="text-green-800 font-semibold text-xs">Paid</Text>
+        <View className={`${isDark ? 'bg-green-900' : 'bg-green-100'} px-3 py-1 rounded-full`}>
+          <Text className={`${isDark ? 'text-green-300' : 'text-green-800'} font-semibold text-xs`}>Paid</Text>
         </View>
       );
     } else if (file.magic_code !== "N/A") {
       return (
-        <View className="bg-yellow-100 px-3 py-1 rounded-full">
-          <Text className="text-yellow-800 font-semibold text-xs">Processing</Text>
+        <View className={`${isDark ? 'bg-yellow-900' : 'bg-yellow-100'} px-3 py-1 rounded-full`}>
+          <Text className={`${isDark ? 'text-yellow-300' : 'text-yellow-800'} font-semibold text-xs`}>Processing</Text>
         </View>
       );
     } else {
       return (
-        <View className="bg-red-100 px-3 py-1 rounded-full">
-          <Text className="text-red-800 font-semibold text-xs">Pending</Text>
+        <View className={`${isDark ? 'bg-red-900' : 'bg-red-100'} px-3 py-1 rounded-full`}>
+          <Text className={`${isDark ? 'text-red-300' : 'text-red-800'} font-semibold text-xs`}>Pending</Text>
         </View>
       );
     }
@@ -273,7 +269,7 @@ export default function OrdersScreen() {
         
         <View className="flex-row items-center">
           <Text className={`${subText} text-sm`}>
-            Pages: {item.page_count}
+            {item.page_count} pages
           </Text>
         </View>
       </View>
@@ -289,11 +285,11 @@ export default function OrdersScreen() {
 
         {!item.payment_success && (
           <TouchableOpacity
-            className={`${paymentLoading ? 'bg-blue-300' : 'bg-blue-500'} px-4 py-2 rounded-lg opacity-${paymentLoading ? '70' : '100'}`}
+            className={`${paymentLoading[item.id] ? 'bg-blue-300' : 'bg-blue-500'} px-4 py-2 rounded-lg opacity-${paymentLoading[item.id] ? '70' : '100'}`}
             onPress={() => handlePayment(item)}
-            disabled={paymentLoading}
+            disabled={paymentLoading[item.id]}
           >
-            {paymentLoading ? (
+            {paymentLoading[item.id] ? (
               <View className="flex-row items-center">
                 <ActivityIndicator size="small" color="white" />
                 <Text className="text-white font-semibold text-sm ml-2">Processing...</Text>
@@ -400,7 +396,7 @@ export default function OrdersScreen() {
           </View>
         ) : authLoaded && !loading && filteringComplete && filteredFiles.length === 0 ? (
           <View className="flex-1 justify-center items-center">
-            <View className="bg-gray-100 p-8 rounded-full mb-4">
+            <View className={`${isDark ? 'bg-gray-700' : 'bg-gray-100'} p-8 rounded-full mb-4`}>
               <ShoppingCart color={isDark ? "#9CA3AF" : "#6B7280"} size={64} />
             </View>
             <Text className={`${textColor} text-xl font-semibold mb-2`}>

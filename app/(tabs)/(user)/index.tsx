@@ -403,80 +403,61 @@ export default function ProfileScreen() {
         <Text className="text-white font-semibold text-center text-base">Logout</Text>
       </TouchableOpacity>
     </View>
-  );
-
-  const renderPaymentsTab = () => (
-    <View className={`${cardBg} rounded-lg py-6 px-4 my-4 mx-2 rounded-lg p-6 border ${borderColor} shadow-sm`}>
-      <Text className={`${textColor} text-xl font-bold mb-6`}>Payment History</Text>
-      
-      {paymentLoading ? (
-        <View className="flex-1 justify-center items-center py-10">
-          <ActivityIndicator size="large" color="#3B82F6" />
-          <Text className={`${subText} mt-2`}>Loading payments...</Text>
-        </View>
-      ) : paymentHistory.length === 0 ? (
-        <View className="flex-1 justify-center items-center py-10">
-          <View className="bg-gray-100 p-6 rounded-full mb-4">
-            <CreditCard color={isDark ? "#9CA3AF" : "#6B7280"} size={48} />
+  );  const renderPaymentsTab = () => (
+    <View className="py-6 px-2">
+      <View className={`${cardBg} rounded-lg pt-6 pb-6 px-4 border ${borderColor} shadow-sm`}>
+        <Text className={`${textColor} text-xl font-bold mb-6`}>Payment History</Text>
+        
+        {paymentLoading ? (
+          <View className="justify-center items-center py-10">
+            <ActivityIndicator size="large" color="#3B82F6" />
+            <Text className={`${subText} mt-2`}>Loading payments...</Text>
           </View>
-          <Text className={`${textColor} text-lg font-semibold mb-2`}>No Payments Yet</Text>
-          <Text className={`${subText} text-center`}>Your payment history will appear here</Text>
-        </View>
-      ) : (
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 30 }}>
-          {paymentHistory.map((payment, index) => (
-            <View
-              key={index}
-              className={`border ${borderColor} rounded-lg p-4 mb-3`}
-            >
-              <View className="flex-row items-start justify-between">
-                <View className="flex-row items-center flex-1">
-                  {/* <View className="bg-green-100 p-2 rounded-lg mr-3">
-                    <CheckCircle color="#10B981" size={20} />
-                  </View> */}
-                  <View className="flex-1">
-                    <Text className={`${textColor} font-semibold`} numberOfLines={1}>
-                      {payment.payment_id}
+        ) : paymentHistory.length === 0 ? (
+          <View className="justify-center items-center py-10">
+            <View className={`${isDark ? 'bg-gray-700' : 'bg-gray-100'} p-6 rounded-full mb-4`}>
+              <CreditCard color={isDark ? "#9CA3AF" : "#6B7280"} size={48} />
+            </View>
+            <Text className={`${textColor} text-lg font-semibold mb-2`}>No Payments Yet</Text>
+            <Text className={`${subText} text-center`}>Your payment history will appear here</Text>
+          </View>
+        ) : (
+          <View className="space-y-2">
+            {paymentHistory.map((payment, index) => (
+              <View
+                key={index}
+                className={`border ${borderColor} rounded-lg p-4 mb-2`}
+              >
+                <View className="flex-row items-start justify-between">
+                  <View className="flex-row items-center flex-1">
+                    <View className="flex-1">
+                      <Text className={`${textColor} font-semibold`} numberOfLines={1}>
+                        {payment.payment_id}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text className="text-green-600 font-bold text-lg">
+                    ₹{calculatePrice(payment.page_count)}
+                  </Text>
+                </View>
+
+                <View className="flex-row items-center justify-start mt-2">
+                  <View className="flex-row items-center">
+                    <Calendar color={isDark ? "#9CA3AF" : "#6B7280"} size={16} />
+                    <Text className={`${subText} text-sm ml-2`}>
+                      {new Date(payment.uploaded_date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
                     </Text>
                   </View>
                 </View>
-                <Text className="text-green-600 font-bold text-lg">
-                  ₹{calculatePrice(payment.page_count)}
-                </Text>
               </View>
-
-              <View className="flex-row items-center justify-start">
-                <View className="flex-row items-center">
-                  <Calendar color={isDark ? "#9CA3AF" : "#6B7280"} size={16} />
-                  <Text className={`${subText} text-sm ml-2`}>
-                    {new Date(payment.uploaded_date).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </Text>
-                </View>
-                
-                {/* <View className="flex-row items-center">
-                  <FileText color={isDark ? "#9CA3AF" : "#6B7280"} size={16} />
-                  <Text className={`${subText} text-sm ml-1`}>
-                    {payment.page_count} pages @ ₹{getPricePerPage(payment.page_count)}/page
-                  </Text>
-                </View> */}
-              </View>
-
-              {/* {payment.magic_code !== "N/A" && (
-                <View className="mt-3 bg-gray-100 p-3 rounded-lg">
-                  <Text className={`${subText} text-xs mb-1`}>Print Code:</Text>
-                  <Text className="text-gray-800 font-mono text-lg font-bold">
-                    {payment.magic_code}
-                  </Text>
-                </View>
-              )} */}
-            </View>
-          ))}
-        </ScrollView>
-      )}
+            ))}
+          </View>
+        )}
+      </View>
     </View>
   );
 
@@ -548,6 +529,7 @@ export default function ProfileScreen() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

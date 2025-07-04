@@ -409,7 +409,7 @@ export default function ProfileScreen() {
   );  
   const renderPaymentsTab = () => (
     <View className="py-6">
-      <View className={`${bgColor} rounded-lg pb-6 px-2 shadow-sm`}>
+      <View className={`rounded-lg pb-6 px-2 shadow-sm`}>
         {/* <Text className={`${textColor} text-xl font-bold mb-6`}>Payment History</Text> */}
         
         {paymentLoading ? (

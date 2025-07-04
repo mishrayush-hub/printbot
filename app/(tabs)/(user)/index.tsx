@@ -429,17 +429,14 @@ export default function ProfileScreen() {
               key={index}
               className={`border ${borderColor} rounded-lg p-4 mb-3`}
             >
-              <View className="flex-row items-start justify-between mb-3">
+              <View className="flex-row items-start justify-between">
                 <View className="flex-row items-center flex-1">
-                  <View className="bg-green-100 p-2 rounded-lg mr-3">
+                  {/* <View className="bg-green-100 p-2 rounded-lg mr-3">
                     <CheckCircle color="#10B981" size={20} />
-                  </View>
+                  </View> */}
                   <View className="flex-1">
                     <Text className={`${textColor} font-semibold`} numberOfLines={1}>
-                      {payment.file_name.replace(/\.[^/.]+$/, "")}
-                    </Text>
-                    <Text className={`${subText} text-sm mt-1`}>
-                      Payment ID: {payment.payment_id}
+                      {payment.payment_id}
                     </Text>
                   </View>
                 </View>
@@ -448,7 +445,7 @@ export default function ProfileScreen() {
                 </Text>
               </View>
 
-              <View className="flex-row justify-between items-center">
+              <View className="flex-row items-center justify-start">
                 <View className="flex-row items-center">
                   <Calendar color={isDark ? "#9CA3AF" : "#6B7280"} size={16} />
                   <Text className={`${subText} text-sm ml-2`}>
@@ -460,12 +457,12 @@ export default function ProfileScreen() {
                   </Text>
                 </View>
                 
-                <View className="flex-row items-center">
+                {/* <View className="flex-row items-center">
                   <FileText color={isDark ? "#9CA3AF" : "#6B7280"} size={16} />
                   <Text className={`${subText} text-sm ml-1`}>
                     {payment.page_count} pages @ ₹{getPricePerPage(payment.page_count)}/page
                   </Text>
-                </View>
+                </View> */}
               </View>
 
               {/* {payment.magic_code !== "N/A" && (

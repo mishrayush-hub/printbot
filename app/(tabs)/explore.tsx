@@ -10,14 +10,20 @@ import {
   TextInput,
   ScrollView
 } from "react-native";
+import Clipboard from "@react-native-clipboard/clipboard";
 import { ShoppingCart, Search, RefreshCw, Filter, FileText, Calendar, DollarSign } from "lucide-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { callbackAPI } from "@/hooks/useCallbackAPI";
+import { usePaymentAPI } from "@/hooks/usePayementAPI";
+import { generateTransactionId } from "@/hooks/generateTransactionId";
 
 export default function OrdersScreen() {
   const [files, setFiles] = useState<any[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authLoaded, setAuthLoaded] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [filteringComplete, setFilteringComplete] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [userId, setUserId] = useState("");
@@ -27,6 +33,10 @@ export default function OrdersScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [GPAYInstalled, setGPAYInstalled] = useState(false);
+  const [PhonePeInstalled, setPhonePeInstalled] = useState(false);
+  const [PaytmInstalled, setPaytmInstalled] = useState(false);
 
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -48,17 +58,6 @@ export default function OrdersScreen() {
     }
   };
 
-  // Function to get price per page based on tier
-  const getPricePerPage = (pageCount: number) => {
-    if (pageCount < 10) {
-      return 4;
-    } else if (pageCount >= 10 && pageCount <= 50) {
-      return 3;
-    } else {
-      return 2;
-    }
-  };
-
   useEffect(() => {
     const getTokenDetails = async () => {
       try {
@@ -74,9 +73,13 @@ export default function OrdersScreen() {
           setUserName(name);
           setUserEmail(email);
           setUserPhone(phone);
+          setAuthLoaded(true);
+          setFilteringComplete(false); // Initialize filtering state
           console.log("User info loaded:", { token, id });
         } else {
           console.log("User details missing from storage.");
+          setAuthLoaded(true); // Still set to true even if no auth data
+          setFilteringComplete(true); // No data to filter
         }
       } catch (error) {
         console.error("Error fetching token details:", error);
@@ -90,6 +93,7 @@ export default function OrdersScreen() {
     if (!authToken || !userId) return;
 
     try {
+      setLoading(true);
       const response = await fetch(
         "https://printbot.cloud/api/v1/get_user_files_api.php",
         {
@@ -112,14 +116,15 @@ export default function OrdersScreen() {
       } else {
         setErrorMessage("");
         setFiles(data.files || []);
+        setFilteringComplete(false); // Reset filtering state when new data loads
       }
     } catch (error) {
       console.error("Error fetching files:", error);
       setErrorMessage("An unexpected error occurred.");
       setFiles([]);
     } finally {
-      setLoading(false);
       setRefreshing(false);
+      setLoading(false);
     }
   }, [authToken, userId]);
 
@@ -131,6 +136,8 @@ export default function OrdersScreen() {
 
   // Filter files based on search and status
   useEffect(() => {
+    setFilteringComplete(false);
+    
     let filtered = files;
     
     if (searchQuery) {
@@ -149,7 +156,63 @@ export default function OrdersScreen() {
     }
     
     setFilteredFiles(filtered);
+    setFilteringComplete(true);
   }, [files, searchQuery, statusFilter]);
+
+  // Payment handler function
+  const handlePayment = async (file: any) => {
+    try {
+      setPaymentLoading(true);
+      const txnId = generateTransactionId();
+      const amount = calculatePrice(file.page_count); // Amount in rupees (payment API will convert to paisa)
+      
+      const result = await usePaymentAPI(
+        txnId,
+        amount,
+        userId,
+        file.id.toString(),
+        userPhone,
+        setGPAYInstalled,
+        setPhonePeInstalled,
+        setPaytmInstalled,
+        GPAYInstalled,
+        PhonePeInstalled,
+        PaytmInstalled
+      );
+
+      if (result) {
+        console.log("Payment Success:", result);
+        // Call the callback API to generate magic code
+        const magicCode = await callbackAPI(txnId, userId, file.id.toString());
+        
+        // Refresh the file list to get updated payment status
+        await loadOrders();
+        
+        Alert.alert(
+          "Payment Successful!",
+          `Payment of ₹${calculatePrice(file.page_count)} for ${file.file_name} completed successfully.${magicCode ? `\n\nMagic Code: ${magicCode}` : ''}`,
+          [
+            { text: "OK" },
+            ...(magicCode ? [{
+              text: "Copy Code",
+              onPress: () => {
+                Clipboard.setString(magicCode);
+                Alert.alert("Copied!", "Magic code copied to clipboard.");
+              }
+            }] : [])
+          ]
+        );
+      } else {
+        console.error("Payment Failed:", result);
+        Alert.alert("Payment Failed", "Payment did not complete. Please try again.");
+      }
+    } catch (error: any) {
+      console.error("Payment Error:", error);
+      Alert.alert("Payment Error", error?.message || "Error processing payment. Please try again.");
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
 
   const getStatusBadge = (file: any) => {
     if (file.payment_success) {
@@ -210,7 +273,7 @@ export default function OrdersScreen() {
         
         <View className="flex-row items-center">
           <Text className={`${subText} text-sm`}>
-            {item.page_count} pages @ ₹{getPricePerPage(item.page_count)}/page
+            Pages: {item.page_count}
           </Text>
         </View>
       </View>
@@ -226,16 +289,24 @@ export default function OrdersScreen() {
 
         {!item.payment_success && (
           <TouchableOpacity
-            className="bg-blue-500 px-4 py-2 rounded-lg"
-            onPress={() => Alert.alert("Payment", `Pay ₹${calculatePrice(item.page_count)} for ${item.file_name}`)}
+            className={`${paymentLoading ? 'bg-blue-300' : 'bg-blue-500'} px-4 py-2 rounded-lg opacity-${paymentLoading ? '70' : '100'}`}
+            onPress={() => handlePayment(item)}
+            disabled={paymentLoading}
           >
-            <Text className="text-white font-semibold text-sm">Pay Now</Text>
+            {paymentLoading ? (
+              <View className="flex-row items-center">
+                <ActivityIndicator size="small" color="white" />
+                <Text className="text-white font-semibold text-sm ml-2">Processing...</Text>
+              </View>
+            ) : (
+              <Text className="text-white font-semibold text-sm">Pay Now</Text>
+            )}
           </TouchableOpacity>
         )}
 
         {item.payment_success && item.magic_code !== "N/A" && (
-          <View className="bg-gray-100 px-3 py-2 rounded-lg">
-            <Text className="text-gray-800 font-mono text-sm">
+          <View className={`${isDark ? 'bg-gray-700' : 'bg-gray-100'} px-3 py-2 rounded-lg`}>
+            <Text className={`${isDark ? 'text-white' : 'text-gray-800'} font-mono text-sm`}>
               Code: {item.magic_code}
             </Text>
           </View>
@@ -316,18 +387,18 @@ export default function OrdersScreen() {
 
       {/* Content */}
       <View className="flex-1 px-4">
-        {loading ? (
+        {!authLoaded || loading ? (
           <View className="flex-1 justify-center items-center">
             <ActivityIndicator size="large" color="#3B82F6" />
             <Text className={`${subText} mt-2`}>Loading files...</Text>
           </View>
-        ) : errorMessage ? (
+        ) : errorMessage || !authLoaded ? (
           <View className="flex-1 justify-center items-center">
             <Text className={`${subText} text-center text-lg`}>
               {errorMessage}
             </Text>
           </View>
-        ) : filteredFiles.length === 0 ? (
+        ) : authLoaded && !loading && filteringComplete && filteredFiles.length === 0 ? (
           <View className="flex-1 justify-center items-center">
             <View className="bg-gray-100 p-8 rounded-full mb-4">
               <ShoppingCart color={isDark ? "#9CA3AF" : "#6B7280"} size={64} />

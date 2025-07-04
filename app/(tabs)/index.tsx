@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, Alert, useColorScheme, Clipboard, Platform } from "react-native";
+import React, {useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, ScrollView, Alert, useColorScheme } from "react-native";
 import { Upload } from "lucide-react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
-import phonepeSDK from "react-native-phonepe-pg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Base64 from "react-native-base64";
-import sha256 from "sha256";
+import { callbackAPI } from "@/hooks/useCallbackAPI";
+import { usePaymentAPI } from "@/hooks/usePayementAPI";
+import { generateTransactionId } from "@/hooks/generateTransactionId";
 
 export default function HomeScreen() {
   const [uploadedFiles, setUploadedFiles] = useState<
@@ -28,6 +28,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
   const [paid, setPaid] = useState(false);
+  const [magicCode, setMagicCode] = useState("");
   const [returnedPageCount, setReturnedPageCount] = useState(0);
   const [GPAYInstalled, setGPAYInstalled] = useState(false);
   const [PhonePeInstalled, setPhonePeInstalled] = useState(false);
@@ -36,16 +37,16 @@ export default function HomeScreen() {
   useEffect(() => {
     const getTokenDetails = async () => {
       try {
-      const authToken = await AsyncStorage.getItem("authToken");
-      const userId = await AsyncStorage.getItem("userId");
-      const userPhone = await AsyncStorage.getItem("userPhone");
-      const userEmail = await AsyncStorage.getItem("userEmail");
-      const userName = await AsyncStorage.getItem("userName");
-      if (authToken) setAuthToken(authToken);
-      if (userId) setUserId(userId);
-      if (userPhone) setUserPhone(userPhone); 
-      if (userEmail) setUserEmail(userEmail);
-      if (userName) setUserName(userName);
+        const authToken = await AsyncStorage.getItem("authToken");
+        const userId = await AsyncStorage.getItem("userId");
+        const userPhone = await AsyncStorage.getItem("userPhone");
+        const userEmail = await AsyncStorage.getItem("userEmail");
+        const userName = await AsyncStorage.getItem("userName");
+        if (authToken) setAuthToken(authToken);
+        if (userId) setUserId(userId);
+        if (userPhone) setUserPhone(userPhone);
+        if (userEmail) setUserEmail(userEmail);
+        if (userName) setUserName(userName);
       } catch (error) {
         console.error("Error fetching token details:", error);
         Alert.alert("Error", "Failed to fetch user details. Please try again.");
@@ -54,228 +55,113 @@ export default function HomeScreen() {
     getTokenDetails();
   }, []);
 
-  const generateMagicCode = async (orderId: string, cost: string) => {
-  try {
-    const response = await fetch("https://printbot.cloud/api/v1/callback_api.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: new URLSearchParams({
-        order_id: orderId,
-        cost: cost,
-        user_id: userId,
-        file_id: fileId
-      }).toString()
-    });
-    
-    const data = await response.json();
-    
-    if (!response.ok || !data.success) {
-      console.error("Error generating magic code:", data.message);
-      Alert.alert("Error", data.message || "Failed to generate magic code.");
-    } else {
-      console.log("Magic code generated:", data);
-      
-      Alert.alert(
-        "Magic Code Generated",
-        `Your magic code is: ${data.magic_code}`,
-        [
-          { text: "OK", style: "default" },
-          {
-            text: "Copy to Clipboard",
-            onPress: () => {
-              Clipboard.setString(data.magic_code);
-              // Optional: Show a toast that it was copied
-              Alert.alert("Copied!", "Magic code copied to clipboard.");
-            }
-          }
-        ]
-      );
-    }
-  } catch (error) {
-    console.error("Error generating magic code:", error);
-    Alert.alert("Error", "An unexpected error occurred while generating the magic code.");
-  }
-};
-
-  const generateTransactionId = () => {
-    const date = new Date();
-    const timestamp = date.getTime().toString();
-    const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
-    return `PRINTBOT-${timestamp}-${randomPart}`;
-  };
-
   const paymentHandler = async () => {
-  if (!uploaded) {
-    Alert.alert("Upload Required", "Please upload a file before proceeding to payment.");
-    return;
-  }
-  if (paid) {
-    Alert.alert("Payment Already Made", "You have already paid for this file.");
-    return;
-  }
-
-  try {
-    setLoading(true);
-    const environment = "PRODUCTION"; // or "SANDBOX"
-    const merchantId = "M22MXCSHVPHOY";
-    const appId = "";
-    const salt_key = "5ef6e9e9-07e9-4d45-a583-cbe550893d61";
-    // const environment = "SANDBOX"; // Use SANDBOX for testing
-    // const merchantId = "PGTESTPAYUAT86"; // Replace with your actual merchant ID
-    // const appId = "com.navstream.printbot"; // Replace with your actual app ID
-    // const salt_key = "96434309-7796-489d-8924-ab56988a6076";
-    const salt_index = 1;
-    const callbackUrl = ""; // Use temporary URL for testing
-    await phonepeSDK.init(environment, merchantId, appId, true);
-
-    phonepeSDK.isGPayAppInstalled()
-      .then((isInstalled) => {
-        if (isInstalled) {
-          setGPAYInstalled(true);
-        } else {
-          setGPAYInstalled(false);
-        }
-      })
-      .catch((error) => {
-        console.error("Error checking GPay installation:", error);
-        setGPAYInstalled(false);
-      });
-
-    phonepeSDK.isPhonePeInstalled()
-      .then((isInstalled) => {
-        if (isInstalled) {
-          setPhonePeInstalled(true);
-        } else {
-          setPhonePeInstalled(false);
-        }
-      })
-      .catch((error) => {
-        console.error("Error checking PhonePe installation:", error);
-        setPhonePeInstalled(false);
-      });
-    phonepeSDK.isPaytmAppInstalled()
-      .then((isInstalled) => {
-        if (isInstalled) {
-          setPaytmInstalled(true);
-        } else {
-          setPaytmInstalled(false);
-        }
-      })
-      .catch((error) => {
-        console.error("Error checking Paytm installation:", error);
-        setPaytmInstalled(false);
-      });
-
-    const txnId = generateTransactionId();
-    const amount = (uploadedFiles.reduce((sum, file) => sum + file.price, 0)) * 100; // Convert to paisa
-
-    const requestBody = {
-      merchantId: merchantId,
-      merchantTransactionId: txnId,
-      merchantUserId: userId,
-      merchantOrderId: txnId,
-      amount: amount,
-      mobileNumber: userPhone,
-      callbackUrl: callbackUrl,
-      paymentInstrument: {
-        type: GPAYInstalled || PhonePeInstalled || PaytmInstalled ? "UPI_INTENT" : "PAY_PAGE",
-        targetApp: Platform.OS === "ios" ? 
-                            (GPAYInstalled ? "GPAY" : PhonePeInstalled ? "PHONEPE" : PaytmInstalled ? "PAYTM" : "PAY_PAGE")
-                            : ( GPAYInstalled ? "com.google.android.apps.nbu.paisa.user" : PhonePeInstalled ? "com.phonepe.app" : PaytmInstalled ? "net.one97.paytm" : "PAY_PAGE"),
-      }
-    };
-    const payload = JSON.stringify(requestBody);
-    const payloadBase64 = Base64.encode(payload);
-    const stringToHash = payloadBase64 + "/pg/v1/pay" + salt_key;
-    const checksum = sha256(stringToHash) + "###" + salt_index;
-
-    const result = await phonepeSDK.startTransaction(
-      payloadBase64,
-      checksum,
-      null,
-      null
-    );
-
-    if (result.success) {
-      console.log("Payment Success:", result);
-      setPaid(true);
-      generateMagicCode(txnId, uploadedFiles.reduce((sum, file) => sum + file.price, 0).toString());
-    } else {
-      console.error("Payment Failed:", result);
-      Alert.alert("Payment Failed", result.message || "Payment did not complete.");
+    if (!uploaded) {
+      Alert.alert("Upload Required", "Please upload a file before proceeding to payment.");
+      return;
     }
-
-  } catch (error: any) {
-    console.error("Payment Error:", error);
-    Alert.alert("Payment Error", error?.message || "Error processing payment.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-  const handleFileToCloud = async () => {
-  try {
-    setLoading(true);
-    setUploaded(false);
-    const authToken = await AsyncStorage.getItem("authToken") || "";
-    const userId = await AsyncStorage.getItem("userId") || "";
-
-    if (!file) {
-      Alert.alert("No file selected", "Please select a file before uploading.");
-      setLoading(false);
-      setUploaded(false);
+    if (paid) {
+      Alert.alert("Payment Already Made", "You have already paid for this file.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("authToken", authToken);
-    formData.append("user_id", userId);
-    formData.append("file", {
-      uri: file.uri,
-      name: file.name || `PB_File_${userId}`,
-      type: file.type || "application/pdf",
-    } as any);
-
-    const response = await fetch("https://printbot.cloud/api/v1/file_upload_api.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      body: formData,
-    });
-
-    const text = await response.text();
-
     try {
-      const data = JSON.parse(text);
-      if (!response.ok || !data.success) {
-        console.error("Upload failed:", data.message);
-        Alert.alert("Upload Failed", data.message || "Unknown error.");
-        setUploaded(false);
+      setLoading(true);
+      const txnId = generateTransactionId();
+      const amount = uploadedFiles.reduce((sum, file) => sum + file.price, 0); // Amount in rupees (payment API will convert to paisa)
+      const result = await usePaymentAPI(
+        txnId,
+        amount,
+        userId,
+        fileId,
+        userPhone,
+        setGPAYInstalled,
+        setPhonePeInstalled,
+        setPaytmInstalled,
+        GPAYInstalled,
+        PhonePeInstalled,
+        PaytmInstalled
+      );
+      if (result) {
+        console.log("Payment Success:", result);
+        setPaid(true);
+        const magic = await callbackAPI(txnId, userId, fileId); // Call the callback API with txnId, userId, and fileId
+        if (magic) {
+          setMagicCode(magic);
+        }
       } else {
-        console.log("File uploaded:", data);
-        setUploaded(true);
-        setReturnedPageCount(data.page_count || 0);
-        setFileId(data.file_id || "");
-        Alert.alert("Upload Successful", "Your file has been uploaded to the cloud.");
+        console.error("Payment Failed:", result);
+        Alert.alert("Payment Failed", "Payment did not complete.");
       }
-    } catch (jsonError) {
-      console.error("Invalid JSON from server:", text);
-      Alert.alert("Upload Failed", "Unexpected server response.");
-      setUploaded(false);
+    } catch (error: any) {
+      console.error("Payment Error:", error);
+      Alert.alert("Payment Error", error?.message || "Error processing payment.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-  } catch (error) {
-    console.error("Upload error:", error);
-    Alert.alert("Upload Failed", "An unexpected error occurred.");
-    setUploaded(false);
-  } finally {
-    setLoading(false);
-  }
-};
+
+  const handleFileToCloud = async () => {
+    try {
+      setLoading(true);
+      setUploaded(false);
+      const authToken = await AsyncStorage.getItem("authToken") || "";
+      const userId = await AsyncStorage.getItem("userId") || "";
+
+      if (!file) {
+        Alert.alert("No file selected", "Please select a file before uploading.");
+        setLoading(false);
+        setUploaded(false);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("authToken", authToken);
+      formData.append("user_id", userId);
+      formData.append("file", {
+        uri: file.uri,
+        name: file.name || `PB_File_${userId}`,
+        type: file.type || "application/pdf",
+      } as any);
+
+      const response = await fetch("https://printbot.cloud/api/v1/file_upload_api.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        body: formData,
+      });
+
+      const text = await response.text();
+
+      try {
+        const data = JSON.parse(text);
+        if (!response.ok || !data.success) {
+          console.error("Upload failed:", data.message);
+          Alert.alert("Upload Failed", data.message || "Unknown error.");
+          setUploaded(false);
+        } else {
+          console.log("File uploaded:", data);
+          setUploaded(true);
+          setReturnedPageCount(data.page_count || 0);
+          setFileId(data.file_id || "");
+          Alert.alert("Upload Successful", "Your file has been uploaded to the cloud.");
+        }
+      } catch (jsonError) {
+        console.error("Invalid JSON from server:", text);
+        Alert.alert("Upload Failed", "Unexpected server response.");
+        setUploaded(false);
+      }
+
+    } catch (error) {
+      console.error("Upload error:", error);
+      Alert.alert("Upload Failed", "An unexpected error occurred.");
+      setUploaded(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Function to count pages in a PDF
   const getPdfPageCount = async (uri: string) => {
@@ -320,6 +206,14 @@ export default function HomeScreen() {
       });
 
       if (!result.canceled && result.assets?.length > 0) {
+        // Reset all states when a new file is selected
+        setUploaded(false);
+        setPaid(false);
+        setFileId("");
+        setMagicCode("");
+        setUploadedFiles([]);
+        setReturnedPageCount(0);
+        
         const file = result.assets[0];
         const fileType = file.mimeType || "";
         setFile({
@@ -352,7 +246,7 @@ export default function HomeScreen() {
           copies: 1,
         };
 
-        setUploadedFiles((prev) => [...prev, newFile]);
+        setUploadedFiles([newFile]); // Replace with new file instead of adding
       }
     } catch (err) {
       console.error("Error picking file:", err);
@@ -375,7 +269,7 @@ export default function HomeScreen() {
           <Text className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             Upload and manage your documents for printing
           </Text>
-          
+
           {/* Pricing Info */}
           <View className={`mb-4 p-3 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-blue-50'} border ${isDarkMode ? 'border-gray-600' : 'border-blue-200'}`}>
             <Text className={`text-xs font-medium mb-1 ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>
@@ -385,7 +279,7 @@ export default function HomeScreen() {
               • Less than 10 pages: ₹4/page  • 10-50 pages: ₹3/page  • 50+ pages: ₹2/page
             </Text>
           </View>
-          
+
           {/* Upload Area - Web Style */}
           <View className={`border-2 border-dashed ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} rounded-lg p-6 items-center justify-center ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
             <Upload size={40} color={isDarkMode ? '#60a5fa' : '#3b82f6'} />
@@ -457,7 +351,7 @@ export default function HomeScreen() {
                     ₹{uploadedFiles.reduce((sum, file) => sum + file.price, 0).toFixed(2)}
                   </Text>
                 </View>
-                
+
                 <View className="border-t border-gray-200 dark:border-gray-700 pt-3">
                   <Text className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Price Breakdown
@@ -473,7 +367,7 @@ export default function HomeScreen() {
                     </View>
                   ))}
                 </View>
-                
+
                 {uploadedFiles.length > 0 && uploaded && !paid && (
                   <TouchableOpacity
                     className="bg-blue-500 py-3 px-4 rounded-lg mt-4 items-center"
@@ -494,7 +388,7 @@ export default function HomeScreen() {
               <Text className={`text-lg font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                 Uploaded Files
               </Text>
-              
+
               {/* Uploaded Files List */}
               {uploadedFiles.map((item, index) => {
                 const totalPrice = item.price;
@@ -516,18 +410,16 @@ export default function HomeScreen() {
                           </Text>
                         </View>
                       </View>
-                      
+
                       {/* Status Badge */}
-                      <View className={`px-2 py-1 rounded-full ${
-                        paid ? 'bg-green-100 dark:bg-green-900' : 
-                        uploaded ? 'bg-blue-100 dark:bg-blue-900' : 
-                        'bg-yellow-100 dark:bg-yellow-900'
-                      }`}>
-                        <Text className={`text-xs font-medium ${
-                          paid ? 'text-green-700 dark:text-green-300' : 
-                          uploaded ? 'text-blue-700 dark:text-blue-300' : 
-                          'text-yellow-700 dark:text-yellow-300'
+                      <View className={`px-2 py-1 rounded-full ${paid ? 'bg-green-100 dark:bg-green-900' :
+                          uploaded ? 'bg-blue-100 dark:bg-blue-900' :
+                            'bg-yellow-100 dark:bg-yellow-900'
                         }`}>
+                        <Text className={`text-xs font-medium ${paid ? 'text-green-700 dark:text-green-300' :
+                            uploaded ? 'text-blue-700 dark:text-blue-300' :
+                              'text-yellow-700 dark:text-yellow-300'
+                          }`}>
                           {paid ? 'Paid' : uploaded ? 'Verified' : 'Pending'}
                         </Text>
                       </View>
@@ -562,7 +454,7 @@ export default function HomeScreen() {
                           <Text className="text-white text-sm font-medium">Upload</Text>
                         </TouchableOpacity>
                       )}
-                      
+
                       {uploaded && !paid && (
                         <View className="bg-blue-100 dark:bg-blue-900 px-4 py-2 rounded-lg">
                           <Text className={`text-sm text-blue-700 dark:text-blue-300`}>
@@ -570,12 +462,21 @@ export default function HomeScreen() {
                           </Text>
                         </View>
                       )}
-                      
+
                       {paid && (
-                        <View className="bg-green-100 dark:bg-green-900 px-4 py-2 rounded-lg">
-                          <Text className={`text-sm text-green-700 dark:text-green-300`}>
-                            Completed ✓
-                          </Text>
+                        <View className="flex-col items-end space-y-2">
+                          <View className="bg-green-100 dark:bg-green-900 px-4 py-2 rounded-lg">
+                            <Text className={`text-sm text-green-700 dark:text-green-300`}>
+                              Completed ✓
+                            </Text>
+                          </View>
+                          {magicCode && (
+                            <View className="bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
+                              <Text className={`text-xs font-mono ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                                Code: {magicCode}
+                              </Text>
+                            </View>
+                          )}
                         </View>
                       )}
                     </View>
@@ -585,7 +486,7 @@ export default function HomeScreen() {
             </View>
           )}
         </View>
-        
+
         {/* Bottom padding for tab bar */}
         <View className="h-20" />
       </ScrollView>

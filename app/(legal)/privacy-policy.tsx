@@ -9,9 +9,10 @@ import {
 export default function PrivacyPolicyScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
+  const bgColor = isDark ? "bg-gray-900" : "bg-gray-50";
 
   return (
-    <View className={`flex-1 ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}>
+    <View className={`flex-1 ${bgColor}`}>
       {/* Content */}
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         <View className="py-4">

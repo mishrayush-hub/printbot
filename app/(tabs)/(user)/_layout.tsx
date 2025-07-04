@@ -24,7 +24,7 @@ export default function UserLayout() {
                 name="index" 
                 options={{ 
                     title: "Settings",
-                    headerShadowVisible: false, // Remove header shadow
+                    headerShadowVisible: false, // Remove header shadow to match tabs
                 }} 
             />
             <Stack.Screen 

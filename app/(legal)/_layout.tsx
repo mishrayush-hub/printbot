@@ -12,6 +12,7 @@ export default function LegalLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
+        headerShadowVisible: false, // Remove header shadow for consistency
       }}
     >
       <Stack.Screen 
@@ -24,6 +25,9 @@ export default function LegalLayout() {
             fontWeight: 'bold',
             color: colorScheme === 'dark' ? 'white' : 'black',
           },
+          headerStyle: {
+                backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+            },
           headerLeft: () => {
             return (
               <TouchableOpacity onPress={() => router.back()}>

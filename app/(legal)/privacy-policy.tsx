@@ -3,62 +3,20 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   useColorScheme,
-  Image,
 } from "react-native";
-import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 
 export default function PrivacyPolicyScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
-  const handleBack = () => {
-    router.back();
-  };
-
   return (
     <View className={`flex-1 ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}>
-      {/* Header */}
-      <View className={`px-6 pt-12 pb-4 ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}>
-        <View className="flex-row items-center justify-between">
-          <TouchableOpacity onPress={handleBack} className="p-2">
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color={isDark ? "#fff" : "#000"}
-            />
-          </TouchableOpacity>
-          <Image
-            source={require("../../assets/images/icon-black.png")}
-            style={{ width: 40, height: 40 }}
-            resizeMode="contain"
-          />
-          <View style={{ width: 40 }} />
-        </View>
-        <Text
-          className={`text-2xl font-bold text-center mt-4 ${
-            isDark ? "text-white" : "text-black"
-          }`}
-        >
-          Privacy Policy
-        </Text>
-      </View>
-
       {/* Content */}
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         <View className="py-4">
           <Text
-            className={`text-sm mb-4 ${
-              isDark ? "text-gray-300" : "text-gray-600"
-            }`}
-          >
-            Last Updated: December 26, 2024
-          </Text>
-
-          <Text
-            className={`text-base mb-6 leading-6 ${
+            className={`text-base mb-6 leading-6 text-justify ${
               isDark ? "text-gray-100" : "text-gray-800"
             }`}
           >
@@ -80,14 +38,14 @@ export default function PrivacyPolicyScreen() {
 
           <Text
             className={`text-base font-semibold mb-2 ${
-              isDark ? "text-gray-200" : "text-gray-700"
+              isDark ? "text-gray-100" : "text-gray-700"
             }`}
           >
             1.1 Personal Information You Provide
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             We collect personal information that you voluntarily provide when you:
@@ -100,7 +58,7 @@ export default function PrivacyPolicyScreen() {
 
           <Text
             className={`text-base font-semibold mb-2 ${
-              isDark ? "text-gray-200" : "text-gray-700"
+              isDark ? "text-gray-100" : "text-gray-700"
             }`}
           >
             1.2 Mobile Application Permissions & Data
@@ -114,8 +72,8 @@ export default function PrivacyPolicyScreen() {
             📄 Storage/File Access Permission
           </Text>
           <Text
-            className={`text-base mb-3 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-3 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             Purpose: To access documents and photos you want to print
@@ -132,8 +90,8 @@ export default function PrivacyPolicyScreen() {
             📷 Camera Permission
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             Purpose: To scan documents directly within the app
@@ -153,14 +111,14 @@ export default function PrivacyPolicyScreen() {
 
           <Text
             className={`text-base font-semibold mb-2 ${
-              isDark ? "text-gray-200" : "text-gray-700"
+              isDark ? "text-gray-100" : "text-gray-700"
             }`}
           >
             2.1 Primary Service Purposes
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             • Order processing: Process and fulfill your document printing requests
@@ -188,8 +146,8 @@ export default function PrivacyPolicyScreen() {
             🔒 Secure Payment Processing
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             We use PhonePe, a leading and trusted payment gateway in India, to process all transactions securely. We do not store or have access to your payment card details.
@@ -213,8 +171,8 @@ export default function PrivacyPolicyScreen() {
             🔐 Encryption & Security
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             • AES-256 encryption for data at rest
@@ -241,8 +199,8 @@ export default function PrivacyPolicyScreen() {
             📄 Automatic Document Deletion
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             Your documents are automatically deleted from our servers to protect your privacy:
@@ -262,8 +220,8 @@ export default function PrivacyPolicyScreen() {
           </Text>
 
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             You have significant control over your personal information:
@@ -284,8 +242,8 @@ export default function PrivacyPolicyScreen() {
           </Text>
 
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             For privacy-related inquiries:
@@ -305,8 +263,8 @@ export default function PrivacyPolicyScreen() {
           </Text>
 
           <Text
-            className={`text-base mb-8 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-8 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             By using PrintBot's services, you acknowledge that you have read and understood this Privacy Policy in its entirety and agree to the collection, use, and disclosure of your information as described.

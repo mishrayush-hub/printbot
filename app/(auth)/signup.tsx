@@ -309,13 +309,13 @@ export default function SignupScreen() {
           <View className="flex-1">
             <Text className={`text-sm leading-5 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
               I agree to the{" "}
-              <TouchableOpacity onPress={() => router.push("/(legal)/terms-and-conditions")}>
+              <TouchableOpacity onPress={() => router.push("/terms-and-conditions")}>
                 <Text className="text-[#008cff] font-semibold underline -mb-1">
                   Terms & Conditions
                 </Text>
               </TouchableOpacity>
               {" "}and{" "}
-              <TouchableOpacity onPress={() => router.push("/(legal)/privacy-policy")}>
+              <TouchableOpacity onPress={() => router.push("/privacy-policy")}>
                 <Text className="text-[#008cff] font-semibold underline -mb-1">
                   Privacy Policy
                 </Text>

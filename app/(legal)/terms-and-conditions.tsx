@@ -3,62 +3,21 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   useColorScheme,
-  Image,
 } from "react-native";
-import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 
 export default function TermsAndConditionsScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
-  const handleBack = () => {
-    router.back();
-  };
-
   return (
     <View className={`flex-1 ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}>
-      {/* Header */}
-      <View className={`px-6 pt-12 pb-4 ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}>
-        <View className="flex-row items-center justify-between">
-          <TouchableOpacity onPress={handleBack} className="p-2">
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color={isDark ? "#fff" : "#000"}
-            />
-          </TouchableOpacity>
-          <Image
-            source={require("../../assets/images/icon-black.png")}
-            style={{ width: 40, height: 40 }}
-            resizeMode="contain"
-          />
-          <View style={{ width: 40 }} />
-        </View>
-        <Text
-          className={`text-2xl font-bold text-center mt-4 ${
-            isDark ? "text-white" : "text-black"
-          }`}
-        >
-          Terms and Conditions
-        </Text>
-      </View>
-
       {/* Content */}
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         <View className="py-4">
-          <Text
-            className={`text-sm mb-4 ${
-              isDark ? "text-gray-300" : "text-gray-600"
-            }`}
-          >
-            Last Updated: December 2024
-          </Text>
 
           <Text
-            className={`text-base mb-6 leading-6 ${
+            className={`text-base mb-6 leading-6 text-justify ${
               isDark ? "text-gray-100" : "text-gray-800"
             }`}
           >
@@ -75,8 +34,8 @@ export default function TermsAndConditionsScreen() {
             1. Service Description
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             • PrintBot provides document printing services for PDF files uploaded through our platform
@@ -93,8 +52,8 @@ export default function TermsAndConditionsScreen() {
             2. User Accounts and Registration
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             • You must create an account to use our printing services
@@ -112,8 +71,8 @@ export default function TermsAndConditionsScreen() {
             3. Document Upload and Content
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             • You may only upload documents that you own or have permission to print
@@ -131,8 +90,8 @@ export default function TermsAndConditionsScreen() {
             4. Payment and Pricing
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             • Payment is required before printing begins
@@ -150,8 +109,8 @@ export default function TermsAndConditionsScreen() {
             5. Document Collection
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             • Documents must be collected within 7 days of printing
@@ -169,8 +128,8 @@ export default function TermsAndConditionsScreen() {
             6. Privacy and Data Security
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             • We implement security measures to protect your documents and personal information
@@ -188,8 +147,8 @@ export default function TermsAndConditionsScreen() {
             7. Quality and Accuracy
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             • We strive to maintain high printing quality standards
@@ -207,8 +166,8 @@ export default function TermsAndConditionsScreen() {
             8. Refunds and Cancellations
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             • Refunds may be issued for technical issues preventing document printing
@@ -226,8 +185,8 @@ export default function TermsAndConditionsScreen() {
             9. Limitation of Liability
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             PrintBot's liability is limited to the amount paid for the specific printing service. We are not liable for indirect, consequential, or incidental damages.
@@ -242,8 +201,8 @@ export default function TermsAndConditionsScreen() {
             10. Service Availability
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             • We strive to maintain 99% service uptime but cannot guarantee uninterrupted service
@@ -260,8 +219,8 @@ export default function TermsAndConditionsScreen() {
             11. Intellectual Property
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             • You retain all rights to your uploaded documents
@@ -278,8 +237,8 @@ export default function TermsAndConditionsScreen() {
             12. Changes to Terms
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             We may update these terms and conditions periodically. Continued use of our services constitutes acceptance of any changes. We will notify users of significant changes via email or platform notifications.
@@ -294,8 +253,8 @@ export default function TermsAndConditionsScreen() {
             13. Contact Information
           </Text>
           <Text
-            className={`text-base mb-4 leading-6 ${
-              isDark ? "text-gray-300" : "text-gray-600"
+            className={`text-base mb-4 leading-6 text-justify ${
+              isDark ? "text-gray-100" : "text-gray-600"
             }`}
           >
             For questions about these terms and conditions:
@@ -307,8 +266,8 @@ export default function TermsAndConditionsScreen() {
           {/* Acknowledgment */}
           <View className={`p-4 rounded-lg mb-8 ${isDark ? "bg-blue-900/30" : "bg-blue-50"}`}>
             <Text
-              className={`text-base font-medium leading-6 ${
-                isDark ? "text-blue-200" : "text-blue-800"
+              className={`text-base font-medium leading-6 text-justify ${
+                isDark ? "text-blue-100" : "text-blue-800"
               }`}
             >
               By using PrintBot's services, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.

@@ -32,7 +32,7 @@ export default function TabLayout() {
         //   },
         tabBarButton: HapticTab,
         // tabBarBackground: TabBarBackground,
-        tabBarActiveTintColor: theme.tint,
+        tabBarActiveTintColor: theme.tabIconSelected,
         tabBarInactiveTintColor: theme.tabIconDefault,
         tabBarStyle: Platform.select({
           ios: {
@@ -75,7 +75,7 @@ export default function TabLayout() {
         },
         headerTintColor: 'white',
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 12,
           marginBottom: 5,
         }
       }}
@@ -84,7 +84,7 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: 'Upload History',
-          tabBarIcon: ({ color }) => <ImageUp size={26} color={color} />,
+          tabBarIcon: ({ color }) => <ImageUp size={28} color={color} />,
           tabBarLabel: 'History', // 👈 shown in tab bar
           headerTitleAlign: 'center', // 👈 center the header title
           headerStyle: {
@@ -96,9 +96,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          headerTitle: `Dashboard`, // 👈 shown in header
+          headerTitle: `Hello, ${userName || "User"} 👋`, // 👈 shown in header
           tabBarLabel: 'Home',     // 👈 shown in tab bar
-          tabBarIcon: ({ color }) => <House size={26} color={color} />,
+          tabBarIcon: ({ color }) => <House size={28} color={color} />,
           headerStyle: {
                 backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
             },
@@ -109,7 +109,7 @@ export default function TabLayout() {
         name="(user)"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <UserRoundCog size={26} color={color} />,
+          tabBarIcon: ({ color }) => <UserRoundCog size={28} color={color} />,
           headerStyle: {
                 backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
             },

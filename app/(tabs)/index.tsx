@@ -260,9 +260,12 @@ export default function HomeScreen() {
 
   return (
     <View className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 30 }}>
         {/* Upload Documents Section - Matching Web */}
         <View className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+          {/* <Text className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+            Hello, {userName || "User"} 👋
+          </Text> */}
           <Text className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
             Upload Documents
           </Text>
@@ -299,6 +302,110 @@ export default function HomeScreen() {
         </View>
 
         <View className="px-4 pt-4">
+          {/* Uploaded Files Section - Web Style */}
+          {uploadedFiles.length > 0 && (
+            <View className="mb-1">
+              <Text className={`text-lg font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                {uploaded ? "Uploaded File" : "Selected File"}
+              </Text>
+
+              {/* Uploaded Files List */}
+              {uploadedFiles.map((item, index) => {
+                const totalPrice = item.price;
+
+                return (
+                  <View key={index} className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4 rounded-lg mb-3 border`}>
+                    {/* File Header - Web Style */}
+                    <View className="flex-row items-start justify-between mb-3">
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded items-center justify-center mr-3">
+                          <Text className="text-blue-600 text-sm font-bold">📄</Text>
+                        </View>
+                        <View className="flex-1">
+                          <Text className={`font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-600'} ${item.fileName.length > 25 ? 'text-sm' : 'text-base'}`} numberOfLines={1}>
+                            {item.fileName}
+                          </Text>
+                          <Text className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            {(item.fileSize / 1024).toFixed(0)} KB
+                          </Text>
+                        </View>
+                      </View>
+
+                      {/* Status Badge */}
+                      <View className={`px-2 py-1 rounded-full ${paid ? 'bg-green-100 dark:bg-green-900' :
+                          uploaded ? 'bg-blue-100 dark:bg-blue-900' :
+                            'bg-yellow-100 dark:bg-yellow-900'
+                        }`}>
+                        <Text className={`text-xs font-medium ${paid ? 'text-green-700 dark:text-green-300' :
+                            uploaded ? 'text-blue-700 dark:text-blue-100' :
+                              'text-yellow-700 dark:text-yellow-100'
+                          }`}>
+                          {paid ? 'Paid' : uploaded ? 'Verified' : 'Pending'}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* File Details */}
+                    <View className="flex-row justify-between items-center mb-3">
+                      <Text className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Pages: {item.pages || 1}
+                      </Text>
+                      <Text className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                        ₹ {totalPrice.toFixed(2)}
+                      </Text>
+                    </View>
+
+                    {/* Action Buttons */}
+                    <View className="flex-row justify-end">
+                      {!uploaded && !paid && (
+                        <TouchableOpacity
+                          className="bg-blue-500 px-4 py-2 rounded-lg"
+                          onPress={() => {
+                            Alert.alert(
+                              "Upload File",
+                              `Upload ${item.fileName} to cloud?`,
+                              [
+                                { text: "Cancel", style: "cancel" },
+                                { text: "Upload", onPress: () => handleFileToCloud() }
+                              ]
+                            );
+                          }}
+                        >
+                          <Text className="text-white text-sm font-medium">Upload</Text>
+                        </TouchableOpacity>
+                      )}
+
+                      {uploaded && !paid && (
+                        <View className="bg-blue-100 dark:bg-blue-900 px-4 py-2 rounded-lg">
+                          <Text className={`text-sm text-blue-700 dark:text-blue-100`}>
+                            Ready for Payment
+                          </Text>
+                        </View>
+                      )}
+
+                      {paid && (
+                        <View className="flex-row items-end space-y-2">
+                          {magicCode && (
+                            <View className="bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
+                              <Text className={`text-xs font-mono ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                                Code: {magicCode}
+                              </Text>
+                            </View>
+                          )}
+                          <View className="bg-green-100 dark:bg-green-900 px-4 py-2 rounded-lg">
+                            <Text className={`text-sm text-green-700 dark:text-green-300`}>
+                              Completed ✓
+                            </Text>
+                          </View>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+
           {/* Quick Stats - Web Style */}
           <View className="mb-4">
             <View className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -379,110 +486,6 @@ export default function HomeScreen() {
                   </TouchableOpacity>
                 )}
               </View>
-            </View>
-          )}
-
-          {/* Uploaded Files Section - Web Style */}
-          {uploadedFiles.length > 0 && (
-            <View className="mb-4">
-              <Text className={`text-lg font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                Uploaded Files
-              </Text>
-
-              {/* Uploaded Files List */}
-              {uploadedFiles.map((item, index) => {
-                const totalPrice = item.price;
-
-                return (
-                  <View key={index} className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4 rounded-lg mb-3 border`}>
-                    {/* File Header - Web Style */}
-                    <View className="flex-row items-start justify-between mb-3">
-                      <View className="flex-row items-center flex-1">
-                        <View className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded items-center justify-center mr-3">
-                          <Text className="text-blue-600 text-sm font-bold">📄</Text>
-                        </View>
-                        <View className="flex-1">
-                          <Text className={`font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-600'} ${item.fileName.length > 25 ? 'text-sm' : 'text-base'}`} numberOfLines={1}>
-                            {item.fileName}
-                          </Text>
-                          <Text className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            {(item.fileSize / 1024).toFixed(0)} KB
-                          </Text>
-                        </View>
-                      </View>
-
-                      {/* Status Badge */}
-                      <View className={`px-2 py-1 rounded-full ${paid ? 'bg-green-100 dark:bg-green-900' :
-                          uploaded ? 'bg-blue-100 dark:bg-blue-900' :
-                            'bg-yellow-100 dark:bg-yellow-900'
-                        }`}>
-                        <Text className={`text-xs font-medium ${paid ? 'text-green-700 dark:text-green-300' :
-                            uploaded ? 'text-blue-700 dark:text-blue-300' :
-                              'text-yellow-700 dark:text-yellow-300'
-                          }`}>
-                          {paid ? 'Paid' : uploaded ? 'Verified' : 'Pending'}
-                        </Text>
-                      </View>
-                    </View>
-
-                    {/* File Details */}
-                    <View className="flex-row justify-between items-center mb-3">
-                      <Text className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Pages: {item.pages || 1}
-                      </Text>
-                      <Text className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                        ₹ {totalPrice.toFixed(2)}
-                      </Text>
-                    </View>
-
-                    {/* Action Buttons */}
-                    <View className="flex-row justify-end">
-                      {!uploaded && !paid && (
-                        <TouchableOpacity
-                          className="bg-blue-500 px-4 py-2 rounded-lg"
-                          onPress={() => {
-                            Alert.alert(
-                              "Upload File",
-                              `Upload ${item.fileName} to cloud?`,
-                              [
-                                { text: "Cancel", style: "cancel" },
-                                { text: "Upload", onPress: () => handleFileToCloud() }
-                              ]
-                            );
-                          }}
-                        >
-                          <Text className="text-white text-sm font-medium">Upload</Text>
-                        </TouchableOpacity>
-                      )}
-
-                      {uploaded && !paid && (
-                        <View className="bg-blue-100 dark:bg-blue-900 px-4 py-2 rounded-lg">
-                          <Text className={`text-sm text-blue-700 dark:text-blue-300`}>
-                            Ready for Payment
-                          </Text>
-                        </View>
-                      )}
-
-                      {paid && (
-                        <View className="flex-row items-end space-y-2">
-                          {magicCode && (
-                            <View className="bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
-                              <Text className={`text-xs font-mono ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                                Code: {magicCode}
-                              </Text>
-                            </View>
-                          )}
-                          <View className="bg-green-100 dark:bg-green-900 px-4 py-2 rounded-lg">
-                            <Text className={`text-sm text-green-700 dark:text-green-300`}>
-                              Completed ✓
-                            </Text>
-                          </View>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-                );
-              })}
             </View>
           )}
         </View>

@@ -11,7 +11,7 @@ export const Colors = {
     tint: '#000',
     icon: '#000',
     tabIconDefault: '#aeaeae',
-    tabIconSelected: '#000',
+    tabIconSelected: '#2563eb',
     tabBarBackground: '#fff', // ✅ Add this
   },
   dark: {

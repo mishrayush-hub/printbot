@@ -4,13 +4,14 @@
     "slug": "hello-to-instant-printing",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/ios-light.png",
     "scheme": "printbot",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "cloud.printbot.app",
+      "icon": "./assets/images/ios-light.png",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Allow PrintBot to access your photos to upload and print documents.",
         "NSPhotoLibraryAddUsageDescription": "Allow PrintBot to save printed documents to your photo library."
@@ -18,8 +19,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "monochromeImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#008cff"
+      },
+      "icon": {
+        "light": "./assets/images/icon-light.png",
+        "dark": "./assets/images/icon-dark.png",
+        "tinted": "./assets/images/icon-tinted.png"
       },
       "package": "cloud.printbot.app",
       "permissions": [
@@ -39,7 +46,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash.png",
+          "image": "./assets/images/splash-white.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#008cff"

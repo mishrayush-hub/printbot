@@ -162,7 +162,7 @@ export default function VerifyForgotPassword() {
         <View className="h-56 px-6 pt-12">
           <View className="flex items-center mt-6">
             <Image
-              source={require("../../assets/images/icon-black.png")}
+              source={require("../../assets/images/splash-black.png")}
               style={{ width: 100, height: 100 }}
               resizeMode="contain"
             />

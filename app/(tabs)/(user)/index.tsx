@@ -406,10 +406,11 @@ export default function ProfileScreen() {
         <Text className="text-white font-semibold text-center text-base">Logout</Text>
       </TouchableOpacity>
     </View>
-  );  const renderPaymentsTab = () => (
-    <View className="py-6 px-2">
-      <View className={`${cardBg} rounded-lg pt-6 pb-6 px-4 border ${borderColor} shadow-sm`}>
-        <Text className={`${textColor} text-xl font-bold mb-6`}>Payment History</Text>
+  );  
+  const renderPaymentsTab = () => (
+    <View className="py-6">
+      <View className={`${bgColor} rounded-lg pb-6 px-2 shadow-sm`}>
+        {/* <Text className={`${textColor} text-xl font-bold mb-6`}>Payment History</Text> */}
         
         {paymentLoading ? (
           <View className="justify-center items-center py-10">
@@ -425,11 +426,11 @@ export default function ProfileScreen() {
             <Text className={`${subText} text-center`}>Your payment history will appear here</Text>
           </View>
         ) : (
-          <View className="space-y-2">
+          <View className="space-y-2 gap-1">
             {paymentHistory.map((payment, index) => (
               <View
                 key={index}
-                className={`border ${borderColor} rounded-lg p-4 mb-2`}
+                className={`${cardBg} border ${borderColor} rounded-lg p-4 mb-2`}
               >
                 <View className="flex-row items-start justify-between">
                   <View className="flex-row items-center flex-1">
@@ -465,8 +466,8 @@ export default function ProfileScreen() {
   );
 
   const renderSecurityTab = () => (
-    <View className={`${cardBg} rounded-lg py-6 px-4 my-4 mx-2 rounded-lg p-6 border ${borderColor} shadow-sm`}>
-      <Text className={`${textColor} text-xl font-bold mb-6`}>Security Settings</Text>
+    <View className={`${cardBg} rounded-lg py-6 px-4 my-6 mx-2 rounded-lg p-6 border ${borderColor} shadow-sm`}>
+      {/* <Text className={`${textColor} text-xl font-bold mb-6`}>Security Settings</Text> */}
       
       <View className="space-y-4">
         <TouchableOpacity
@@ -508,7 +509,7 @@ export default function ProfileScreen() {
   const renderLegalTab = () => (
     <View className="py-6 px-2">
       <View className={`${cardBg} rounded-lg pt-6 pb-6 px-4 border ${borderColor} shadow-sm`}>
-        <Text className={`${textColor} text-xl font-bold mb-6`}>Legal Information</Text>
+        {/* <Text className={`${textColor} text-xl font-bold mb-6`}>Legal Information</Text> */}
         
         <View className="space-y-4">
           <TouchableOpacity
@@ -607,7 +608,7 @@ export default function ProfileScreen() {
 
       {/* Tab Content */}
       <ScrollView
-        className="flex-1"
+        className="flex-1 px-2"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={

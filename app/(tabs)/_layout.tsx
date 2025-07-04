@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { Platform, Text } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
-import { ShoppingBag, House, UserRoundCog } from 'lucide-react-native';
-import TabBarBackground from '@/components/ui/TabBarBackground';
+import { ShoppingBag, House, UserRoundCog, ImageUp } from 'lucide-react-native';
+// import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -37,9 +37,9 @@ export default function TabLayout() {
         tabBarStyle: Platform.select({
           ios: {
             position: 'absolute',
-            backgroundColor: theme.tabBarBackground,
-            height: 70,
-            paddingTop: 10,
+            backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+            height: 80,
+            paddingTop: 15,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
             borderBottomRightRadius: 30,
@@ -52,9 +52,9 @@ export default function TabLayout() {
           },
           android: {
            position: 'absolute',
-            backgroundColor: theme.tabBarBackground,
-            height: 70,
-            paddingTop: 10,
+            backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+            height: 80,
+            paddingTop: 15,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
             borderBottomRightRadius: 30,
@@ -84,7 +84,7 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: 'Upload History',
-          tabBarIcon: ({ color }) => <ShoppingBag size={26} color={color} />,
+          tabBarIcon: ({ color }) => <ImageUp size={26} color={color} />,
           tabBarLabel: 'History', // 👈 shown in tab bar
           headerTitleAlign: 'center', // 👈 center the header title
           headerStyle: {

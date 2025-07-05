@@ -293,7 +293,7 @@ export default function ProfileScreen() {
   );
 
   const renderProfileTab = () => (
-    <View className="py-6 px-2">
+    <View className="py-4 px-2">
       <View className={`${cardBg} rounded-lg p-6 border ${borderColor} shadow-sm`}>
         <View className="flex-row items-center justify-between mb-6">
           <View className="flex-row items-center">
@@ -408,7 +408,7 @@ export default function ProfileScreen() {
     </View>
   );  
   const renderPaymentsTab = () => (
-    <View className="py-6">
+    <View className="py-4">
       <View className={`rounded-lg pb-6 px-2`}>
         {/* <Text className={`${textColor} text-xl font-bold mb-6`}>Payment History</Text> */}
         
@@ -466,7 +466,7 @@ export default function ProfileScreen() {
   );
 
   const renderSecurityTab = () => (
-    <View className={`${cardBg} rounded-lg py-6 px-4 my-6 mx-2 rounded-lg p-6 border ${borderColor} shadow-sm`}>
+    <View className={`${cardBg} rounded-lg py-6 px-4 my-4 mx-2 rounded-lg p-6 border ${borderColor} shadow-sm`}>
       {/* <Text className={`${textColor} text-xl font-bold mb-6`}>Security Settings</Text> */}
       
       <View className="space-y-4">
@@ -507,7 +507,7 @@ export default function ProfileScreen() {
   );
 
   const renderLegalTab = () => (
-    <View className="py-6 px-2">
+    <View className="py-4 px-2">
       <View className={`${cardBg} rounded-lg pt-6 pb-6 px-4 border ${borderColor} shadow-sm`}>
         {/* <Text className={`${textColor} text-xl font-bold mb-6`}>Legal Information</Text> */}
         

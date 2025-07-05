@@ -12,7 +12,6 @@ export default function LegalLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        headerShadowVisible: false, // Remove header shadow for consistency
       }}
     >
       <Stack.Screen 

@@ -1,7 +1,7 @@
 import { Tabs, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Platform, Text } from 'react-native';
-
+import DeviceInfo from 'react-native-device-info';
 import { HapticTab } from '@/components/HapticTab';
 import { Cog, House, ImageUp } from 'lucide-react-native';
 // import TabBarBackground from '@/components/ui/TabBarBackground';
@@ -45,7 +45,7 @@ export default function TabLayout() {
             borderBottomRightRadius: 30,
             borderBottomLeftRadius: 30,
             shadowOpacity: 0,
-            marginBottom: 20,
+            marginBottom: DeviceInfo.isTablet() === true ? 5 : 20,
             marginHorizontal: 13.5,
             borderWidth: 0.5,
             borderColor: colorScheme === 'dark' ? '#444444' : '#CCCCCC',

@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { callbackAPI } from "@/hooks/useCallbackAPI";
 import { usePaymentAPI } from "@/hooks/usePayementAPI";
 import { generateTransactionId } from "@/hooks/generateTransactionId";
+import { checkAndRequestPermissions, showPermissionRequiredAlert } from "@/utils/permissionUtils";
 
 export default function HomeScreen() {
   const [uploadedFiles, setUploadedFiles] = useState<
@@ -200,6 +201,13 @@ export default function HomeScreen() {
   // File Upload Handler
   const handleFileUpload = async () => {
     try {
+      // Check permissions first
+      const hasPermissions = await checkAndRequestPermissions();
+      if (!hasPermissions) {
+        showPermissionRequiredAlert();
+        return;
+      }
+
       const result = await DocumentPicker.getDocumentAsync({
         type: ["application/pdf", "image/jpeg"],
         multiple: false,

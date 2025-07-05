@@ -168,7 +168,7 @@ export default function SignupScreen() {
         <View className="h-56 px-6 pt-12">
           <View className="flex items-center mt-6">
             <Image
-              source={require("../../assets/images/splash-black.png")}
+              source={require("../../assets/images/splash-white.png")}
               style={{ width: 100, height: 100 }}
               resizeMode="contain"
             />

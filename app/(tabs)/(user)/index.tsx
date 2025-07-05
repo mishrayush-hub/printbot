@@ -409,7 +409,7 @@ export default function ProfileScreen() {
   );  
   const renderPaymentsTab = () => (
     <View className="py-6">
-      <View className={`rounded-lg pb-6 px-2 shadow-sm`}>
+      <View className={`rounded-lg pb-6 px-2`}>
         {/* <Text className={`${textColor} text-xl font-bold mb-6`}>Payment History</Text> */}
         
         {paymentLoading ? (
@@ -608,7 +608,7 @@ export default function ProfileScreen() {
 
       {/* Tab Content */}
       <ScrollView
-        className="flex-1 px-2"
+        className="flex-1 px-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={

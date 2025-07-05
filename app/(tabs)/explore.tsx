@@ -382,7 +382,7 @@ export default function OrdersScreen() {
       </View>
 
       {/* Content */}
-      <View className="flex-1 px-2">
+      <View className="flex-1 px-3">
         {!authLoaded || loading ? (
           <View className="flex-1 justify-center items-center">
             <ActivityIndicator size="large" color="#3B82F6" />

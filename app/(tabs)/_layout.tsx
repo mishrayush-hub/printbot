@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Platform, Text } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
-import { ShoppingBag, House, UserRoundCog, ImageUp } from 'lucide-react-native';
+import { Cog, House, ImageUp } from 'lucide-react-native';
 // import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -53,15 +53,15 @@ export default function TabLayout() {
           android: {
            position: 'absolute',
             backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
-            height: 80,
-            paddingTop: 15,
+            height: 75,
+            paddingTop: 11,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
             borderBottomRightRadius: 30,
             borderBottomLeftRadius: 30,
             shadowOpacity: 0,
-            marginBottom: 20,
-            marginHorizontal: 13.5,
+            marginBottom: 10,
+            marginHorizontal: 10,
             borderWidth: 0.5,
             elevation: 10,
             borderColor: colorScheme === 'dark' ? '#444444' : '#CCCCCC',
@@ -108,8 +108,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="(user)"
         options={{
-          title: 'Profile',
-          tabBarIcon: ({ color }) => <UserRoundCog size={28} color={color} />,
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <Cog size={28} color={color} />,
           headerStyle: {
                 backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
             },

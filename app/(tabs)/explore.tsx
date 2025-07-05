@@ -250,12 +250,19 @@ export default function OrdersScreen() {
             </Text>
           </View>
         </View>
-        {getStatusBadge(item)}
+        <View className="flex-1 flex-col items-end justify-end">
+          {getStatusBadge(item)}
+          {item.payment_success && (
+          <Text className={`${subText} text-xs mt-1`}>
+            {item.printed === true ? "Printed" : "Not Printed"}
+          </Text>
+          )}
+        </View>
       </View>
 
       {/* File details */}
       <View className="flex-row justify-between items-center mb-3">
-        <View className="flex-row items-center">
+        <View className="flex-row items-center"> 
           <Calendar color={isDark ? "#9CA3AF" : "#6B7280"} size={16} />
           <Text className={`${subText} text-sm ml-2`}>
             {new Date(item.uploaded_date).toLocaleDateString('en-US', {

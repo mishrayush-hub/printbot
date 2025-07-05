@@ -86,9 +86,9 @@ export default function OrdersScreen() {
           setUserPhone(phone);
           setAuthLoaded(true);
           setFilteringComplete(false); // Initialize filtering state
-          console.log("User info loaded:", { token, id });
+          // // console.log("User info loaded:", { token, id });
         } else {
-          console.log("User details missing from storage.");
+          // console.log("User details missing from storage.");
           setAuthLoaded(true); // Still set to true even if no auth data
           setFilteringComplete(true); // No data to filter
         }
@@ -192,7 +192,7 @@ export default function OrdersScreen() {
       );
 
       if (result) {
-        console.log("Payment Success:", result);
+        // console.log("Payment Success:", result);
         // Call the callback API to generate magic code
         const magicCode = await callbackAPI(txnId, userId, file.id.toString());
         

@@ -79,12 +79,12 @@ export default function VerifyForgotPassword() {
     password: any,
     confirmPassword: any
   ) => {
-    console.log("Values:", {
-      email,
-      forgotToken,
-      password,
-      confirmPassword
-    });
+    //  console.log("Values:", {
+    //   email,
+    //   forgotToken,
+    //   password,
+    //   confirmPassword
+    // });
     try {
       setLoading(true);
       const response = await fetch(
@@ -106,7 +106,7 @@ export default function VerifyForgotPassword() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        console.log("Forgot Password response:", data.message);
+        // console.log("Forgot Password response:", data.message);
         setErrorMessage(
           data.message || "Forgot Password failed. Please try again."
         );

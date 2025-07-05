@@ -16,11 +16,11 @@ export const callbackAPI = async (orderId: string, user_id: string, file_id: str
         }).toString()
       });
 
-      console.log("Data: ", {
-        orderId: orderId,
-        userId: user_id,
-        fileId: file_id
-      });
+      // console.log("Data: ", {
+      //   orderId: orderId,
+      //   userId: user_id,
+      //   fileId: file_id
+      // });
       
       const data = await response.json();
       
@@ -29,7 +29,7 @@ export const callbackAPI = async (orderId: string, user_id: string, file_id: str
         Alert.alert("Error", data.message || "Failed to generate magic code.");
         return null; // Return null in case of error
       } else {
-        console.log("Magic code generated:", data);
+        // console.log("Magic code generated:", data);
         Alert.alert(
           "Magic Code Generated",
           `Your magic code is: ${data.data.magic_code}`,

@@ -83,7 +83,7 @@ export default function HomeScreen() {
         PaytmInstalled
       );
       if (result) {
-        console.log("Payment Success:", result);
+        // // console.log("Payment Success:", result);
         setPaid(true);
         const magic = await callbackAPI(txnId, userId, fileId); // Call the callback API with txnId, userId, and fileId
         if (magic) {
@@ -142,7 +142,7 @@ export default function HomeScreen() {
           Alert.alert("Upload Failed", data.message || "Unknown error.");
           setUploaded(false);
         } else {
-          console.log("File uploaded:", data);
+          // // console.log("File uploaded:", data);
           setUploaded(true);
           setReturnedPageCount(data.page_count || 0);
           setFileId(data.file_id || "");

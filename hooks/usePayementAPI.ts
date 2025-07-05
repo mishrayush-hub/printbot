@@ -98,7 +98,7 @@ export const usePaymentAPI = async (
         );
 
         if (result.status === "SUCCESS") {
-            console.log("Payment Success:", result);
+            // console.log("Payment Success:", result);
             return true;
         } else {
             console.error("Payment Failed:", result);

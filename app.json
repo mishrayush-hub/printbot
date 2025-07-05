@@ -13,8 +13,8 @@
       "bundleIdentifier": "cloud.printbot.app",
       "icon": "./assets/images/ios-light.png",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Allow PrintBot to access your photos to upload and print documents.",
-        "NSPhotoLibraryAddUsageDescription": "Allow PrintBot to save printed documents to your photo library."
+        "NSPhotoLibraryUsageDescription": "Allow PrintBot to access your photos to upload and print documents. This permission is required to select files from your photo library to upload to our servers.",
+        "NSPhotoLibraryAddUsageDescription": "Allow PrintBot to save printed documents to your photo library. This permission is required to select printed documents after processing in our servers."
       }
     },
     "android": {

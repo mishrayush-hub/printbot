@@ -58,9 +58,9 @@
     <key>NSMicrophoneUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your microphone</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>Allow PrintBot to save printed documents to your photo library.</string>
+    <string>Allow PrintBot to save printed documents to your photo library. This permission is required to select printed documents after processing in our servers.</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>Allow PrintBot to access your photos to upload and print documents.</string>
+    <string>Allow PrintBot to access your photos to upload and print documents. This permission is required to select files from your photo library to upload to our servers.</string>
     <key>NSUserActivityTypes</key>
     <array>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>

@@ -1,6 +1,5 @@
 
 import { Alert } from "react-native";
-import Clipboard from "@react-native-clipboard/clipboard";
 
 export const callbackAPI = async (orderId: string, user_id: string, file_id: string) => {
     try {
@@ -35,15 +34,8 @@ export const callbackAPI = async (orderId: string, user_id: string, file_id: str
           `Your magic code is: ${data.data.magic_code}`,
           [
             { text: "OK", style: "default" },
-            {
-              text: "Copy to Clipboard",
-              onPress: () => {
-                Clipboard.setString(data.data.magic_code);
-                // Optional: Show a toast that it was copied
-                Alert.alert("Copied!", "Magic code copied to clipboard.");
-              }
-            }
-          ]
+          ],
+          { cancelable: true }
         );
         return data.data.magic_code; // Return the magic code
       }

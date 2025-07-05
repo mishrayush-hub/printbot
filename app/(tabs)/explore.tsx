@@ -10,7 +10,6 @@ import {
   TextInput,
   ScrollView
 } from "react-native";
-import Clipboard from "@react-native-clipboard/clipboard";
 import { ShoppingCart, Search, RefreshCw, Filter, FileText, Calendar, DollarSign } from "lucide-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { callbackAPI } from "@/hooks/useCallbackAPI";

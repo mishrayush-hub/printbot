@@ -79,7 +79,7 @@ export default function LoginScreen() {
       await AsyncStorage.setItem("userPhone", data.data.phone_number);
       await AsyncStorage.setItem("userId", data.data.user_id.toString());
 
-      router.push("/(tabs)");
+      router.replace("/(tabs)");
     } catch (error) {
       console.error("Login error:", error);
       setLoading(false);

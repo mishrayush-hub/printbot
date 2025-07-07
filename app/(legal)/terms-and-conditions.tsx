@@ -259,6 +259,7 @@ export default function TermsAndConditionsScreen() {
             }`}
           >
             For questions about these terms and conditions:
+            {"\n"}💼 Business Name: MadhuSons Group
             {"\n"}📧 Email: support@printbot.cloud
             {"\n"}📞 Phone: +91 9999273367
             {"\n"}🏢 Address: C-336, Greater Noida, Uttar Pradesh, 201310, India

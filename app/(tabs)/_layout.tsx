@@ -122,7 +122,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="explore"
           options={{
-            title: 'Upload History',
+            title: 'Your Orders',
             tabBarIcon: ({ color }) => <ImageUp size={28} color={color} />,
             tabBarLabel: 'History', // 👈 shown in tab bar
             headerTitleAlign: 'center', // 👈 center the header title

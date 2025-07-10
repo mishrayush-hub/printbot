@@ -54,6 +54,21 @@ export default function HomeScreen() {
     getTokenDetails();
   }, []);
 
+  const removeFile = () => {
+    setFile({
+      uri: "",
+      name: "",
+      type: ""
+    });
+    setUploaded(false);
+    setUploadedFiles([]);
+    setFileId("");
+    setPaid(false);
+    setMagicCode("");
+    setReturnedPageCount(0);
+    setLoading(false);
+  };
+
   const { initiatePayment, modalState, setModalVisible } = usePaymentAPI();
 
   const paymentHandler = async () => {
@@ -200,7 +215,7 @@ export default function HomeScreen() {
       }
 
       const result = await DocumentPicker.getDocumentAsync({
-        type: ["application/pdf", "image/jpeg"],
+        type: ["application/pdf"],
         multiple: false,
       });
 
@@ -226,10 +241,8 @@ export default function HomeScreen() {
         if (fileType === "application/pdf") {
           pageCount = await getPdfPageCount(file.uri);
           price = calculatePrice(pageCount); // Use tiered pricing
-        } else if (fileType === "image/jpeg") {
-          price = 10;
         } else {
-          Alert.alert("Invalid File", "Only PDF and JPG files are allowed.");
+          Alert.alert("Invalid File", "Only PDF files are allowed.");
           return;
         }
 
@@ -286,16 +299,16 @@ export default function HomeScreen() {
           <View className={`border-2 border-dashed ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} rounded-lg p-6 items-center justify-center ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
             <Upload size={40} color={isDarkMode ? '#60a5fa' : '#3b82f6'} />
             <Text className={`text-base font-medium mt-3 mb-1 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-              Drop files here or click to browse
+              Drop PDF files here or click to browse
             </Text>
             <Text className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              Supports PDF up to 50MB
+              Supports PDF files up to 50MB
             </Text>
             <TouchableOpacity
               className="bg-blue-500 px-6 py-2 rounded-lg"
               onPress={handleFileUpload}
             >
-              <Text className="text-white font-medium">Select Files</Text>
+              <Text className="text-white font-medium">Select PDF</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -358,7 +371,25 @@ export default function HomeScreen() {
                     <View className="flex-row justify-end">
                       {!uploaded && !paid && (
                         <TouchableOpacity
-                          className="bg-blue-500 px-4 py-2 rounded-lg"
+                          className="bg-red-500 px-4 py-2 rounded-lg mr-2"
+                          onPress={() => {
+                            Alert.alert(
+                              "Remove File",
+                              `Remove ${item.fileName}?`,
+                              [
+                                { text: "Cancel", style: "cancel" },
+                                { text: "Remove", style: "destructive", onPress: removeFile }
+                              ]
+                            );
+                          }}
+                        >
+                          <Text className="text-white text-sm font-medium">Remove</Text>
+                        </TouchableOpacity>
+                      )}
+                      
+                      {!uploaded && !paid && (
+                        <TouchableOpacity
+                          className="bg-blue-500 px-6 py-2 rounded-lg items-center"
                           onPress={() => {
                             Alert.alert(
                               "Upload File",
@@ -370,7 +401,7 @@ export default function HomeScreen() {
                             );
                           }}
                         >
-                          <Text className="text-white text-sm font-medium">Upload</Text>
+                          <Text className="text-white text-sm font-medium">Upload File</Text>
                         </TouchableOpacity>
                       )}
 
@@ -499,6 +530,7 @@ export default function HomeScreen() {
         stage={modalState.stage}
         magicCode={modalState.magicCode}
         errorMessage={modalState.errorMessage}
+        onClose={() => setModalVisible(false)}
       />
     </View>
   );

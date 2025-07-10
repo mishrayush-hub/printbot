@@ -5,14 +5,16 @@ import {
   Modal,
   ActivityIndicator,
   useColorScheme,
+  TouchableOpacity,
 } from 'react-native';
-import { CheckCircle, Clock } from 'lucide-react-native';
+import { CheckCircle, Clock, X } from 'lucide-react-native';
 
 interface PaymentProcessingModalProps {
   visible: boolean;
   stage: 'processing' | 'success' | 'error';
   magicCode?: string;
   errorMessage?: string;
+  onClose?: () => void;
 }
 
 export default function PaymentProcessingModal({
@@ -20,6 +22,7 @@ export default function PaymentProcessingModal({
   stage,
   magicCode,
   errorMessage,
+  onClose,
 }: PaymentProcessingModalProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -68,8 +71,21 @@ export default function PaymentProcessingModal({
       animationType="fade"
       statusBarTranslucent
     >
-      <View className="flex-1 bg-black/50 justify-center items-center px-4">
-        <View className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-8 w-full max-w-sm mx-4 shadow-2xl`}>
+      <View className="flex-1 bg-black/50 justify-center items-center px-4 py-2">
+        <View className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-8 w-full max-w-sm mx-4 shadow-2xl relative`}>
+          {/* Close Button */}
+          {onClose && (
+            <TouchableOpacity
+              onPress={onClose}
+              className="absolute top-4 mt-2 right-4 z-10"
+              style={{ zIndex: 10 }}
+            >
+              <View className={`w-8 h-8 rounded-full ${isDark ? 'bg-gray-700' : 'bg-gray-100'} items-center justify-center`}>
+                <X size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+              </View>
+            </TouchableOpacity>
+          )}
+          
           {/* Icon */}
           <View className="items-center mb-6">
             <View className={`${isDark ? (stage === 'success' ? 'bg-green-900' : stage === 'error' ? 'bg-red-900' : 'bg-blue-900') : (stage === 'success' ? 'bg-green-100' : stage === 'error' ? 'bg-red-100' : 'bg-blue-100')} p-4 rounded-full mb-4`}>

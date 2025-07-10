@@ -32,7 +32,7 @@ export default function OrdersScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
-  const [paymentLoading, setPaymentLoading] = useState<{[key: string]: boolean}>({});
+  const [paymentLoading, setPaymentLoading] = useState<{ [key: string]: boolean }>({});
 
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -144,15 +144,15 @@ export default function OrdersScreen() {
   // Filter files based on search and status
   useEffect(() => {
     setFilteringComplete(false);
-    
+
     let filtered = files;
-    
+
     if (searchQuery) {
-      filtered = filtered.filter((file: any) => 
+      filtered = filtered.filter((file: any) =>
         file.file_name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     if (statusFilter !== "All") {
       filtered = filtered.filter((file: any) => {
         if (statusFilter === "Paid") return file.payment_success;
@@ -161,7 +161,7 @@ export default function OrdersScreen() {
         return true;
       });
     }
-    
+
     setFilteredFiles(filtered);
     setFilteringComplete(true);
   }, [files, searchQuery, statusFilter]);
@@ -174,7 +174,7 @@ export default function OrdersScreen() {
       setPaymentLoading(prev => ({ ...prev, [file.id]: true }));
       const txnId = generateTransactionId();
       const amount = calculatePrice(file.page_count);
-      
+
       const result = await initiatePayment(
         txnId,
         amount,
@@ -241,16 +241,16 @@ export default function OrdersScreen() {
         <View className="flex-1 flex-col items-end justify-end">
           {getStatusBadge(item)}
           {item.payment_success && (
-          <Text className={`${subText} text-xs mt-1`}>
-            {item.printed === true ? "Printed" : "Not Printed"}
-          </Text>
+            <Text className={`${subText} text-xs mt-1`}>
+              {item.printed === true ? "Printed" : "Not Printed"}
+            </Text>
           )}
         </View>
       </View>
 
       {/* File details */}
       <View className="flex-row justify-between items-center mb-3">
-        <View className="flex-row items-center"> 
+        <View className="flex-row items-center">
           <Calendar color={isDark ? "#9CA3AF" : "#6B7280"} size={16} />
           <Text className={`${subText} text-sm ml-2`}>
             {new Date(item.uploaded_date).toLocaleDateString('en-US', {
@@ -260,7 +260,7 @@ export default function OrdersScreen() {
             })}
           </Text>
         </View>
-        
+
         <View className="flex-row items-center">
           <Text className={`${subText} text-sm`}>
             {item.page_count <= 1 ? item.page_count + " page" : item.page_count + " pages"}
@@ -321,7 +321,7 @@ export default function OrdersScreen() {
               className={`flex-1 ml-3 ${textColor} text-base`}
             />
           </View>
-          
+
           <TouchableOpacity
             onPress={() => {
               setRefreshing(true);
@@ -335,9 +335,9 @@ export default function OrdersScreen() {
 
         {/* Filter Buttons */}
         <View className="flex-row items-center mt-1">
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false} 
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
             className="flex-1"
             contentContainerStyle={{ paddingRight: 12 }}
           >
@@ -346,18 +346,16 @@ export default function OrdersScreen() {
                 <TouchableOpacity
                   key={status}
                   onPress={() => setStatusFilter(status)}
-                  className={`px-4 py-2 rounded-full min-w-[80px] items-center ${
-                    statusFilter === status
+                  className={`px-4 py-2 rounded-full min-w-[80px] items-center ${statusFilter === status
                       ? "bg-blue-500"
                       : isDark ? "bg-gray-700" : "bg-gray-200"
-                  }`}
+                    }`}
                 >
                   <Text
-                    className={`font-medium text-sm ${
-                      statusFilter === status
+                    className={`font-medium text-sm ${statusFilter === status
                         ? "text-white"
                         : isDark ? "text-gray-300" : "text-gray-700"
-                    }`}
+                      }`}
                   >
                     {status}
                   </Text>
@@ -426,6 +424,7 @@ export default function OrdersScreen() {
           stage={modalState.stage}
           magicCode={modalState.magicCode}
           errorMessage={modalState.errorMessage}
+          onClose={() => setModalVisible(false)}
         />
       </View>
     </View>

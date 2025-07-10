@@ -11,7 +11,7 @@ import { checkAndRequestPermissions, showPermissionRequiredAlert } from "@/utils
 
 export default function HomeScreen() {
   const [uploadedFiles, setUploadedFiles] = useState<
-    { fileName: string; fileSize: number; fileType: string; pages?: number; price: number; otp: number; copies: number }[]
+    { fileName: string; fileSize: number; fileType: string; pages?: number; price: number; otp: number; copies: number; isEstimated?: boolean }[]
   >([]);
   const colorScheme = useColorScheme();
   const [authToken, setAuthToken] = useState("");
@@ -116,12 +116,28 @@ export default function HomeScreen() {
       const authToken = await AsyncStorage.getItem("authToken") || "";
       const userId = await AsyncStorage.getItem("userId") || "";
 
-      if (!file) {
+      if (!file || !file.uri) {
         Alert.alert("No file selected", "Please select a file before uploading.");
         setLoading(false);
         setUploaded(false);
         return;
       }
+
+      // Validate file exists
+      const fileInfo = await FileSystem.getInfoAsync(file.uri);
+      if (!fileInfo.exists) {
+        Alert.alert("File Error", "The selected file no longer exists. Please select a new file.");
+        setLoading(false);
+        setUploaded(false);
+        return;
+      }
+
+      // console.log("Uploading file:", {
+      //   uri: file.uri,
+      //   name: file.name,
+      //   type: file.type,
+      //   size: fileInfo.size
+      // });
 
       const formData = new FormData();
       formData.append("authToken", authToken);
@@ -141,23 +157,47 @@ export default function HomeScreen() {
       });
 
       const text = await response.text();
+      // console.log("Upload response:", text);
 
       try {
         const data = JSON.parse(text);
+        // console.log("Parsed response:", data);
+        
         if (!response.ok || !data.success) {
           console.error("Upload failed:", data.message);
-          Alert.alert("Upload Failed", data.message || "Unknown error.");
+          Alert.alert("Upload Failed", data.message || "Unknown error occurred during upload.");
           setUploaded(false);
         } else {
-          // // console.log("File uploaded:", data);
+          // console.log("Upload successful:", data);
           setUploaded(true);
           setReturnedPageCount(data.page_count || 0);
           setFileId(data.file_id || "");
-          Alert.alert("Upload Successful", "Your file has been uploaded to the cloud.");
+          
+          // Update the uploaded files with server response
+          if (data.page_count && uploadedFiles.length > 0) {
+            const serverPageCount = data.page_count;
+            const serverPrice = calculatePrice(serverPageCount);
+            
+            const updatedFiles = uploadedFiles.map(f => ({
+              ...f,
+              pages: serverPageCount,
+              price: serverPrice,
+              isEstimated: false // Now we have actual count
+            }));
+            setUploadedFiles(updatedFiles);
+            
+            // console.log("Updated pricing based on server response:", {
+            //   serverPageCount,
+            //   serverPrice,
+            //   pricePerPage: getPricePerPage(serverPageCount)
+            // });
+          }
+          
+          Alert.alert("Upload Successful", `Your file has been uploaded to the cloud. Pages: ${data.page_count || 'Unknown'}`);
         }
       } catch (jsonError) {
         console.error("Invalid JSON from server:", text);
-        Alert.alert("Upload Failed", "Unexpected server response.");
+        Alert.alert("Upload Failed", "Unexpected server response. Please try again.");
         setUploaded(false);
       }
 
@@ -173,9 +213,54 @@ export default function HomeScreen() {
   // Function to count pages in a PDF
   const getPdfPageCount = async (uri: string) => {
     try {
-      const fileData = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
-      const matches = fileData.match(/\/Type\s*\/Page[^s]/g);
-      return matches ? matches.length : 1;
+      // For mobile, we'll use a more reliable approach
+      // First, try to read the file info
+      const fileInfo = await FileSystem.getInfoAsync(uri);
+      if (!fileInfo.exists) {
+        console.error("File does not exist:", uri);
+        return 1;
+      }
+
+      try {
+        // Try to read as binary and look for page markers
+        const fileData = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+        
+        // Convert base64 to binary string for better parsing
+        const binaryData = atob(fileData);
+        
+        // Look for PDF page count patterns
+        const pageCountPatterns = [
+          /\/Count\s+(\d+)/g,
+          /\/Type\s*\/Page[^s]/g,
+          /\/N\s+(\d+)/g
+        ];
+        
+        let maxCount = 0;
+        
+        for (const pattern of pageCountPatterns) {
+          const matches = binaryData.match(pattern);
+          if (matches) {
+            if (pattern.source.includes('Count') || pattern.source.includes('N')) {
+              // Extract number from /Count or /N pattern
+              const countMatch = pattern.exec(binaryData);
+              if (countMatch && countMatch[1]) {
+                maxCount = Math.max(maxCount, parseInt(countMatch[1], 10));
+              }
+            } else {
+              // Count occurrences for /Type /Page pattern
+              maxCount = Math.max(maxCount, matches.length);
+            }
+          }
+        }
+        
+        return maxCount > 0 ? maxCount : 1;
+      } catch (parseError) {
+        console.error("Error parsing PDF for page count:", parseError);
+        // Fallback: estimate based on file size (rough estimate)
+        const sizeInKB = fileInfo.size / 1024;
+        const estimatedPages = Math.max(1, Math.ceil(sizeInKB / 50)); // Assume ~50KB per page
+        return Math.min(estimatedPages, 100); // Cap at 100 pages for safety
+      }
     } catch (error) {
       console.error("Error getting PDF page count:", error);
       return 1;
@@ -230,20 +315,43 @@ export default function HomeScreen() {
         
         const file = result.assets[0];
         const fileType = file.mimeType || "";
+        
+        // Validate file type
+        if (fileType !== "application/pdf") {
+          Alert.alert("Invalid File", "Only PDF files are allowed.");
+          return;
+        }
+        
+        // console.log("Selected file:", {
+        //   name: file.name,
+        //   size: file.size,
+        //   type: fileType,
+        //   uri: file.uri
+        // });
+        
         setFile({
           uri: file.uri,
-          name: file.name || `PB_File_${userId}}`,
+          name: file.name || `PB_File_${userId}`,
           type: fileType,
         });
+        
         let price = 0;
         let pageCount = 1;
 
-        if (fileType === "application/pdf") {
+        try {
           pageCount = await getPdfPageCount(file.uri);
-          price = calculatePrice(pageCount); // Use tiered pricing
-        } else {
-          Alert.alert("Invalid File", "Only PDF files are allowed.");
-          return;
+          price = calculatePrice(pageCount);
+          
+          // console.log("PDF analysis:", {
+          //   pageCount,
+          //   price,
+          //   pricePerPage: getPricePerPage(pageCount)
+          // });
+        } catch (error) {
+          console.error("Error analyzing PDF:", error);
+          Alert.alert("Warning", "Could not analyze PDF properly. Using default pricing.");
+          pageCount = 1;
+          price = 4; // Default to 1 page at ₹4
         }
 
         const otp = Math.floor(100000 + Math.random() * 900000);
@@ -252,10 +360,11 @@ export default function HomeScreen() {
           fileName: file.name ?? "Unknown File",
           fileSize: file.size ?? 0,
           fileType,
-          pages: fileType === "application/pdf" ? pageCount : undefined,
+          pages: pageCount,
           price,
           otp,
           copies: 1,
+          isEstimated: true, // Flag to indicate this is estimated, will be updated after upload
         };
 
         setUploadedFiles([newFile]); // Replace with new file instead of adding
@@ -292,6 +401,9 @@ export default function HomeScreen() {
             </Text>
             <Text className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               • Less than 10 pages: ₹4/page  • 10-50 pages: ₹3/page  • 50+ pages: ₹2/page
+            </Text>
+            <Text className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              Page count is estimated until upload. Final price will be calculated after upload.
             </Text>
           </View>
 
@@ -359,9 +471,16 @@ export default function HomeScreen() {
 
                     {/* File Details */}
                     <View className="flex-row justify-between items-center mb-3">
-                      <Text className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Pages: {item.pages || 1}
-                      </Text>
+                      <View className="flex-row items-center">
+                        <Text className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Pages: {item.pages || 1}
+                        </Text>
+                        {item.isEstimated && !uploaded && (
+                          <Text className={`text-xs ml-2 px-2 py-1 rounded ${isDarkMode ? 'bg-yellow-900 text-yellow-300' : 'bg-yellow-100 text-yellow-700'}`}>
+                            Estimated
+                          </Text>
+                        )}
+                      </View>
                       <Text className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                         ₹ {totalPrice.toFixed(2)}
                       </Text>

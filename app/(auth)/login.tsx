@@ -14,6 +14,7 @@ import {
   KeyboardAvoidingView,
   Platform
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -98,7 +99,12 @@ export default function LoginScreen() {
       className="flex-1" 
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View className={`bg-[#008cff] flex-1`}>
+      <LinearGradient
+        colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
+        style={{ flex: 1 }}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      >
         {/* Loading Modal */}
         <Modal transparent={true} animationType="fade" visible={loading}>
           <View className="flex-1 justify-center items-center bg-black/40">
@@ -107,14 +113,14 @@ export default function LoginScreen() {
         </Modal>
 
         {/* Header */}
-        <View className="h-56 px-6 pt-12">
+        <View className="h-56 px-6 pt-7">
           <View className="flex items-center mt-6">
             <Image
               source={require("../../assets/images/splash-black.png")}
-              style={{ width: 100, height: 100 }}
+              style={{ width: 150, height: 150 }}
               resizeMode="contain"
             />
-            <Text className="font-bold text-3xl text-white">Printbot</Text>
+            {/* <Text className="font-bold text-3xl text-white">Printbot</Text> */}
           </View>
         </View>
 
@@ -194,12 +200,26 @@ export default function LoginScreen() {
 
         {/* Login Button */}
         <TouchableOpacity
-          className="bg-[#008cff] w-[326px] h-[51px] rounded-full py-3"
+          className="w-[326px] h-[51px] rounded-full"
           onPress={handleLogin}
         >
-          <Text className="text-white text-center text-2xl font-bold">
-            Login
-          </Text>
+          <LinearGradient
+            colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{
+              width: '100%',
+              height: '100%',
+              paddingVertical: 12,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 25.5, // Half of height (51/2) for perfect rounded corners
+            }}
+          >
+            <Text className="text-white text-center text-2xl font-bold">
+              Login
+            </Text>
+          </LinearGradient>
         </TouchableOpacity>
 
         {/* Sign-up Link */}
@@ -260,7 +280,7 @@ export default function LoginScreen() {
             .
           </Text>
         </View>
-      </View>
+      </LinearGradient>
     </KeyboardAvoidingView>
   );
 }

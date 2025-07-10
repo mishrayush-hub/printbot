@@ -28,6 +28,7 @@ import {
   Truck,
   RefreshCw
 } from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function ProfileScreen() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -308,10 +309,24 @@ export default function ProfileScreen() {
           {!editingProfile ? (
             <TouchableOpacity
               onPress={() => setEditingProfile(true)}
-              className="flex-row items-center bg-blue-500 px-4 py-2 rounded-lg"
+              className="flex-row items-center rounded-lg"
             >
+              <LinearGradient
+                                    colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={{
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      paddingHorizontal: 10,
+                                      paddingVertical: 10,
+                                      justifyContent: 'center',
+                                      borderRadius: 8, // Half of height (51/2) for perfect rounded corners
+                                    }}
+                                  >
               <Edit3 color="white" size={16} />
               <Text className="text-white font-medium ml-2">Edit</Text>
+            </LinearGradient>
             </TouchableOpacity>
           ) : (
             <View className="flex-row" style={{ gap: 8 }}>

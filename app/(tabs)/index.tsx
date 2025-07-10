@@ -1,4 +1,4 @@
-import React, {useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView, Alert, useColorScheme } from "react-native";
 import { Upload } from "lucide-react-native";
 import * as DocumentPicker from "expo-document-picker";
@@ -8,6 +8,7 @@ import { usePaymentAPI } from "@/hooks/usePayementAPI";
 import PaymentProcessingModal from "@/components/PaymentProcessingModal";
 import { generateTransactionId } from "@/hooks/generateTransactionId";
 import { checkAndRequestPermissions, showPermissionRequiredAlert } from "@/utils/permissionUtils";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function HomeScreen() {
   const [uploadedFiles, setUploadedFiles] = useState<
@@ -85,7 +86,7 @@ export default function HomeScreen() {
       setLoading(true);
       const txnId = generateTransactionId();
       const amount = uploadedFiles.reduce((sum, file) => sum + file.price, 0);
-      
+
       const result = await initiatePayment(
         txnId,
         amount,
@@ -95,7 +96,7 @@ export default function HomeScreen() {
         userEmail,
         userPhone
       );
-      
+
       if (result.success && result.magicCode) {
         setPaid(true);
         setMagicCode(result.magicCode);
@@ -162,7 +163,7 @@ export default function HomeScreen() {
       try {
         const data = JSON.parse(text);
         // console.log("Parsed response:", data);
-        
+
         if (!response.ok || !data.success) {
           console.error("Upload failed:", data.message);
           Alert.alert("Upload Failed", data.message || "Unknown error occurred during upload.");
@@ -172,12 +173,12 @@ export default function HomeScreen() {
           setUploaded(true);
           setReturnedPageCount(data.page_count || 0);
           setFileId(data.file_id || "");
-          
+
           // Update the uploaded files with server response
           if (data.page_count && uploadedFiles.length > 0) {
             const serverPageCount = data.page_count;
             const serverPrice = calculatePrice(serverPageCount);
-            
+
             const updatedFiles = uploadedFiles.map(f => ({
               ...f,
               pages: serverPageCount,
@@ -185,14 +186,14 @@ export default function HomeScreen() {
               isEstimated: false // Now we have actual count
             }));
             setUploadedFiles(updatedFiles);
-            
+
             // console.log("Updated pricing based on server response:", {
             //   serverPageCount,
             //   serverPrice,
             //   pricePerPage: getPricePerPage(serverPageCount)
             // });
           }
-          
+
           Alert.alert("Upload Successful", `Your file has been uploaded to the cloud. Pages: ${data.page_count || 'Unknown'}`);
         }
       } catch (jsonError) {
@@ -224,19 +225,19 @@ export default function HomeScreen() {
       try {
         // Try to read as binary and look for page markers
         const fileData = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
-        
+
         // Convert base64 to binary string for better parsing
         const binaryData = atob(fileData);
-        
+
         // Look for PDF page count patterns
         const pageCountPatterns = [
           /\/Count\s+(\d+)/g,
           /\/Type\s*\/Page[^s]/g,
           /\/N\s+(\d+)/g
         ];
-        
+
         let maxCount = 0;
-        
+
         for (const pattern of pageCountPatterns) {
           const matches = binaryData.match(pattern);
           if (matches) {
@@ -252,7 +253,7 @@ export default function HomeScreen() {
             }
           }
         }
-        
+
         return maxCount > 0 ? maxCount : 1;
       } catch (parseError) {
         console.error("Error parsing PDF for page count:", parseError);
@@ -312,36 +313,36 @@ export default function HomeScreen() {
         setMagicCode("");
         setUploadedFiles([]);
         setReturnedPageCount(0);
-        
+
         const file = result.assets[0];
         const fileType = file.mimeType || "";
-        
+
         // Validate file type
         if (fileType !== "application/pdf") {
           Alert.alert("Invalid File", "Only PDF files are allowed.");
           return;
         }
-        
+
         // console.log("Selected file:", {
         //   name: file.name,
         //   size: file.size,
         //   type: fileType,
         //   uri: file.uri
         // });
-        
+
         setFile({
           uri: file.uri,
           name: file.name || `PB_File_${userId}`,
           type: fileType,
         });
-        
+
         let price = 0;
         let pageCount = 1;
 
         try {
           pageCount = await getPdfPageCount(file.uri);
           price = calculatePrice(pageCount);
-          
+
           // console.log("PDF analysis:", {
           //   pageCount,
           //   price,
@@ -417,10 +418,25 @@ export default function HomeScreen() {
               Supports PDF files up to 50MB
             </Text>
             <TouchableOpacity
-              className="bg-blue-500 px-6 py-2 rounded-lg"
+              className="max-w-[326px] max-h-[40px]"
               onPress={handleFileUpload}
             >
-              <Text className="text-white font-medium">Select PDF</Text>
+              <LinearGradient
+                colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  paddingVertical: 2,
+                  paddingHorizontal: 20,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 10, // Half of height (51/2) for perfect rounded corners
+                }}
+              >
+                <Text className="text-white font-medium">Select PDF</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </View>
@@ -457,12 +473,12 @@ export default function HomeScreen() {
 
                       {/* Status Badge */}
                       <View className={`px-2 py-1 rounded-full ${paid ? 'bg-green-100 dark:bg-green-900' :
-                          uploaded ? 'bg-blue-100 dark:bg-blue-900' :
-                            'bg-yellow-100 dark:bg-yellow-900'
+                        uploaded ? 'bg-blue-100 dark:bg-blue-900' :
+                          'bg-yellow-100 dark:bg-yellow-900'
                         }`}>
                         <Text className={`text-xs font-medium ${paid ? 'text-green-700 dark:text-green-300' :
-                            uploaded ? 'text-blue-700 dark:text-blue-100' :
-                              'text-yellow-700 dark:text-yellow-100'
+                          uploaded ? 'text-blue-700 dark:text-blue-100' :
+                            'text-yellow-700 dark:text-yellow-100'
                           }`}>
                           {paid ? 'Paid' : uploaded ? 'Verified' : 'Pending'}
                         </Text>
@@ -490,7 +506,7 @@ export default function HomeScreen() {
                     <View className="flex-row justify-end">
                       {!uploaded && !paid && (
                         <TouchableOpacity
-                          className="bg-red-500 px-4 py-2 rounded-lg mr-2"
+                          className="bg-red-500 max-w-[200px] max-h-[35px] items-center justify-center px-4 rounded-[8px] mr-2"
                           onPress={() => {
                             Alert.alert(
                               "Remove File",
@@ -505,10 +521,10 @@ export default function HomeScreen() {
                           <Text className="text-white text-sm font-medium">Remove</Text>
                         </TouchableOpacity>
                       )}
-                      
+
                       {!uploaded && !paid && (
                         <TouchableOpacity
-                          className="bg-blue-500 px-6 py-2 rounded-lg items-center"
+                          className="max-w-[200px] max-h-[35px] items-center"
                           onPress={() => {
                             Alert.alert(
                               "Upload File",
@@ -520,7 +536,22 @@ export default function HomeScreen() {
                             );
                           }}
                         >
-                          <Text className="text-white text-sm font-medium">Upload File</Text>
+                          <LinearGradient
+                            colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              paddingVertical: 0,
+                              paddingHorizontal: 20,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderRadius: 8, // Half of height (51/2) for perfect rounded corners
+                            }}
+                          >
+                            <Text className="text-white text-sm font-medium">Upload File</Text>
+                          </LinearGradient>
                         </TouchableOpacity>
                       )}
 
@@ -626,12 +657,26 @@ export default function HomeScreen() {
 
                 {uploadedFiles.length > 0 && uploaded && !paid && (
                   <TouchableOpacity
-                    className="bg-blue-500 py-3 px-4 rounded-lg mt-4 items-center"
+                    className="max-h-[40px] mt-4 items-center"
                     onPress={paymentHandler}
                   >
-                    <Text className="text-white font-medium">
-                      💳 Proceed to Payment
-                    </Text>
+                    <LinearGradient
+                      colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        paddingHorizontal: 20,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 8, // Half of height (51/2) for perfect rounded corners
+                      }}
+                    >
+                      <Text className="text-white font-medium">
+                        💳 Proceed to Payment
+                      </Text>
+                    </LinearGradient>
                   </TouchableOpacity>
                 )}
               </View>

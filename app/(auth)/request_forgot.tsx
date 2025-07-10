@@ -15,7 +15,7 @@ import {
   Platform
 } from "react-native";
 import { router } from "expo-router";
-import { ArrowLeft } from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function RequestForgotPassword() {
   const colorScheme = useColorScheme(); // 'light' or 'dark'
@@ -104,21 +104,26 @@ export default function RequestForgotPassword() {
       className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View className={`bg-[#008cff] flex-1`}>
+      <LinearGradient
+        colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
+        style={{ flex: 1 }}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      >
         <Modal transparent={true} visible={loading}>
           <View className="flex-1 justify-center items-center bg-black/50">
             <ActivityIndicator size="large" color="#fff" />
           </View>
         </Modal>
         {/* Header */}
-        <View className="h-56 px-6 pt-12">
+        <View className="h-56 px-6 pt-7">
           <View className="flex items-center mt-6">
             <Image
               source={require("../../assets/images/splash-black.png")}
-              style={{ width: 100, height: 100 }}
+              style={{ width: 150, height: 150 }}
               resizeMode="contain"
             />
-            <Text className="font-bold text-3xl text-white">Printbot</Text>
+            {/* <Text className="font-bold text-3xl text-white">Printbot</Text> */}
           </View>
         </View>
 
@@ -164,12 +169,26 @@ export default function RequestForgotPassword() {
 
           {/* Submit Button */}
           <TouchableOpacity
-            className="bg-[#008cff] w-[326px] h-[51px] rounded-full py-3"
+            className="w-[326px] h-[51px]"
             onPress={handleRequest}
           >
-            <Text className="text-white text-center text-2xl font-bold">
-              Submit
-            </Text>
+            <LinearGradient
+              colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                width: '100%',
+                height: '100%',
+                paddingVertical: 12,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 25.5, // Half of height (51/2) for perfect rounded corners
+              }}
+            >
+              <Text className="text-white text-center text-2xl font-bold">
+                Submit
+              </Text>
+            </LinearGradient>
           </TouchableOpacity>
 
           {/* Login Link */}
@@ -196,7 +215,7 @@ export default function RequestForgotPassword() {
             className={`${isDark ? "text-white" : "text-gray-500"
               } text-[14px] text-center leading-6`}
           >
-            By clicking the Login button, you agree to our{" "}
+            By clicking the Submit button, you agree to our{" "}
             <Text
               onPress={() => router.push("/(legal)/terms-and-conditions")}
               className="text-blue-500"
@@ -213,7 +232,7 @@ export default function RequestForgotPassword() {
             .
           </Text>
         </View>
-      </View>
+      </LinearGradient>
     </KeyboardAvoidingView>
   );
 }

@@ -16,6 +16,8 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+
 
 export default function SignupScreen() {
   const colorScheme = useColorScheme();
@@ -152,11 +154,16 @@ export default function SignupScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
-      className="flex-1" 
+    <KeyboardAvoidingView
+      className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View className={`bg-[#008cff] flex-1`}>
+      <LinearGradient
+        colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
+        style={{ flex: 1 }}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      >
         {/* Loading Modal */}
         <Modal transparent={true} visible={loading}>
           <View className="flex-1 justify-center items-center bg-black/50">
@@ -165,194 +172,199 @@ export default function SignupScreen() {
         </Modal>
 
         {/* Header */}
-        <View className="h-56 px-6 pt-12">
+        <View className="h-56 px-6 pt-7">
           <View className="flex items-center mt-6">
             <Image
               source={require("../../assets/images/splash-black.png")}
-              style={{ width: 100, height: 100 }}
+              style={{ width: 150, height: 150 }}
               resizeMode="contain"
             />
-            <Text className="font-bold text-3xl text-white">Printbot</Text>
+            {/* <Text className="font-bold text-3xl text-white">Printbot</Text> */}
           </View>
         </View>
 
         {/* Form */}
         <ScrollView
           ref={scrollViewRef}
-          className={`flex-1 rounded-t-[58] ${
-            isDark ? "bg-[#1a1a1a]" : "bg-white"
-          }`}
+          className={`flex-1 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"
+            }`}
           contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 16 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-        <Text
-          className={`text-[30px] font-bold text-center mb-6 ${
-            isDark ? "text-white" : "text-black"
-          }`}
-        >
-          Sign Up
-        </Text>
-
-        {errorMessage !== "" && (
-          <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
-        )}
-        {successMessage !== "" && (
-          <Text className="text-green-500 text-center mb-4">
-            {successMessage}
-          </Text>
-        )}
-
-        {/* Full Name Input */}
-        <TextInput
-          ref={fullNameRef}
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-          }`}
-          placeholder="Full Name"
-          placeholderTextColor={isDark ? "#aaa" : "#999"}
-          value={fullName}
-          autoCapitalize="none"
-          autoCorrect={false}
-          textContentType="name"
-          autoComplete="name"
-          returnKeyType="next"
-          onChangeText={setFullName}
-          onFocus={() => scrollToInput(fullNameRef)}
-          onSubmitEditing={() => emailRef.current?.focus()}
-        />
-
-        {/* Email Input */}
-        <TextInput
-          ref={emailRef}
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-          }`}
-          placeholder="Email"
-          placeholderTextColor={isDark ? "#aaa" : "#999"}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoCorrect={false}
-          textContentType="emailAddress"
-          autoComplete="email"
-          returnKeyType="next"
-          value={email}
-          onChangeText={setEmail}
-          onFocus={() => scrollToInput(emailRef)}
-          onSubmitEditing={() => mobileRef.current?.focus()}
-        />
-
-        {/* Mobile Input */}
-        <TextInput
-          ref={mobileRef}
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-          }`}
-          placeholder="Mobile Number"
-          placeholderTextColor={isDark ? "#aaa" : "#999"}
-          keyboardType="phone-pad"
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="next"
-          value={mobile}
-          onChangeText={setMobile}
-          onFocus={() => scrollToInput(mobileRef)}
-          onSubmitEditing={() => passwordRef.current?.focus()}
-        />
-
-        {/* Password Input */}
-        <TextInput
-          ref={passwordRef}
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-          }`}
-          placeholder="Password"
-          placeholderTextColor={isDark ? "#aaa" : "#999"}
-          secureTextEntry
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="next"
-          value={password}
-          onChangeText={setPassword}
-          onFocus={() => scrollToInput(passwordRef)}
-          onSubmitEditing={() => confirmPasswordRef.current?.focus()}
-        />
-        <TextInput
-          ref={confirmPasswordRef}
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-          }`}
-          placeholder="Confirm Password"
-          placeholderTextColor={isDark ? "#aaa" : "#999"}
-          secureTextEntry
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="done"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          onFocus={() => scrollToInput(confirmPasswordRef)}
-          onSubmitEditing={() => Keyboard.dismiss()}
-        />
-
-        {/* Terms and Privacy Policy Acceptance */}
-        <View className="flex-row items-start mb-6 w-[326px]">
-          <TouchableOpacity
-            onPress={() => setAcceptedTerms(!acceptedTerms)}
-            className="mr-3 mt-3"
+          <Text
+            className={`text-[30px] font-bold text-center mb-6 ${isDark ? "text-white" : "text-black"
+              }`}
           >
-            <Ionicons
-              name={acceptedTerms ? "checkbox" : "square-outline"}
-              size={20}
-              color={acceptedTerms ? "#008cff" : (isDark ? "#aaa" : "#999")}
-            />
-          </TouchableOpacity>
-          <View className="flex-1">
-            <Text className={`text-sm leading-5 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
-              I agree to the{" "}
-              <TouchableOpacity onPress={() => router.push("/terms-and-conditions")}>
-                <Text className="text-[#008cff] font-semibold underline -mb-1">
-                  Terms & Conditions
-                </Text>
-              </TouchableOpacity>
-              {" "}and{" "}
-              <TouchableOpacity onPress={() => router.push("/privacy-policy")}>
-                <Text className="text-[#008cff] font-semibold underline -mb-1">
-                  Privacy Policy
-                </Text>
-              </TouchableOpacity>
-            </Text>
-          </View>
-        </View>
-
-        {/* Signup Button */}
-        <TouchableOpacity
-          className="bg-[#008cff] w-[326px] h-[51px] rounded-full py-3"
-          onPress={handleSignup}
-        >
-          <Text className="text-white text-center text-2xl font-bold">
             Sign Up
           </Text>
-        </TouchableOpacity>
 
-        {/* Login Link */}
-        <Text
-          className={`${
-            isDark ? "text-gray-300" : "text-gray-500"
-          } text-[16px] text-center mt-4`}
-        >
-          Already have an account?{" "}
-          <TouchableOpacity onPress={handleLogin}>
-            <Text
-              className={`text-[16px] font-bold ${
-                isDark ? "text-white" : "text-black"
-              } -mb-[4px]`}
-            >
-              Login
+          {errorMessage !== "" && (
+            <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
+          )}
+          {successMessage !== "" && (
+            <Text className="text-green-500 text-center mb-4">
+              {successMessage}
             </Text>
+          )}
+
+          {/* Full Name Input */}
+          <TextInput
+            ref={fullNameRef}
+            className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              }`}
+            placeholder="Full Name"
+            placeholderTextColor={isDark ? "#aaa" : "#999"}
+            value={fullName}
+            autoCapitalize="none"
+            autoCorrect={false}
+            textContentType="name"
+            autoComplete="name"
+            returnKeyType="next"
+            onChangeText={setFullName}
+            onFocus={() => scrollToInput(fullNameRef)}
+            onSubmitEditing={() => emailRef.current?.focus()}
+          />
+
+          {/* Email Input */}
+          <TextInput
+            ref={emailRef}
+            className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              }`}
+            placeholder="Email"
+            placeholderTextColor={isDark ? "#aaa" : "#999"}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            textContentType="emailAddress"
+            autoComplete="email"
+            returnKeyType="next"
+            value={email}
+            onChangeText={setEmail}
+            onFocus={() => scrollToInput(emailRef)}
+            onSubmitEditing={() => mobileRef.current?.focus()}
+          />
+
+          {/* Mobile Input */}
+          <TextInput
+            ref={mobileRef}
+            className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              }`}
+            placeholder="Mobile Number"
+            placeholderTextColor={isDark ? "#aaa" : "#999"}
+            keyboardType="phone-pad"
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="next"
+            value={mobile}
+            onChangeText={setMobile}
+            onFocus={() => scrollToInput(mobileRef)}
+            onSubmitEditing={() => passwordRef.current?.focus()}
+          />
+
+          {/* Password Input */}
+          <TextInput
+            ref={passwordRef}
+            className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              }`}
+            placeholder="Password"
+            placeholderTextColor={isDark ? "#aaa" : "#999"}
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="next"
+            value={password}
+            onChangeText={setPassword}
+            onFocus={() => scrollToInput(passwordRef)}
+            onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+          />
+          <TextInput
+            ref={confirmPasswordRef}
+            className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              }`}
+            placeholder="Confirm Password"
+            placeholderTextColor={isDark ? "#aaa" : "#999"}
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="done"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            onFocus={() => scrollToInput(confirmPasswordRef)}
+            onSubmitEditing={() => Keyboard.dismiss()}
+          />
+
+          {/* Terms and Privacy Policy Acceptance */}
+          <View className="flex-row items-start mb-6 w-[326px]">
+            <TouchableOpacity
+              onPress={() => setAcceptedTerms(!acceptedTerms)}
+              className="mr-3 mt-3"
+            >
+              <Ionicons
+                name={acceptedTerms ? "checkbox" : "square-outline"}
+                size={20}
+                color={acceptedTerms ? "#008cff" : (isDark ? "#aaa" : "#999")}
+              />
+            </TouchableOpacity>
+            <View className="flex-1">
+              <Text className={`text-sm leading-5 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                I agree to the{" "}
+                <TouchableOpacity onPress={() => router.push("/terms-and-conditions")}>
+                  <Text className="text-[#008cff] font-semibold underline -mb-1">
+                    Terms & Conditions
+                  </Text>
+                </TouchableOpacity>
+                {" "}and{" "}
+                <TouchableOpacity onPress={() => router.push("/privacy-policy")}>
+                  <Text className="text-[#008cff] font-semibold underline -mb-1">
+                    Privacy Policy
+                  </Text>
+                </TouchableOpacity>
+              </Text>
+            </View>
+          </View>
+
+          {/* Signup Button */}
+          <TouchableOpacity
+            className="w-[326px] h-[51px]"
+            onPress={handleSignup}
+          >
+            <LinearGradient
+              colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                width: '100%',
+                height: '100%',
+                paddingVertical: 12,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 25.5, // Half of height (51/2) for perfect rounded corners
+              }}
+            >
+              <Text className="text-white text-center text-2xl font-bold">
+                Sign Up
+              </Text>
+            </LinearGradient>
           </TouchableOpacity>
-        </Text>
+
+          {/* Login Link */}
+          <Text
+            className={`${isDark ? "text-gray-300" : "text-gray-500"
+              } text-[16px] text-center mt-4`}
+          >
+            Already have an account?{" "}
+            <TouchableOpacity onPress={handleLogin}>
+              <Text
+                className={`text-[16px] font-bold ${isDark ? "text-white" : "text-black"
+                  } -mb-[4px]`}
+              >
+                Login
+              </Text>
+            </TouchableOpacity>
+          </Text>
         </ScrollView>
-      </View>
+      </LinearGradient>
     </KeyboardAvoidingView>
   );
 }

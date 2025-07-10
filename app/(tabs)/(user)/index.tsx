@@ -35,19 +35,19 @@ export default function ProfileScreen() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
-  
+
   // User data
   const [userId, setUserId] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  
+
   // Edit fields
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newPhone, setNewPhone] = useState("");
-  
+
   // Payment history
   const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
   const [paymentLoading, setPaymentLoading] = useState(false);
@@ -119,7 +119,7 @@ export default function ProfileScreen() {
 
   const loadPaymentHistory = async () => {
     if (!authToken || !userId) return;
-    
+
     setPaymentLoading(true);
     try {
       const response = await fetch(
@@ -187,12 +187,12 @@ export default function ProfileScreen() {
         await AsyncStorage.setItem("userName", newName);
         await AsyncStorage.setItem("userEmail", newEmail);
         await AsyncStorage.setItem("userPhone", newPhone);
-        
+
         setName(newName);
         setEmail(newEmail);
         setPhone(newPhone);
         setEditingProfile(false);
-        
+
         Alert.alert("Success", "Profile updated successfully");
       } else {
         Alert.alert("Error", data.message || "Failed to update profile");
@@ -222,7 +222,7 @@ export default function ProfileScreen() {
           }).toString()
         }
       );
-      
+
       const data = await response.json();
       if (data.success) {
         Alert.alert(
@@ -278,18 +278,43 @@ export default function ProfileScreen() {
     <TouchableOpacity
       key={id}
       onPress={() => setActiveTab(id)}
-      className={`flex-row items-center justify-center py-3 px-4 rounded-lg min-w-[100px] ${
-        activeTab === id ? "bg-blue-500" : isDark ? "bg-gray-700" : "bg-gray-100"
-      }`}
-    >
-      {icon}
-      <Text
-        className={`ml-2 font-medium ${
-          activeTab === id ? "text-white" : isDark ? "text-gray-300" : "text-gray-700"
+      className={`py-1 rounded-lg min-w-[85px] min-h-[35px] items-center justify-center ${activeTab === id ? "" : isDark ? "bg-gray-700" : "bg-gray-100"
         }`}
-      >
-        {label}
-      </Text>
+    >
+      {activeTab === id ? (
+        <LinearGradient
+          colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={{
+            flexDirection: 'row',
+            paddingVertical: 0,
+            borderRadius: 8,
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+          }}
+        >
+          {/* {icon} */}
+          <Text className="ml-2 font-medium text-white">
+            {label}
+          </Text>
+        </LinearGradient>
+      ) : (
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {/* {icon} */}
+          <Text
+            className={`ml-2 font-medium ${isDark ? "text-gray-300" : "text-gray-700"
+              }`}
+          >
+            {label}
+          </Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 
@@ -309,24 +334,24 @@ export default function ProfileScreen() {
           {!editingProfile ? (
             <TouchableOpacity
               onPress={() => setEditingProfile(true)}
-              className="flex-row items-center rounded-lg"
+              className="flex-row items-center rounded-lg min-h-[35px]"
             >
               <LinearGradient
-                                    colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
-                                    start={{ x: 0, y: 0 }}
-                                    end={{ x: 1, y: 0 }}
-                                    style={{
-                                      flexDirection: 'row',
-                                      alignItems: 'center',
-                                      paddingHorizontal: 10,
-                                      paddingVertical: 10,
-                                      justifyContent: 'center',
-                                      borderRadius: 8, // Half of height (51/2) for perfect rounded corners
-                                    }}
-                                  >
-              <Edit3 color="white" size={16} />
-              <Text className="text-white font-medium ml-2">Edit</Text>
-            </LinearGradient>
+                colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 10,
+                  paddingVertical: 8,
+                  justifyContent: 'center',
+                  borderRadius: 8, // Half of height (51/2) for perfect rounded corners
+                }}
+              >
+                <Edit3 color="white" size={16} />
+                <Text className="text-white font-medium ml-2">Edit</Text>
+              </LinearGradient>
             </TouchableOpacity>
           ) : (
             <View className="flex-row" style={{ gap: 8 }}>
@@ -421,12 +446,12 @@ export default function ProfileScreen() {
         <Text className="text-white font-semibold text-center text-base">Logout</Text>
       </TouchableOpacity>
     </View>
-  );  
+  );
   const renderPaymentsTab = () => (
     <View className="py-4">
       <View className={`rounded-lg pb-6 px-2`}>
         {/* <Text className={`${textColor} text-xl font-bold mb-6`}>Payment History</Text> */}
-        
+
         {paymentLoading ? (
           <View className="justify-center items-center py-10">
             <ActivityIndicator size="large" color="#3B82F6" />
@@ -483,7 +508,7 @@ export default function ProfileScreen() {
   const renderSecurityTab = () => (
     <View className={`${cardBg} rounded-lg py-6 px-4 my-4 mx-2 rounded-lg p-6 border ${borderColor} shadow-sm`}>
       {/* <Text className={`${textColor} text-xl font-bold mb-6`}>Security Settings</Text> */}
-      
+
       <View className="space-y-4">
         <TouchableOpacity
           onPress={handleChangePassword}
@@ -500,7 +525,18 @@ export default function ProfileScreen() {
           {loading ? (
             <ActivityIndicator size="small" color="#3B82F6" />
           ) : (
-            <Text className="text-blue-500 font-medium">Change</Text>
+            <LinearGradient
+              colors={['#2563eb', '#9333ea']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 6,
+              }}
+            >
+              <Text className="text-white font-medium text-sm">Change</Text>
+            </LinearGradient>
           )}
         </TouchableOpacity>
 
@@ -515,7 +551,9 @@ export default function ProfileScreen() {
               <Text className={`${subText} text-sm`}>Permanently delete your account</Text>
             </View>
           </View>
-          <Text className="text-red-500 font-medium">Delete</Text>
+          <View className="flex-row items-center justify-center bg-red-500 rounded-md py-[6px] px-4">
+            <Text className="text-sm font-medium text-white">Delete</Text>
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -525,22 +563,8 @@ export default function ProfileScreen() {
     <View className="py-4 px-2">
       <View className={`${cardBg} rounded-lg pt-6 pb-6 px-4 border ${borderColor} shadow-sm`}>
         {/* <Text className={`${textColor} text-xl font-bold mb-6`}>Legal Information</Text> */}
-        
-        <View className="space-y-4">
-          <TouchableOpacity
-            onPress={() => router.push("/(legal)/terms-and-conditions")}
-            className={`flex-row items-center justify-between p-4 mb-4 border ${borderColor} rounded-lg`}
-          >
-            <View className="flex-row items-center">
-              <Scale color={isDark ? "#9CA3AF" : "#6B7280"} size={24} />
-              <View className="ml-3">
-                <Text className={`${textColor} font-semibold`}>Terms and Conditions</Text>
-                <Text className={`${subText} text-sm`}>Read our terms of service</Text>
-              </View>
-            </View>
-            <Text className="text-blue-500 font-medium">View</Text>
-          </TouchableOpacity>
 
+        <View className="space-y-4">
           <TouchableOpacity
             onPress={() => router.push("/(legal)/privacy-policy")}
             className={`flex-row items-center justify-between p-4 mb-4 border ${borderColor} rounded-lg`}
@@ -556,14 +580,14 @@ export default function ProfileScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => router.push("/(legal)/shipping-policy")}
+            onPress={() => router.push("/(legal)/terms-and-conditions")}
             className={`flex-row items-center justify-between p-4 mb-4 border ${borderColor} rounded-lg`}
           >
             <View className="flex-row items-center">
-              <Truck color={isDark ? "#9CA3AF" : "#6B7280"} size={24} />
+              <Scale color={isDark ? "#9CA3AF" : "#6B7280"} size={24} />
               <View className="ml-3">
-                <Text className={`${textColor} font-semibold`}>Shipping Policy</Text>
-                <Text className={`${subText} text-sm`}>View our shipping information</Text>
+                <Text className={`${textColor} font-semibold`}>Terms and Conditions</Text>
+                <Text className={`${subText} text-sm`}>Read our terms of service</Text>
               </View>
             </View>
             <Text className="text-blue-500 font-medium">View</Text>
@@ -571,13 +595,27 @@ export default function ProfileScreen() {
 
           <TouchableOpacity
             onPress={() => router.push("/(legal)/return-refund-exchange-policy")}
-            className={`flex-row items-center justify-between p-4 border ${borderColor} rounded-lg`}
+            className={`flex-row items-center justify-between p-4 mb-4 border ${borderColor} rounded-lg`}
           >
             <View className="flex-row items-center">
               <RefreshCw color={isDark ? "#9CA3AF" : "#6B7280"} size={24} />
               <View className="ml-3">
-                <Text className={`${textColor} font-semibold`}>Return, Refund & Exchange Policy</Text>
+                <Text className={`${textColor} font-semibold`}>Returns, Refunds & Exchanges</Text>
                 <Text className={`${subText} text-sm`}>Learn about returns and refunds</Text>
+              </View>
+            </View>
+            <Text className="text-blue-500 font-medium">View</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push("/(legal)/shipping-policy")}
+            className={`flex-row items-center justify-between p-4 border ${borderColor} rounded-lg`}
+          >
+            <View className="flex-row items-center">
+              <Truck color={isDark ? "#9CA3AF" : "#6B7280"} size={24} />
+              <View className="ml-3">
+                <Text className={`${textColor} font-semibold`}>Shipping Policy</Text>
+                <Text className={`${subText} text-sm`}>View our shipping information</Text>
               </View>
             </View>
             <Text className="text-blue-500 font-medium">View</Text>
@@ -591,10 +629,8 @@ export default function ProfileScreen() {
     <View className={`flex-1 ${bgColor}`}>
       {/* Tab Navigation */}
       <View className={`${cardBg} p-4 border-b ${borderColor}`}>
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 0 }}
+        <View
+          style={{ paddingHorizontal: 0 }}
         >
           <View className="flex-row" style={{ gap: 8 }}>
             {renderTabButton(
@@ -618,7 +654,7 @@ export default function ProfileScreen() {
               <Scale color={activeTab === "legal" ? "white" : (isDark ? "#9CA3AF" : "#6B7280")} size={18} />
             )}
           </View>
-        </ScrollView>
+        </View>
       </View>
 
       {/* Tab Content */}

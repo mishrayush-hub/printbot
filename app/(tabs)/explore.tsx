@@ -10,6 +10,7 @@ import {
   TextInput,
   ScrollView
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { ShoppingCart, Search, RefreshCw, Filter, FileText, Calendar, DollarSign } from "lucide-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usePaymentAPI } from "@/hooks/usePayementAPI";
@@ -279,18 +280,32 @@ export default function OrdersScreen() {
 
         {!item.payment_success && (
           <TouchableOpacity
-            className={`${paymentLoading[item.id] ? 'bg-blue-300' : 'bg-blue-500'} px-4 py-2 rounded-lg opacity-${paymentLoading[item.id] ? '70' : '100'}`}
+            className={`rounded-lg ${paymentLoading[item.id] ? 'opacity-70' : 'opacity-100'}`}
             onPress={() => handlePayment(item)}
             disabled={paymentLoading[item.id]}
           >
-            {paymentLoading[item.id] ? (
-              <View className="flex-row items-center">
-                <ActivityIndicator size="small" color="white" />
-                <Text className="text-white font-semibold text-sm ml-2">Processing...</Text>
-              </View>
-            ) : (
-              <Text className="text-white font-semibold text-sm">Pay Now</Text>
-            )}
+            <LinearGradient
+              colors={paymentLoading[item.id] ? ['#93c5fd', '#c4b5fd'] : ['#2563eb', '#9333ea']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 8,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {paymentLoading[item.id] ? (
+                <>
+                  <ActivityIndicator size="small" color="white" />
+                  <Text className="text-white font-semibold text-sm ml-2">Processing...</Text>
+                </>
+              ) : (
+                <Text className="text-white font-semibold text-sm">Pay Now</Text>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
         )}
 
@@ -335,42 +350,51 @@ export default function OrdersScreen() {
 
         {/* Filter Buttons */}
         <View className="flex-row items-center mt-1">
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            className="flex-1"
-            contentContainerStyle={{ paddingRight: 12 }}
-          >
-            <View className="flex-row" style={{ gap: 8 }}>
-              {["All", "Paid", "Processing", "Pending"].map((status) => (
-                <TouchableOpacity
-                  key={status}
-                  onPress={() => setStatusFilter(status)}
-                  className={`px-4 py-2 rounded-full min-w-[80px] items-center ${statusFilter === status
-                      ? "bg-blue-500"
-                      : isDark ? "bg-gray-700" : "bg-gray-200"
-                    }`}
-                >
+          <View className="flex-row flex-1" style={{ gap: 8 }}>
+            {["All", "Paid", "Processing", "Pending"].map((status) => (
+              <TouchableOpacity
+                key={status}
+                onPress={() => setStatusFilter(status)}
+                className={`py-1 rounded-lg min-w-[85px] min-h-[35px] items-center ${statusFilter === status
+                    ? ""
+                    : isDark ? "bg-gray-700" : "bg-gray-200"
+                  } justify-center`}
+              >
+                {statusFilter === status ? (
+                  <LinearGradient
+                    colors={['#2563eb', '#9333ea']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{
+                      // paddingHorizontal: 15,
+                      paddingVertical: 0,
+                      borderRadius: 8,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'absolute',
+                      left: 0,
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                    }}
+                  >
+                    <Text className="font-medium text-sm text-white">
+                      {status}
+                    </Text>
+                  </LinearGradient>
+                ) : (
                   <Text
-                    className={`font-medium text-sm ${statusFilter === status
-                        ? "text-white"
-                        : isDark ? "text-gray-300" : "text-gray-700"
-                      }`}
+                    className={`font-medium text-sm ${
+                      isDark ? "text-gray-300" : "text-gray-700"
+                    }`}
                   >
                     {status}
                   </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
-
-        {/* Results Count */}
-        {/* <View className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-          <Text className={`${subText} text-sm`}>
-            {filteredFiles.length} of {files.length} files
-          </Text>
-        </View> */}
       </View>
 
       {/* Content */}

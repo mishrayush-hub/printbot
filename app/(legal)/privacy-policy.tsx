@@ -152,7 +152,7 @@ export default function PrivacyPolicyScreen() {
             }`}
           >
             We use Razorpay, a leading and trusted payment gateway in India, to process all transactions securely. We do not store or have access to your payment card details.
-            {"\n\n"}All payment transactions are processed directly through PhonePe's PCI-DSS compliant infrastructure. We only store the transaction reference number, order amount, and payment status.
+            {"\n\n"}All payment transactions are processed directly through Razorpay's PCI-DSS compliant infrastructure. We only store the transaction reference number, order amount, and payment status.
           </Text>
 
           {/* Section 4: Data Security */}

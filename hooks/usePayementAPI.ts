@@ -1,114 +1,95 @@
-import phonepeSDK from "react-native-phonepe-pg";
-import Base64 from "react-native-base64";
-import sha256 from "sha256";
-import { Alert, Platform } from "react-native";
+import { useState } from 'react';
+import { useRazorpayAPI } from './useRazorpayAPI';
 
-export const usePaymentAPI = async (
-    transactionID: string,
-    cost: number,
-    userId: string,
-    fileId: string,
-    userPhone: string,
-    setGPAYInstalled: (value: boolean) => void,
-    setPhonePeInstalled: (value: boolean) => void,
-    setPaytmInstalled: (value: boolean) => void,
-    GPAYInstalled: boolean,
-    PhonePeInstalled: boolean,
-    PaytmInstalled: boolean
-) => {
-    try {
-        const environment = "SANDBOX"; // or "SANDBOX" "PRODUCTION"
-        const merchantId = "PGTESTPAYUAT86"; // "M22MXCSHVPHOY"
-        const appId = "cloud.voltrack.app";
-        const salt_key = "96434309-7796-489d-8924-ab56988a6076"; //"5ef6e9e9-07e9-4d45-a583-cbe550893d61"
-        // const environment = "SANDBOX"; // Use SANDBOX for testing
-        // const merchantId = "PGTESTPAYUAT86"; // Replace with your actual merchant ID
-        // const appId = "com.navstream.printbot"; // Replace with your actual app ID
-        // const salt_key = "96434309-7796-489d-8924-ab56988a6076";
-        const salt_index = 1;
-        const callbackUrl = ""; // Use temporary URL for testing
-        await phonepeSDK.init(environment, merchantId, appId, true);
+export const usePaymentAPI = () => {
+    const { processPayment, showPaymentErrorAlert } = useRazorpayAPI();
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalStage, setModalStage] = useState<'processing' | 'success' | 'error'>('processing');
+    const [magicCode, setMagicCode] = useState<string>('');
+    const [errorMessage, setErrorMessage] = useState<string>('');
 
-        phonepeSDK.isGPayAppInstalled()
-            .then((isInstalled) => {
-                if (isInstalled) {
-                    setGPAYInstalled(true);
-                } else {
-                    setGPAYInstalled(false);
+    const initiatePayment = async (
+        transactionID: string,
+        cost: number,
+        userId: string,
+        fileId: string,
+        userName: string,
+        userEmail: string,
+        userPhone: string
+    ) => {
+        try {
+            const result = await processPayment(
+                userId,
+                userName,
+                userEmail,
+                userPhone,
+                cost,
+                fileId,
+                `Transaction-${transactionID}`,
+                // onProcessingStart callback
+                () => {
+                    setModalStage('processing');
+                    setModalVisible(true);
+                },
+                // onProcessingComplete callback
+                (success: boolean, code?: string, error?: string) => {
+                    if (success && code) {
+                        setMagicCode(code);
+                        setModalStage('success');
+                        // Hide modal after 5 seconds for success
+                        setTimeout(() => {
+                            setModalVisible(false);
+                            setMagicCode('');
+                        }, 5000);
+                    } else {
+                        setErrorMessage(error || 'Payment processing failed');
+                        setModalStage('error');
+                        // Hide modal after 3 seconds for error
+                        setTimeout(() => {
+                            setModalVisible(false);
+                            setErrorMessage('');
+                        }, 3000);
+                    }
                 }
-            })
-            .catch((error) => {
-                console.error("Error checking GPay installation:", error);
-                setGPAYInstalled(false);
-            });
+            );
 
-        phonepeSDK.isPhonePeInstalled()
-            .then((isInstalled) => {
-                if (isInstalled) {
-                    setPhonePeInstalled(true);
-                } else {
-                    setPhonePeInstalled(false);
+            if (result.success && result.magicCode) {
+                return {
+                    success: true,
+                    magicCode: result.magicCode,
+                    paymentId: result.paymentId
+                };
+            } else {
+                // Only show error alert if modal is not visible (for cases where Razorpay itself fails)
+                if (!modalVisible) {
+                    showPaymentErrorAlert(result.error || "Payment failed");
                 }
-            })
-            .catch((error) => {
-                console.error("Error checking PhonePe installation:", error);
-                setPhonePeInstalled(false);
-            });
-        phonepeSDK.isPaytmAppInstalled()
-            .then((isInstalled) => {
-                if (isInstalled) {
-                    setPaytmInstalled(true);
-                } else {
-                    setPaytmInstalled(false);
-                }
-            })
-            .catch((error) => {
-                console.error("Error checking Paytm installation:", error);
-                setPaytmInstalled(false);
-            });
-
-        const txnId = transactionID; // Generate a unique transaction ID
-        const amount = cost * 100; // Convert to paisa
-
-        const requestBody = {
-            merchantId: merchantId,
-            merchantTransactionId: txnId,
-            merchantUserId: userId,
-            merchantOrderId: txnId,
-            amount: amount,
-            mobileNumber: userPhone,
-            callbackUrl: callbackUrl,
-            paymentInstrument: {
-                type: GPAYInstalled || PhonePeInstalled || PaytmInstalled ? "UPI_INTENT" : "PAY_PAGE",
-                targetApp: Platform.OS === "ios" ?
-                    (GPAYInstalled ? "GPAY" : PhonePeInstalled ? "PHONEPE" : PaytmInstalled ? "PAYTM" : "PAY_PAGE")
-                    : (GPAYInstalled ? "com.google.android.apps.nbu.paisa.user" : PhonePeInstalled ? "com.phonepe.app" : PaytmInstalled ? "net.one97.paytm" : "PAY_PAGE"),
+                return {
+                    success: false,
+                    error: result.error || "Payment failed"
+                };
             }
-        };
-        const payload = JSON.stringify(requestBody);
-        const payloadBase64 = Base64.encode(payload);
-        const stringToHash = payloadBase64 + "/pg/v1/pay" + salt_key;
-        const checksum = sha256(stringToHash) + "###" + salt_index;
-
-        const result = await phonepeSDK.startTransaction(
-            payloadBase64,
-            checksum,
-            null,
-            null
-        );
-
-        if (result.status === "SUCCESS") {
-            // console.log("Payment Success:", result);
-            return true;
-        } else {
-            console.error("Payment Failed:", result);
-            Alert.alert("Payment Failed", result.message || "Payment did not complete.");
-            return false;
+        } catch (error: any) {
+            console.error("Payment Error:", error);
+            // Only show error alert if modal is not visible
+            if (!modalVisible) {
+                showPaymentErrorAlert(error?.message || "Error processing payment.");
+            }
+            return {
+                success: false,
+                error: error?.message || "Error processing payment."
+            };
         }
+    };
 
-    } catch (error: any) {
-        console.error("Payment Error:", error);
-        Alert.alert("Payment Error", error?.message || "Error processing payment.");
-        return false;
-    }
+    return {
+        initiatePayment,
+        modalState: {
+            visible: modalVisible,
+            stage: modalStage,
+            magicCode,
+            errorMessage,
+        },
+        setModalVisible,
+    };
 };

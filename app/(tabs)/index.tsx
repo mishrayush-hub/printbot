@@ -4,8 +4,8 @@ import { Upload } from "lucide-react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { callbackAPI } from "@/hooks/useCallbackAPI";
 import { usePaymentAPI } from "@/hooks/usePayementAPI";
+import PaymentProcessingModal from "@/components/PaymentProcessingModal";
 import { generateTransactionId } from "@/hooks/generateTransactionId";
 import { checkAndRequestPermissions, showPermissionRequiredAlert } from "@/utils/permissionUtils";
 
@@ -31,9 +31,7 @@ export default function HomeScreen() {
   const [paid, setPaid] = useState(false);
   const [magicCode, setMagicCode] = useState("");
   const [returnedPageCount, setReturnedPageCount] = useState(0);
-  const [GPAYInstalled, setGPAYInstalled] = useState(false);
-  const [PhonePeInstalled, setPhonePeInstalled] = useState(false);
-  const [PaytmInstalled, setPaytmInstalled] = useState(false);
+
 
   useEffect(() => {
     const getTokenDetails = async () => {
@@ -56,6 +54,8 @@ export default function HomeScreen() {
     getTokenDetails();
   }, []);
 
+  const { initiatePayment, modalState, setModalVisible } = usePaymentAPI();
+
   const paymentHandler = async () => {
     if (!uploaded) {
       Alert.alert("Upload Required", "Please upload a file before proceeding to payment.");
@@ -69,30 +69,21 @@ export default function HomeScreen() {
     try {
       setLoading(true);
       const txnId = generateTransactionId();
-      const amount = uploadedFiles.reduce((sum, file) => sum + file.price, 0); // Amount in rupees (payment API will convert to paisa)
-      const result = await usePaymentAPI(
+      const amount = uploadedFiles.reduce((sum, file) => sum + file.price, 0);
+      
+      const result = await initiatePayment(
         txnId,
         amount,
         userId,
         fileId,
-        userPhone,
-        setGPAYInstalled,
-        setPhonePeInstalled,
-        setPaytmInstalled,
-        GPAYInstalled,
-        PhonePeInstalled,
-        PaytmInstalled
+        userName,
+        userEmail,
+        userPhone
       );
-      if (result) {
-        // // console.log("Payment Success:", result);
+      
+      if (result.success && result.magicCode) {
         setPaid(true);
-        const magic = await callbackAPI(txnId, userId, fileId); // Call the callback API with txnId, userId, and fileId
-        if (magic) {
-          setMagicCode(magic);
-        }
-      } else {
-        console.error("Payment Failed:", result);
-        Alert.alert("Payment Failed", "Payment did not complete.");
+        setMagicCode(result.magicCode);
       }
     } catch (error: any) {
       console.error("Payment Error:", error);
@@ -501,6 +492,14 @@ export default function HomeScreen() {
         {/* Bottom padding for tab bar */}
         <View className="h-20" />
       </ScrollView>
+
+      {/* Payment Processing Modal */}
+      <PaymentProcessingModal
+        visible={modalState.visible}
+        stage={modalState.stage}
+        magicCode={modalState.magicCode}
+        errorMessage={modalState.errorMessage}
+      />
     </View>
   );
 }

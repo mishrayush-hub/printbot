@@ -12,8 +12,8 @@ import {
 } from "react-native";
 import { ShoppingCart, Search, RefreshCw, Filter, FileText, Calendar, DollarSign } from "lucide-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { callbackAPI } from "@/hooks/useCallbackAPI";
 import { usePaymentAPI } from "@/hooks/usePayementAPI";
+import PaymentProcessingModal from "@/components/PaymentProcessingModal";
 import { generateTransactionId } from "@/hooks/generateTransactionId";
 
 export default function OrdersScreen() {
@@ -33,9 +33,6 @@ export default function OrdersScreen() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState<{[key: string]: boolean}>({});
-  const [GPAYInstalled, setGPAYInstalled] = useState(false);
-  const [PhonePeInstalled, setPhonePeInstalled] = useState(false);
-  const [PaytmInstalled, setPaytmInstalled] = useState(false);
 
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -169,37 +166,28 @@ export default function OrdersScreen() {
     setFilteringComplete(true);
   }, [files, searchQuery, statusFilter]);
 
+  const { initiatePayment, modalState, setModalVisible } = usePaymentAPI();
+
   // Payment handler function
   const handlePayment = async (file: any) => {
     try {
       setPaymentLoading(prev => ({ ...prev, [file.id]: true }));
       const txnId = generateTransactionId();
-      const amount = calculatePrice(file.page_count); // Amount in rupees (payment API will convert to paisa)
+      const amount = calculatePrice(file.page_count);
       
-      const result = await usePaymentAPI(
+      const result = await initiatePayment(
         txnId,
         amount,
         userId,
         file.id.toString(),
-        userPhone,
-        setGPAYInstalled,
-        setPhonePeInstalled,
-        setPaytmInstalled,
-        GPAYInstalled,
-        PhonePeInstalled,
-        PaytmInstalled
+        userName,
+        userEmail,
+        userPhone
       );
 
-      if (result) {
-        // console.log("Payment Success:", result);
-        // Call the callback API to generate magic code
-        const magicCode = await callbackAPI(txnId, userId, file.id.toString());
-        
+      if (result.success) {
         // Refresh the file list to get updated payment status
         await loadOrders();
-      } else {
-        console.error("Payment Failed:", result);
-        Alert.alert("Payment Failed", "Payment did not complete. Please try again.");
       }
     } catch (error: any) {
       console.error("Payment Error:", error);
@@ -431,6 +419,14 @@ export default function OrdersScreen() {
             }}
           />
         )}
+
+        {/* Payment Processing Modal */}
+        <PaymentProcessingModal
+          visible={modalState.visible}
+          stage={modalState.stage}
+          magicCode={modalState.magicCode}
+          errorMessage={modalState.errorMessage}
+        />
       </View>
     </View>
   );

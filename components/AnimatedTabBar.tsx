@@ -193,7 +193,7 @@ export default function AnimatedTabBar({ state, descriptors, navigation }: TabBa
     <View
       style={{
         position: 'absolute',
-        bottom: DeviceInfo.isTablet() === true ? 5 : 20,
+        bottom: DeviceInfo.isTablet() === true ? 5 : Platform.OS === 'ios' ? 20 : 10,
         left: 13,
         right: 13,
         height: 75,
@@ -201,9 +201,9 @@ export default function AnimatedTabBar({ state, descriptors, navigation }: TabBa
         overflow: 'hidden',
         borderWidth: 0.5,
         borderColor: colorScheme === 'dark' ? '#444444' : '#CCCCCC',
-        ...(Platform.OS === 'android' && {
-          elevation: 10,
-        }),
+        // ...(Platform.OS === 'android' && {
+        //   elevation: 10,
+        // }),
       }}
     >
       {/* Glassmorphic Background */}

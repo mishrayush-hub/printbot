@@ -4,7 +4,7 @@ import { Platform, Text } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { HapticTab } from '@/components/HapticTab';
 import { Cog, House, ImageUp } from 'lucide-react-native';
-// import TabBarBackground from '@/components/ui/TabBarBackground';
+import AnimatedTabBar from '@/components/AnimatedTabBar';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -64,48 +64,11 @@ export default function TabLayout() {
     <>
       <Tabs
         initialRouteName='index'
+        tabBar={(props) => <AnimatedTabBar {...props} />}
         screenOptions={{
           headerShown: true,
-          // headerStyle: {
-          //     height: 85,
-          //   },
-          tabBarButton: HapticTab,
-          // tabBarBackground: TabBarBackground,
           tabBarActiveTintColor: theme.tabIconSelected,
           tabBarInactiveTintColor: theme.tabIconDefault,
-          tabBarStyle: Platform.select({
-            ios: {
-              position: 'absolute',
-              backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
-              height: 80,
-              paddingTop: 15,
-              borderTopLeftRadius: 30,
-              borderTopRightRadius: 30,
-              borderBottomRightRadius: 30,
-              borderBottomLeftRadius: 30,
-              shadowOpacity: 0,
-              marginBottom: DeviceInfo.isTablet() === true ? 5 : 20,
-              marginHorizontal: 13.5,
-              borderWidth: 0.5,
-              borderColor: colorScheme === 'dark' ? '#444444' : '#CCCCCC',
-            },
-            android: {
-             position: 'absolute',
-              backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
-              height: 75,
-              paddingTop: 11,
-              borderTopLeftRadius: 30,
-              borderTopRightRadius: 30,
-              borderBottomRightRadius: 30,
-              borderBottomLeftRadius: 30,
-              shadowOpacity: 0,
-              marginBottom: 10,
-              marginHorizontal: 10,
-              borderWidth: 0.5,
-              elevation: 10,
-              borderColor: colorScheme === 'dark' ? '#444444' : '#CCCCCC',
-            },
-          }),
           headerTitleStyle: {
             fontSize: 24,
             fontWeight: 'bold',
@@ -113,10 +76,6 @@ export default function TabLayout() {
             marginTop: -10
           },
           headerTintColor: 'white',
-          tabBarLabelStyle: {
-            fontSize: 12,
-            marginBottom: 5,
-          }
         }}
       >
         <Tabs.Screen

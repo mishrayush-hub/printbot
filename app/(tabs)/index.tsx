@@ -382,9 +382,9 @@ export default function HomeScreen() {
 
   return (
     <View className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 30 }}>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 30, paddingHorizontal: 10, paddingTop: 15 }}>
         {/* Upload Documents Section - Matching Web */}
-        <View className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+        <View className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 border rounded-lg ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
           {/* <Text className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
             Hello, {userName || "User"} 👋
           </Text> */}
@@ -441,7 +441,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <View className="px-4 pt-4">
+        <View className="pt-4">
           {/* Uploaded Files Section - Web Style */}
           {uploadedFiles.length > 0 && (
             <View className="mb-1">

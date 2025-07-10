@@ -1,5 +1,5 @@
 import RazorpayCheckout from 'react-native-razorpay';
-import { Alert, StatusBar, Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
 
 interface PaymentOptions {
   key: string;
@@ -122,23 +122,8 @@ export const useRazorpayAPI = () => {
 
       // Step 2: Open Razorpay checkout
       return new Promise((resolve) => {
-        // Set status bar to dark content before opening Razorpay
-        if (Platform.OS === 'ios') {
-          StatusBar.setBarStyle('dark-content', true);
-        } else {
-          StatusBar.setBarStyle('dark-content', true);
-          StatusBar.setBackgroundColor('#ffffff', true);
-        }
-
         RazorpayCheckout.open(paymentOptions)
           .then(async (paymentData: any) => {
-            // Reset status bar after payment completion
-            if (Platform.OS === 'ios') {
-              StatusBar.setBarStyle('default', true);
-            } else {
-              StatusBar.setBarStyle('default', true);
-            }
-
             try {
               // Notify that payment verification is starting
               onProcessingStart?.();
@@ -179,13 +164,6 @@ export const useRazorpayAPI = () => {
             }
           })
           .catch((error: any) => {
-            // Reset status bar after payment cancellation/error
-            if (Platform.OS === 'ios') {
-              StatusBar.setBarStyle('default', true);
-            } else {
-              StatusBar.setBarStyle('default', true);
-            }
-
             console.error('Razorpay payment error:', error);
             
             // Handle user cancellation

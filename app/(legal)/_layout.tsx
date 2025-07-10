@@ -3,12 +3,14 @@ import { TouchableOpacity, Text } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
+import { StatusBar } from 'expo-status-bar';
 
 export default function LegalLayout() {
   const router = useRouter();
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
   return (
+    <>
     <Stack
       screenOptions={{
         headerShown: false,
@@ -103,5 +105,7 @@ export default function LegalLayout() {
         }} 
       />
     </Stack>
+    <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+    </>
   );
 }

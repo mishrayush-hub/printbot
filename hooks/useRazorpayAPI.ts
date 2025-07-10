@@ -165,19 +165,36 @@ export const useRazorpayAPI = () => {
           })
           .catch((error: any) => {
             console.error('Razorpay payment error:', error);
-            
-            // Handle user cancellation
-            if (error.code === 1 || error.description === 'Payment processing cancelled by user') {
-              resolve({
-                success: false,
-                error: 'Payment cancelled by user',
-              });
-            } else {
-              resolve({
-                success: false,
-                error: error.description || 'Payment failed',
-              });
+
+            // Try to parse error description if it's a JSON string
+            let userMessage = 'Payment failed';
+            if (error && typeof error.description === 'string') {
+              try {
+                const parsed = JSON.parse(error.description);
+                if (parsed && parsed.error && parsed.error.reason) {
+                  if (parsed.error.reason === 'payment_error') {
+                    userMessage = 'Payment could not be completed. Please try again or use a different payment method.';
+                  } else {
+                    userMessage = parsed.error.description || userMessage;
+                  }
+                }
+              } catch {
+                // Not JSON, use as is
+                userMessage = error.description || userMessage;
+              }
+            } else if (error && error.description) {
+              userMessage = error.description;
             }
+
+            // Handle user cancellation
+            if (error.code === 1 || userMessage.toLowerCase().includes('cancelled')) {
+              userMessage = 'Payment was cancelled by user.';
+            }
+
+            resolve({
+              success: false,
+              error: userMessage,
+            });
           });
       });
     } catch (error: any) {

@@ -325,7 +325,7 @@ export default function OrdersScreen() {
       {/* Search and Filter Header */}
       <View className={`${cardBg} px-4 py-4 border-b ${borderColor}`}>
         {/* Search Bar */}
-        <View className="flex-row items-center mb-4" style={{ gap: 12 }}>
+        <View className="flex-row items-center mb-3" style={{ gap: 12 }}>
           <View className={`flex-1 flex-row items-center ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg px-3 py-3`}>
             <Search color={isDark ? "#9CA3AF" : "#6B7280"} size={20} />
             <TextInput
@@ -349,13 +349,14 @@ export default function OrdersScreen() {
         </View>
 
         {/* Filter Buttons */}
-        <View className="flex-row items-center mt-1">
-          <View className="flex-row flex-1" style={{ gap: 8 }}>
+        <View>
+          <View className="flex-row" style={{ gap: 6 }}>
             {["All", "Paid", "Processing", "Pending"].map((status) => (
               <TouchableOpacity
                 key={status}
                 onPress={() => setStatusFilter(status)}
-                className={`py-1 rounded-lg min-w-[85px] min-h-[35px] items-center ${statusFilter === status
+                style={{ flex: 1 }}
+                className={`py-2 rounded-lg min-h-[35px] items-center ${statusFilter === status
                     ? ""
                     : isDark ? "bg-gray-700" : "bg-gray-200"
                   } justify-center`}
@@ -378,13 +379,13 @@ export default function OrdersScreen() {
                       bottom: 0,
                     }}
                   >
-                    <Text className="font-medium text-sm text-white">
+                    <Text className="font-medium text-[12px] text-white px-1">
                       {status}
                     </Text>
                   </LinearGradient>
                 ) : (
                   <Text
-                    className={`font-medium text-sm ${
+                    className={`font-medium text-[12px] px-1 ${
                       isDark ? "text-gray-300" : "text-gray-700"
                     }`}
                   >

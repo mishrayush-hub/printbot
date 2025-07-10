@@ -255,13 +255,13 @@ export default function AnimatedTabBar({ state, descriptors, navigation }: TabBa
           style={{
             flex: 1,
             borderRadius: 60,
-            shadowColor: colorScheme === 'dark' ? '#8B5CF6' : '#6366F1',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 8,
-            ...(Platform.OS === 'android' && {
-              elevation: 8,
-            }),
+            // shadowColor: colorScheme === 'dark' ? '#8B5CF6' : '#6366F1',
+            // shadowOffset: { width: 0, height: 4 },
+            // shadowOpacity: 0.3,
+            // shadowRadius: 8,
+            // ...(Platform.OS === 'android' && {
+            //   elevation: 8,
+            // }),
           }}
         />
       </Animated.View>

@@ -274,50 +274,50 @@ export default function ProfileScreen() {
     );
   };
 
-  const renderTabButton = (id: string, label: string, icon: any) => (
-    <TouchableOpacity
-      key={id}
-      onPress={() => setActiveTab(id)}
-      style={{ flex: 1 }}
-      className={`py-2 rounded-lg min-h-[35px] items-center justify-center ${activeTab === id ? "" : isDark ? "bg-gray-700" : "bg-gray-100"
-        }`}
-    >
-      {activeTab === id ? (
-        <LinearGradient
-          colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={{
-            flexDirection: 'row',
-            paddingVertical: 0,
-            borderRadius: 8,
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-          }}
-        >
-          {/* {icon} */}
-          <Text className="font-medium text-[12px] text-white px-1">
-            {label}
-          </Text>
-        </LinearGradient>
-      ) : (
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          {/* {icon} */}
-          <Text
-            className={`font-medium text-[12px] px-1 ${isDark ? "text-gray-300" : "text-gray-700"
-              }`}
+  const renderTabButton = (id: string, label: string, icon: any) => {
+    return (
+      <TouchableOpacity
+        key={id}
+        onPress={() => setActiveTab(id)}
+        style={{ flex: 1 }}
+        className={`py-2 rounded-lg min-h-[35px] items-center justify-center ${activeTab === id ? "" : isDark ? "bg-gray-700" : "bg-gray-100"
+          }`}
+      >
+        {activeTab === id ? (
+          <LinearGradient
+            colors={['#2563eb', '#9333ea']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{
+              flexDirection: 'row',
+              paddingVertical: 0,
+              borderRadius: 8,
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+            }}
           >
-            {label}
-          </Text>
-        </View>
-      )}
-    </TouchableOpacity>
-  );
+            <Text className="font-medium text-xs text-white px-1">
+              {label}
+            </Text>
+          </LinearGradient>
+        ) : (
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <Text
+              className={`font-medium text-xs px-1 ${isDark ? "text-gray-300" : "text-gray-700"
+                }`}
+            >
+              {label}
+            </Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
 
   const renderProfileTab = () => (
     <View className="py-4 px-2">
@@ -625,12 +625,10 @@ export default function ProfileScreen() {
       </View>
     </View>
   );
-
-  return (
     <View className={`flex-1 ${bgColor}`}>
       {/* Tab Navigation */}
       <View className={`${cardBg} p-4 border-b ${borderColor}`}>
-        <View className="flex-row max-w-[100%]" style={{ gap: 6 }}>
+        <View className="flex-row" style={{ gap: 6 }}>
             {renderTabButton(
               "profile",
               "Profile",
@@ -652,6 +650,7 @@ export default function ProfileScreen() {
               <Scale color={activeTab === "legal" ? "white" : (isDark ? "#9CA3AF" : "#6B7280")} size={18} />
             )}
           </View>
+        </View>
       </View>
 
       {/* Tab Content */}

@@ -83,7 +83,7 @@ export default function TabLayout() {
           options={{
             title: 'Your Orders',
             tabBarIcon: ({ color }) => <ImageUp size={28} color={color} />,
-            tabBarLabel: 'History', // 👈 shown in tab bar
+            tabBarLabel: 'Orders', // 👈 shown in tab bar
             headerTitleAlign: 'center', // 👈 center the header title
             headerStyle: {
                   backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',

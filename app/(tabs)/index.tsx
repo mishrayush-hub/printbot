@@ -60,39 +60,28 @@ export default function HomeScreen() {
   // - replaces internal whitespace runs with single underscore
   // - avoids leading/trailing underscores
   // - preserves extension and avoids underscore before extension
+  // Minimal sanitize: only replace spaces with underscores and preserve extension.
+  // If `uid` provided, prefix the filename with `<uid>_`.
   const sanitizeFileName = (originalName: string | undefined, uid?: string) => {
     const name = (originalName || "").toString();
 
-    // If empty, return a fallback
     if (!name) return uid ? `${uid}` : "file";
 
-    // Find last dot for extension (ignore dot at position 0 which could be hidden file)
     const lastDot = name.lastIndexOf('.');
     let base = name;
     let ext = '';
 
     if (lastDot > 0) {
       base = name.slice(0, lastDot);
-      ext = name.slice(lastDot).trim(); // includes the dot
-    } else {
-      base = name;
-      ext = '';
+      ext = name.slice(lastDot); // includes the dot
     }
 
-    // Trim and replace internal whitespace with underscores
-    base = base.trim().replace(/\s+/g, '_');
+    // Only replace spaces with underscores in the base name
+    base = base.replace(/\s+/g, '_');
 
-    // Remove any leading/trailing underscores introduced by trimming / replacement
-    base = base.replace(/^_+|_+$/g, '');
-
-    // Compose final base with user id if provided
     const finalBase = (uid && uid.toString().trim() !== '') ? `${uid}_${base}` : base;
 
-    // If base became empty (e.g., filename was just spaces), fallback
-    const safeBase = finalBase || (uid ? `${uid}` : 'file');
-
-    // Return combined name (preserve extension exactly as trimmed)
-    return safeBase + ext;
+    return finalBase + ext;
   };
 
   const removeFile = () => {

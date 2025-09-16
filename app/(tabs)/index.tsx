@@ -55,6 +55,46 @@ export default function HomeScreen() {
     getTokenDetails();
   }, []);
 
+  // Helper to sanitize filenames:
+  // - trims whitespace
+  // - replaces internal whitespace runs with single underscore
+  // - avoids leading/trailing underscores
+  // - preserves extension and avoids underscore before extension
+  const sanitizeFileName = (originalName: string | undefined, uid?: string) => {
+    const name = (originalName || "").toString();
+
+    // If empty, return a fallback
+    if (!name) return uid ? `${uid}` : "file";
+
+    // Find last dot for extension (ignore dot at position 0 which could be hidden file)
+    const lastDot = name.lastIndexOf('.');
+    let base = name;
+    let ext = '';
+
+    if (lastDot > 0) {
+      base = name.slice(0, lastDot);
+      ext = name.slice(lastDot).trim(); // includes the dot
+    } else {
+      base = name;
+      ext = '';
+    }
+
+    // Trim and replace internal whitespace with underscores
+    base = base.trim().replace(/\s+/g, '_');
+
+    // Remove any leading/trailing underscores introduced by trimming / replacement
+    base = base.replace(/^_+|_+$/g, '');
+
+    // Compose final base with user id if provided
+    const finalBase = (uid && uid.toString().trim() !== '') ? `${uid}_${base}` : base;
+
+    // If base became empty (e.g., filename was just spaces), fallback
+    const safeBase = finalBase || (uid ? `${uid}` : 'file');
+
+    // Return combined name (preserve extension exactly as trimmed)
+    return safeBase + ext;
+  };
+
   const removeFile = () => {
     setFile({
       uri: "",
@@ -143,9 +183,13 @@ export default function HomeScreen() {
       const formData = new FormData();
       formData.append("authToken", authToken);
       formData.append("user_id", userId);
+
+      // Ensure file name is sanitized before upload
+      const uploadFileName = sanitizeFileName(file.name, userId);
+
       formData.append("file", {
         uri: file.uri,
-        name: file.name || `PB_File_${userId}`,
+        name: uploadFileName,
         type: file.type || "application/pdf",
       } as any);
 
@@ -330,9 +374,12 @@ export default function HomeScreen() {
         //   uri: file.uri
         // });
 
+  // Sanitize filename and include userId prefix when available
+  const sanitizedFileName = sanitizeFileName(file.name, userId);
+
         setFile({
           uri: file.uri,
-          name: file.name || `PB_File_${userId}`,
+          name: sanitizedFileName,
           type: fileType,
         });
 
@@ -358,7 +405,7 @@ export default function HomeScreen() {
         const otp = Math.floor(100000 + Math.random() * 900000);
 
         const newFile = {
-          fileName: file.name ?? "Unknown File",
+          fileName: sanitizedFileName ?? "Unknown_File",
           fileSize: file.size ?? 0,
           fileType,
           pages: pageCount,

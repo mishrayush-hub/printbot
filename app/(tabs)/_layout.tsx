@@ -60,20 +60,38 @@ export default function TabLayout() {
     setShowPermissionModal(false);
   };
 
+  const isIOS = Platform.OS === 'ios';
+
+  const tabBarStyle = {
+    backgroundColor: colorScheme === 'dark' ? '#0b1220' : '#ffffff',
+    borderTopWidth: 0,
+    ...(isIOS
+      ? {
+          height: 86,
+          paddingTop: 10,
+          paddingBottom: 20,
+        }
+      : {
+          elevation: 8,
+          height: 64,
+        }),
+  } as any;
+
   return (
     <>
       <Tabs
-        initialRouteName='index'
-        tabBar={(props) => <AnimatedTabBar {...props} />}
+        initialRouteName="index"
         screenOptions={{
           headerShown: true,
           tabBarActiveTintColor: theme.tabIconSelected,
           tabBarInactiveTintColor: theme.tabIconDefault,
+          tabBarStyle,
+          tabBarShowLabel: true,
           headerTitleStyle: {
             fontSize: 24,
             fontWeight: 'bold',
             color: colorScheme === 'dark' ? 'white' : 'black',
-            marginTop: -10
+            marginTop: -10,
           },
           headerTintColor: 'white',
         }}
@@ -82,7 +100,7 @@ export default function TabLayout() {
           name="explore"
           options={{
             title: 'Your Orders',
-            tabBarIcon: ({ color }) => <ImageUp size={28} color={color} />,
+            tabBarIcon: ({ color }) => <ImageUp size={isIOS ? 24 : 22} color={color} />,
             tabBarLabel: 'Orders', // 👈 shown in tab bar
             headerTitleAlign: 'center', // 👈 center the header title
             headerStyle: {
@@ -96,7 +114,7 @@ export default function TabLayout() {
           options={{
             headerTitle: `Hello, ${userName || "User"} 👋`, // 👈 shown in header
             tabBarLabel: 'Home',     // 👈 shown in tab bar
-            tabBarIcon: ({ color }) => <House size={28} color={color} />,
+            tabBarIcon: ({ color }) => <House size={isIOS ? 24 : 22} color={color} />,
             headerStyle: {
                   backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
               },
@@ -107,7 +125,7 @@ export default function TabLayout() {
           name="(user)"
           options={{
             title: 'Settings',
-            tabBarIcon: ({ color }) => <Cog size={28} color={color} />,
+            tabBarIcon: ({ color }) => <Cog size={isIOS ? 24 : 22} color={color} />,
             headerStyle: {
                   backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
               },

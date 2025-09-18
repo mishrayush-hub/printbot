@@ -35,11 +35,11 @@ export default function SignupScreen() {
 
   // Refs for auto-scroll and focus
   const scrollViewRef = useRef<ScrollView>(null);
-  const fullNameRef = useRef<TextInput>(null);
-  const emailRef = useRef<TextInput>(null);
-  const mobileRef = useRef<TextInput>(null);
-  const passwordRef = useRef<TextInput>(null);
-  const confirmPasswordRef = useRef<TextInput>(null);
+  const fullNameRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
+  const emailRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
+  const mobileRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
+  const passwordRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
+  const confirmPasswordRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
 
   // Auto-scroll function
   const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
@@ -175,7 +175,7 @@ export default function SignupScreen() {
         <View className="h-56 px-6 pt-7">
           <View className="flex items-center mt-6">
             <Image
-              source={require("../../assets/images/splash-black.png")}
+              source={require("../../assets/images/splash/splash-black.png")}
               style={{ width: 150, height: 150 }}
               resizeMode="contain"
             />
@@ -326,26 +326,12 @@ export default function SignupScreen() {
 
           {/* Signup Button */}
           <TouchableOpacity
-            className="w-[326px] h-[51px]"
+            className="w-[326px] h-[51px] bg-[#008cff] rounded-full items-center justify-center"
             onPress={handleSignup}
           >
-            <LinearGradient
-              colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{
-                width: '100%',
-                height: '100%',
-                paddingVertical: 12,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 25.5, // Half of height (51/2) for perfect rounded corners
-              }}
-            >
-              <Text className="text-white text-center text-2xl font-bold">
-                Sign Up
-              </Text>
-            </LinearGradient>
+            <Text className="text-white text-center text-2xl font-bold">
+              Sign Up
+            </Text>
           </TouchableOpacity>
 
           {/* Login Link */}

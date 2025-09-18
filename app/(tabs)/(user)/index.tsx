@@ -279,43 +279,9 @@ export default function ProfileScreen() {
       key={id}
       onPress={() => setActiveTab(id)}
       style={{ flex: 1 }}
-      className={`py-2 rounded-lg min-h-[35px] items-center justify-center ${activeTab === id ? "" : isDark ? "bg-gray-700" : "bg-gray-100"
-        }`}
+      className={`py-2 rounded-lg min-h-[35px] items-center justify-center ${activeTab === id ? "bg-[#008cff]" : isDark ? "bg-gray-700" : "bg-gray-100"}`}
     >
-      {activeTab === id ? (
-        <LinearGradient
-          colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={{
-            flexDirection: 'row',
-            paddingVertical: 0,
-            borderRadius: 8,
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-          }}
-        >
-          {/* {icon} */}
-          <Text className="font-medium text-[12px] text-white px-1">
-            {label}
-          </Text>
-        </LinearGradient>
-      ) : (
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          {/* {icon} */}
-          <Text
-            className={`font-medium text-[12px] px-1 ${isDark ? "text-gray-300" : "text-gray-700"
-              }`}
-          >
-            {label}
-          </Text>
-        </View>
-      )}
+      <Text className={`font-semibold text-[14px] px-1 ${activeTab === id ? "text-white" : isDark ? "text-gray-300" : "text-gray-700"}`}>{label}</Text>
     </TouchableOpacity>
   );
 
@@ -335,24 +301,10 @@ export default function ProfileScreen() {
           {!editingProfile ? (
             <TouchableOpacity
               onPress={() => setEditingProfile(true)}
-              className="flex-row items-center rounded-lg min-h-[35px]"
+              className="flex-row items-center rounded-lg min-h-[35px] bg-[#008cff] px-4 py-2"
             >
-              <LinearGradient
-                colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  paddingHorizontal: 10,
-                  paddingVertical: 8,
-                  justifyContent: 'center',
-                  borderRadius: 8, // Half of height (51/2) for perfect rounded corners
-                }}
-              >
-                <Edit3 color="white" size={16} />
-                <Text className="text-white font-medium ml-2">Edit</Text>
-              </LinearGradient>
+              <Edit3 color="white" size={16} />
+              <Text className="text-white font-medium ml-2">Edit</Text>
             </TouchableOpacity>
           ) : (
             <View className="flex-row" style={{ gap: 8 }}>
@@ -444,7 +396,7 @@ export default function ProfileScreen() {
         onPress={handleLogout}
         className="bg-red-500 rounded-lg p-4 mt-4"
       >
-        <Text className="text-white font-semibold text-center text-base">Logout</Text>
+        <Text className="text-white font-bold text-center text-xl">Logout</Text>
       </TouchableOpacity>
     </View>
   );
@@ -526,18 +478,9 @@ export default function ProfileScreen() {
           {loading ? (
             <ActivityIndicator size="small" color="#3B82F6" />
           ) : (
-            <LinearGradient
-              colors={['#2563eb', '#9333ea']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{
-                paddingHorizontal: 12,
-                paddingVertical: 6,
-                borderRadius: 6,
-              }}
-            >
+            <View className="bg-[#008cff] px-3 py-2 rounded-md">
               <Text className="text-white font-medium text-sm">Change</Text>
-            </LinearGradient>
+            </View>
           )}
         </TouchableOpacity>
 

@@ -31,8 +31,8 @@ export default function LoginScreen() {
 
   // Refs for auto-scroll and focus
   const scrollViewRef = useRef<ScrollView>(null);
-  const emailRef = useRef<TextInput>(null);
-  const passwordRef = useRef<TextInput>(null);
+  const emailRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
+  const passwordRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
 
   // Auto-scroll function
   const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
@@ -80,7 +80,7 @@ export default function LoginScreen() {
       await AsyncStorage.setItem("userPhone", data.data.phone_number);
       await AsyncStorage.setItem("userId", data.data.user_id.toString());
 
-      router.replace("/(tabs)");
+      router.replace("/(tabs)/(index)");
     } catch (error) {
       console.error("Login error:", error);
       setLoading(false);
@@ -116,7 +116,7 @@ export default function LoginScreen() {
         <View className="h-56 px-6 pt-7">
           <View className="flex items-center mt-6">
             <Image
-              source={require("../../assets/images/splash-black.png")}
+              source={require("../../assets/images/splash/splash-black.png")}
               style={{ width: 150, height: 150 }}
               resizeMode="contain"
             />
@@ -200,26 +200,12 @@ export default function LoginScreen() {
 
         {/* Login Button */}
         <TouchableOpacity
-          className="w-[326px] h-[51px] rounded-full"
+          className="w-[326px] h-[51px] rounded-full bg-[#008cff] items-center justify-center"
           onPress={handleLogin}
         >
-          <LinearGradient
-            colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{
-              width: '100%',
-              height: '100%',
-              paddingVertical: 12,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 25.5, // Half of height (51/2) for perfect rounded corners
-            }}
-          >
-            <Text className="text-white text-center text-2xl font-bold">
-              Login
-            </Text>
-          </LinearGradient>
+          <Text className="text-white text-center text-2xl font-bold">
+            Login
+          </Text>
         </TouchableOpacity>
 
         {/* Sign-up Link */}

@@ -1,11 +1,5 @@
-import { Tabs, useRouter } from 'expo-router';
+import { Tabs } from "@/components/bottom-tabs";
 import React, { useEffect, useState } from 'react';
-import { Platform, Text } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
-import { HapticTab } from '@/components/HapticTab';
-import { Cog, House, ImageUp } from 'lucide-react-native';
-import AnimatedTabBar from '@/components/AnimatedTabBar';
-import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -13,7 +7,6 @@ import PermissionModal from '@/components/PermissionModal';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? 'light';
-  const theme = Colors[colorScheme];
   const [userName, setUserName] = useState('');
   const [showPermissionModal, setShowPermissionModal] = useState(false);
 
@@ -62,57 +55,26 @@ export default function TabLayout() {
 
   return (
     <>
-      <Tabs
-        initialRouteName='index'
-        tabBar={(props) => <AnimatedTabBar {...props} />}
-        screenOptions={{
-          headerShown: true,
-          tabBarActiveTintColor: theme.tabIconSelected,
-          tabBarInactiveTintColor: theme.tabIconDefault,
-          headerTitleStyle: {
-            fontSize: 24,
-            fontWeight: 'bold',
-            color: colorScheme === 'dark' ? 'white' : 'black',
-            marginTop: -10
-          },
-          headerTintColor: 'white',
-        }}
-      >
+      <Tabs hapticFeedbackEnabled={true}>
         <Tabs.Screen
-          name="explore"
+          name="(orders)"
           options={{
-            title: 'Your Orders',
-            tabBarIcon: ({ color }) => <ImageUp size={28} color={color} />,
-            tabBarLabel: 'Orders', // 👈 shown in tab bar
-            headerTitleAlign: 'center', // 👈 center the header title
-            headerStyle: {
-                  backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
-              },
-            headerShadowVisible: false, // 👈 remove header shadow
+            title: "Orders",
+            tabBarIcon: () => require('../../assets/images/tabbar/cart.svg'),
           }}
         />
         <Tabs.Screen
-          name="index"
+          name="(index)"
           options={{
-            headerTitle: `Hello, ${userName || "User"} 👋`, // 👈 shown in header
-            tabBarLabel: 'Home',     // 👈 shown in tab bar
-            tabBarIcon: ({ color }) => <House size={28} color={color} />,
-            headerStyle: {
-                  backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
-              },
-            headerTitleAlign: 'center', // 👈 center the header title
+            title: "Home",
+            tabBarIcon: () => require('../../assets/images/tabbar/home.svg'),
           }}
         />
         <Tabs.Screen
           name="(user)"
           options={{
-            title: 'Settings',
-            tabBarIcon: ({ color }) => <Cog size={28} color={color} />,
-            headerStyle: {
-                  backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
-              },
-            headerShown: false,
-            headerShadowVisible: false, // 👈 remove header shadow
+            title: "Settings",
+            tabBarIcon: () => require('../../assets/images/tabbar/cog.svg'),
           }}
         />
       </Tabs>

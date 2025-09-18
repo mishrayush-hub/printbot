@@ -30,12 +30,12 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
 
   // Refs for auto-scroll and focus
-  const scrollViewRef = useRef<ScrollView>(null);
-  const emailRef = useRef<TextInput>(null);
-  const passwordRef = useRef<TextInput>(null);
+  const scrollViewRef = useRef<ScrollView | null>(null);
+  const emailRef = useRef<TextInput | null>(null);
+  const passwordRef = useRef<TextInput | null>(null);
 
   // Auto-scroll function
-  const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
+  const scrollToInput = (inputRef: React.RefObject<TextInput | null>) => {
     setTimeout(() => {
       if (inputRef.current && scrollViewRef.current) {
         inputRef.current.measure((x, y, width, height, pageX, pageY) => {

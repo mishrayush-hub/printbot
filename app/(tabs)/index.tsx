@@ -257,7 +257,7 @@ export default function HomeScreen() {
 
       try {
         // Try to read as binary and look for page markers
-        const fileData = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+  const fileData = await FileSystem.readAsStringAsync(uri, { encoding: 'base64' });
 
         // Convert base64 to binary string for better parsing
         const binaryData = atob(fileData);

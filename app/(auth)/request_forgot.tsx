@@ -119,7 +119,7 @@ export default function RequestForgotPassword() {
         <View className="h-56 px-6 pt-7">
           <View className="flex items-center mt-6">
             <Image
-              source={require("../../assets/images/splash-black.png")}
+              source={require("../../assets/images/splash/splash-black.png")}
               style={{ width: 150, height: 150 }}
               resizeMode="contain"
             />

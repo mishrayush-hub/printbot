@@ -4,14 +4,14 @@
     "slug": "hello-to-instant-printing",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/ios-light.png",
+    "icon": "./assets/images/androidIcons/android-light.png",
     "scheme": "printbot",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "cloud.printbot.app",
-      "icon": "./assets/images/ios-light.png",
+      "icon": "./assets/images/iosIcons/printbot.icon",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Allow PrintBot to access your photos to upload and print documents. This permission is required to select files from your photo library to upload to our servers.",
         "NSPhotoLibraryAddUsageDescription": "Allow PrintBot to save printed documents to your photo library. This permission is required to select printed documents after processing in our servers."
@@ -19,14 +19,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "monochromeImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/androidIcons/adaptive-icon.png",
+        "monochromeImage": "./assets/images/androidIcons/adaptive-icon.png",
         "backgroundColor": "#008cff"
       },
       "icon": {
-        "light": "./assets/images/icon-light.png",
-        "dark": "./assets/images/icon-dark.png",
-        "tinted": "./assets/images/icon-tinted.png"
+        "light": "./assets/images/androidIcons/android-light.png",
+        "dark": "./assets/images/androidIcons/android-dark.png",
+        "tinted": "./assets/images/androidIcons/android-tinted.png"
       },
       "package": "cloud.printbot.app",
       "permissions": [
@@ -39,25 +39,46 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/webIcons/favicon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-black.png",
+          "image": "./assets/images/splash/splash-black.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#008cff"
         }
       ],
       [
+        "react-native-bottom-tabs",
+        [
+          "expo-build-properties",
+          {
+            "ios": {
+              "extraPods": [
+                {
+                  "name": "SDWebImage",
+                  "modular_headers": true
+                },
+                {
+                  "name": "SDWebImageSVGCoder",
+                  "modular_headers": true
+                }
+              ]
+            }
+          }
+        ]
+      ],
+      [
         "expo-document-picker",
         {
           "iCloudContainerEnvironment": "Production"
         }
-      ]
+      ],
+      "expo-build-properties"
     ],
     "experiments": {
       "typedRoutes": true

@@ -23,11 +23,7 @@
         "monochromeImage": "./assets/images/android/adaptive-icon.png",
         "backgroundColor": "#008cff"
       },
-      "icon": {
-        "light": "./assets/images/android/icon-light.png",
-        "dark": "./assets/images/android/icon-dark.png",
-        "tinted": "./assets/images/android/icon-tinted.png"
-      },
+      "icon":  "./assets/images/android/icon-light.png",
       "package": "cloud.printbot.app",
       "permissions": [
         "READ_EXTERNAL_STORAGE",

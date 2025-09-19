@@ -114,7 +114,7 @@ export default function OrdersScreen() {
       }
 
       const response = await fetch(
-        "https://printbot.cloud/api/v1/edit_profile_api.php",
+        "https://printbot.cloud/api/v1/update_profile_api.php",
         {
           method: "POST",
           headers: {

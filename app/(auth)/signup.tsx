@@ -118,36 +118,83 @@ export default function SignupScreen() {
     password: string,
     confirmPassword: string
   ) => {
-    setLoading(true); // <-- Start loading
+    setLoading(true);
+    
+    // console.log("Starting signup request...");
+    // console.log("Request data:", {
+    //   signupEmail: email,
+    //   signupName: fullName,
+    //   signupMobile: mobile,
+    //   address1,
+    //   address2,
+    //   city,
+    //   state,
+    //   pincode,
+    //   country,
+    // });
+    
     try {
+      const requestBody = new URLSearchParams({
+        signupEmail: email,
+        signupName: fullName,
+        signupMobile: mobile,
+        address1: address1,
+        address2: address2,
+        city: city,
+        state: state,
+        pincode: pincode,
+        country: country,
+        signupPassword: password,
+        confirmPassword: confirmPassword
+      }).toString();
+      
+      // console.log("Request body:", requestBody);
+      
       const response = await fetch(
         "https://printbot.cloud/api/v1/signup_api.php",
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json",
           },
-          body: new URLSearchParams({
-            signupEmail: email,
-            signupName: fullName,
-            signupMobile: mobile,
-            address1: address1,
-            address2: address2,
-            city: city,
-            state: state,
-            pincode: pincode,
-            country: country,
-            signupPassword: password,
-            confirmPassword: confirmPassword
-          }).toString()
+          body: requestBody
         }
       );
 
-      const data = await response.json();
-      setLoading(false); // <-- Stop loading
+      // console.log("Response received:");
+      // console.log("Status:", response.status);
+      // console.log("Status Text:", response.statusText);
+      // console.log("Headers:", response.headers);
+      
+      // Check if response has content
+      const responseText = await response.text();
+      // console.log("Response text length:", responseText.length);
+      // console.log("Response text:", responseText);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}. Response: ${responseText}`);
+      }
+      
+      if (!responseText || responseText.trim() === '') {
+        throw new Error("Empty response from server");
+      }
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        // console.error("JSON Parse Error:", parseError);
+        // console.error("Response was:", responseText);
+        throw new Error(`Invalid JSON response: ${responseText.substring(0, 200)}...`);
+      }
+
+      setLoading(false);
 
       if (!response.ok || !data.success) {
-        setErrorMessage(data.message || "Signup failed. Please try again.");
+        const errorMsg = data.message || `Server error (${response.status}): ${response.statusText}`;
+        setErrorMessage(errorMsg);
+        Alert.alert("Signup Failed", errorMsg);
         return;
       }
 
@@ -161,6 +208,12 @@ export default function SignupScreen() {
               setFullName("");
               setEmail("");
               setMobile("");
+              setAddress1("");
+              setAddress2("");
+              setCity("");
+              setState("");
+              setPincode("");
+              setCountry("India");
               setPassword("");
               setConfirmPassword("");
               setAcceptedTerms(false);
@@ -171,13 +224,30 @@ export default function SignupScreen() {
         { cancelable: false }
       );
     } catch (error) {
-      setLoading(false); // <-- Stop loading on error
-      Alert.alert(
-        "Signup Error",
-        "An error occurred while signing up. Please try again later."
-      );
-      console.error("Signup error:", error);
-      setErrorMessage("An error occurred while signing up. Please try again.");
+      setLoading(false);
+      // console.error("Signup error details:", error);
+      
+      let errorMessage = "An error occurred while signing up. Please try again.";
+      
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        errorMessage = "Network error. Please check your internet connection and try again.";
+      } else if (error instanceof Error) {
+        if (error.message.includes('Empty response')) {
+          errorMessage = "Server is not responding properly. Please try again later.";
+        } else if (error.message.includes('Invalid JSON')) {
+          errorMessage = "Server returned an invalid response. Please try again.";
+        } else if (error.message.includes('HTTP')) {
+          errorMessage = `Server error: ${error.message}`;
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      // console.error("Final error message:", errorMessage);
+      Alert.alert("Signup Error", errorMessage);
+      setErrorMessage(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 

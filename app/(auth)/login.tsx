@@ -14,6 +14,7 @@ import {
   KeyboardAvoidingView,
   Platform
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -79,8 +80,16 @@ export default function LoginScreen() {
       await AsyncStorage.setItem("userEmail", data.data.email);
       await AsyncStorage.setItem("userPhone", data.data.phone_number);
       await AsyncStorage.setItem("userId", data.data.user_id.toString());
+      
+      // Save address fields if available
+      await AsyncStorage.setItem("userAddress1", data.data.address.address1 || "");
+      await AsyncStorage.setItem("userAddress2", data.data.address.address2 || "");
+      await AsyncStorage.setItem("userCity", data.data.address.city || "");
+      await AsyncStorage.setItem("userState", data.data.address.state || "");
+      await AsyncStorage.setItem("userPincode", data.data.address.pincode || "");
+      await AsyncStorage.setItem("userCountry", data.data.address.country || "");
 
-      router.replace("/(tabs)/(index)");
+      router.replace("/(tabs)/(home)");
     } catch (error) {
       console.error("Login error:", error);
       setLoading(false);
@@ -95,16 +104,16 @@ export default function LoginScreen() {
   const handleForgotPassword = () => router.push("/(auth)/request_forgot");
 
   return (
-    <KeyboardAvoidingView 
-      className="flex-1" 
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <LinearGradient
-        colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
-        style={{ flex: 1 }}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+      <KeyboardAvoidingView 
+        className="flex-1" 
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
+        <LinearGradient
+          colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
+          style={{ flex: 1 }}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
         {/* Loading Modal */}
         <Modal transparent={true} animationType="fade" visible={loading}>
           <View className="flex-1 justify-center items-center bg-black/40">
@@ -127,10 +136,10 @@ export default function LoginScreen() {
         {/* Login Box */}
         <ScrollView
           ref={scrollViewRef}
-          className={`flex-1 rounded-t-[58] ${
+          className={`flex-1 px-4 rounded-t-[58] ${
             isDark ? "bg-[#1a1a1a]" : "bg-white"
           }`}
-          contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 16 }}
+          contentContainerStyle={{ paddingVertical: 16 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -147,13 +156,17 @@ export default function LoginScreen() {
           <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
         )}
 
+        <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
+                    Email Address
+                  </Text>
+
         {/* Email Input */}
         <TextInput
           ref={emailRef}
-          className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${
+          className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${
             isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
           }`}
-          placeholder="Email"
+          placeholder="Enter Email Address"
           placeholderTextColor={isDark ? "#aaa" : "#999"}
           value={email}
           autoCapitalize="none"
@@ -167,16 +180,20 @@ export default function LoginScreen() {
           onSubmitEditing={() => passwordRef.current?.focus()}
         />
 
+          <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
+            Password
+          </Text>
+
         {/* Password Input with toggle */}
         <View
-          className={`flex-row items-center rounded-full w-[326px] h-[51px] px-4 mb-10 ${
+          className={`flex-row items-center rounded-xl max-w-[400px] h-[51px] px-4 py-3 mb-10 ${
             isDark ? "bg-[#2a2a2a]" : "bg-gray-100"
           }`}
         >
           <TextInput
             ref={passwordRef}
             className={`flex-1 text-xl ${isDark ? "text-white" : "text-black"}`}
-            placeholder="Password"
+            placeholder="Enter Password"
             placeholderTextColor={isDark ? "#aaa" : "#999"}
             secureTextEntry={!showPassword}
             autoCapitalize="none"
@@ -200,7 +217,7 @@ export default function LoginScreen() {
 
         {/* Login Button */}
         <TouchableOpacity
-          className="w-[326px] h-[51px] rounded-full bg-[#008cff] items-center justify-center"
+          className="max-w-[400px] h-[51px] bg-[#008cff] rounded-xl items-center justify-center"
           onPress={handleLogin}
         >
           <Text className="text-white text-center text-2xl font-bold">

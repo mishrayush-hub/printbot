@@ -1,5 +1,5 @@
-import { Stack } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Stack } from "expo-router";
 
 export default function UserLayout() {
     const colorScheme = useColorScheme() ?? 'light';
@@ -23,8 +23,8 @@ export default function UserLayout() {
             <Stack.Screen 
                 name="index" 
                 options={{ 
-                    title: "Home",
-                    headerShadowVisible: true, // Remove header shadow to match tabs
+                    title: "Dashboard",
+                    headerShadowVisible: true,
                 }} 
             />
         </Stack>

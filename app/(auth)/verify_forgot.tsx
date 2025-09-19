@@ -44,7 +44,7 @@ export default function VerifyForgotPassword() {
       if (inputRef.current && scrollViewRef.current) {
         inputRef.current.measure((x, y, width, height, pageX, pageY) => {
           scrollViewRef.current?.scrollTo({
-            y: pageY - 150, // Offset to show input clearly above keyboard
+            y: pageY - 100, // Offset to show input clearly above keyboard
             animated: true,
           });
         });
@@ -178,8 +178,8 @@ export default function VerifyForgotPassword() {
         {/* Reset Password Form */}
         <ScrollView
           ref={scrollViewRef}
-          className={`flex-1 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}
-          contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 16 }}
+          className={`flex-1 px-4 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}
+          contentContainerStyle={{ paddingVertical: 16 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -199,12 +199,15 @@ export default function VerifyForgotPassword() {
             </Text>
           )}
 
+          <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
+            Token
+          </Text>
           {/* Reset Token Input */}
           <TextInput
             ref={forgotTokenRef}
-            className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+            className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
               }`}
-            placeholder="Reset Token"
+            placeholder="Enter Reset Token *"
             placeholderTextColor={isDark ? "#aaa" : "#999"}
             autoCapitalize="none"
             autoCorrect={false}
@@ -216,12 +219,16 @@ export default function VerifyForgotPassword() {
             onSubmitEditing={() => passwordRef.current?.focus()}
           />
 
+          <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
+            New Password
+          </Text>
+
           {/* Password Input */}
           <TextInput
             ref={passwordRef}
-            className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+            className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
               }`}
-            placeholder="Password"
+            placeholder="Enter New Password *"
             placeholderTextColor={isDark ? "#aaa" : "#999"}
             secureTextEntry
             autoCapitalize="none"
@@ -233,11 +240,17 @@ export default function VerifyForgotPassword() {
             onFocus={() => scrollToInput(passwordRef)}
             onSubmitEditing={() => confirmPasswordRef.current?.focus()}
           />
+
+          <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
+            Confirm Password
+          </Text>
+
+          {/* Confirm Password Input */}
           <TextInput
             ref={confirmPasswordRef}
-            className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-10 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+            className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-10 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
               }`}
-            placeholder="Confirm Password"
+            placeholder="Enter Confirm Password *"
             placeholderTextColor={isDark ? "#aaa" : "#999"}
             secureTextEntry
             autoCapitalize="none"
@@ -252,7 +265,7 @@ export default function VerifyForgotPassword() {
 
           {/* Signup Button */}
           <TouchableOpacity
-            className="w-[326px] h-[51px] bg-[#008cff] rounded-full items-center justify-center"
+            className="max-w-[400px] h-[51px] bg-[#008cff] rounded-xl items-center justify-center"
             onPress={handleSignup}
           >
             <Text className="text-white text-center text-2xl font-bold">

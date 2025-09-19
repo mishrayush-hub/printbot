@@ -7,7 +7,14 @@
       "layers" : [
         {
           "image-name" : "printbot.png",
-          "name" : "printbot"
+          "name" : "printbot",
+          "position" : {
+            "scale" : 0.9,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
         }
       ],
       "shadow" : {

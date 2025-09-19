@@ -39,6 +39,7 @@
     },
     "plugins": [
       "expo-router",
+      "react-native-bottom-tabs",
       [
         "expo-splash-screen",
         {
@@ -48,26 +49,25 @@
           "backgroundColor": "#008cff"
         }
       ],
-      ["react-native-bottom-tabs",
-        [
-          "expo-build-properties", {
-            "ios": {
-              "useFrameworks": "static",
-              "extraPods": [
-                { "name": "SDWebImage", "modular_headers": true },
-                { "name": "SDWebImageWebPCoder", "modular_headers": true }
-              ]
-            }
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "extraPods": [
+              { "name": "SDWebImage", "modular_headers": true },
+              { "name": "SDWebImageSVGCoder", "modular_headers": true },
+              { "name": "SDWebImageWebPCoder", "modular_headers": true }
+            ]
           }
-        ]
-        ],
+        }
+      ],
       [
         "expo-document-picker",
         {
           "iCloudContainerEnvironment": "Production"
         }
-      ],
-      "expo-build-properties"
+      ]
     ],
     "experiments": {
       "typedRoutes": true

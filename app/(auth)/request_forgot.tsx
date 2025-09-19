@@ -130,9 +130,9 @@ export default function RequestForgotPassword() {
         {/* Forgot Password Box */}
         <ScrollView
           ref={scrollViewRef}
-          className={`flex-1 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"
+          className={`flex-1 px-4 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"
             }`}
-          contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 16 }}
+          contentContainerStyle={{ paddingVertical: 16 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -148,12 +148,16 @@ export default function RequestForgotPassword() {
             <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
           )}
 
+          <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
+            Email Address
+          </Text>
+
           {/* Email Input */}
           <TextInput
             ref={emailRef}
-            className={`rounded-full w-[326px] h-[51px] px-6 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+            className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
               }`}
-            placeholder="Email"
+            placeholder="Enter Email Address *"
             placeholderTextColor={isDark ? "#aaa" : "#999"}
             value={email}
             autoCapitalize="none"
@@ -169,7 +173,7 @@ export default function RequestForgotPassword() {
 
           {/* Submit Button */}
           <TouchableOpacity
-            className="w-[326px] h-[51px] bg-[#008cff] rounded-full items-center justify-center"
+            className="mt-4 max-w-[400px] h-[51px] bg-[#008cff] rounded-xl items-center justify-center"
             onPress={handleRequest}
           >
             <Text className="text-white text-center text-2xl font-bold">

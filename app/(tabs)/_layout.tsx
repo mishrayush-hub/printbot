@@ -1,12 +1,10 @@
 import { Tabs } from "@/components/bottom-tabs";
-import React, { useEffect, useState } from 'react';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { usePermissions } from '@/hooks/usePermissions';
 import PermissionModal from '@/components/PermissionModal';
+import { usePermissions } from '@/hooks/usePermissions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from 'react';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme() ?? 'light';
   const [userName, setUserName] = useState('');
   const [showPermissionModal, setShowPermissionModal] = useState(false);
 
@@ -29,7 +27,6 @@ export default function TabLayout() {
   // Show permission modal when permissions are not granted and not loading
   useEffect(() => {
     if (!permissionLoading && !permissionStatus.allGranted) {
-      // Only show modal if user is logged in (has userName)
       if (userName && userName !== 'User') {
         setShowPermissionModal(true);
       }
@@ -55,23 +52,30 @@ export default function TabLayout() {
 
   return (
     <>
-      <Tabs hapticFeedbackEnabled={true}>
+      <Tabs hapticFeedbackEnabled={true} initialRouteName="(home)">
         <Tabs.Screen
-          name="(orders)"
-          options={{
-            title: "Orders",
-            tabBarIcon: () => require('../../assets/images/tabbar/cart.svg'),
-          }}
-        />
-        <Tabs.Screen
-          name="(index)"
+          name="(home)"
           options={{
             title: "Home",
             tabBarIcon: () => require('../../assets/images/tabbar/home.svg'),
           }}
         />
         <Tabs.Screen
-          name="(user)"
+          name="(history)"
+          options={{
+            title: "History",
+            tabBarIcon: () => require('../../assets/images/tabbar/cart.svg'),
+          }}
+        />
+        <Tabs.Screen
+          name="(profile)"
+          options={{
+            title: "Profile",
+            tabBarIcon: () => require('../../assets/images/tabbar/profile.svg'),
+          }}
+        />
+        <Tabs.Screen
+          name="(setting)"
           options={{
             title: "Settings",
             tabBarIcon: () => require('../../assets/images/tabbar/cog.svg'),

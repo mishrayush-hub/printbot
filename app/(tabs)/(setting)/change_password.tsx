@@ -1,17 +1,17 @@
-import React, { useEffect, useState, useLayoutEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import React, { useLayoutEffect, useState } from "react";
 import {
-  View,
-  Text,
-  useColorScheme,
-  TextInput,
+  ActivityIndicator,
   Alert,
   Modal,
-  ActivityIndicator
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useColorScheme,
+  View
 } from "react-native";
-import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { HapticTab } from "@/components/HapticTab";
-import { useNavigation } from "@react-navigation/native";
 
 export default function ChangePassword() {
   const colorScheme = useColorScheme();
@@ -98,7 +98,7 @@ export default function ChangePassword() {
           paddingBottom: 20,
         },
       headerRight: () => (
-        <HapticTab
+        <TouchableOpacity
           onPress={() => {
             handleChange();
           }}
@@ -106,10 +106,10 @@ export default function ChangePassword() {
             <Text className={`text-lg ${isDark ? "text-white" : "text-black"}`}>
               Save
             </Text>
-        </HapticTab>
+        </TouchableOpacity>
       ),
       headerLeft: () => (
-        <HapticTab
+        <TouchableOpacity
           onPress={() => {
             Alert.alert(
               "Discard Changes",
@@ -136,7 +136,7 @@ export default function ChangePassword() {
             <Text className={`text-lg ${isDark ? "text-white" : "text-black"}`}>
               Discard
             </Text>
-        </HapticTab>
+        </TouchableOpacity>
         ),
       headerTitleAlign: "center"
     });

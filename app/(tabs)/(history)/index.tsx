@@ -299,7 +299,7 @@ export default function OrdersScreen() {
       <View className={`${cardBg} px-4 py-4 border-b ${borderColor}`}>
         {/* Search Bar */}
         <View className="flex-row items-center mb-3" style={{ gap: 12 }}>
-          <View className={`flex-1 flex-row items-center ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg px-3 py-3`}>
+          <View className={`flex-1 max-h-[40px] flex-row items-center ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg px-3 py-3`}>
             <Search color={isDark ? "#9CA3AF" : "#6B7280"} size={20} />
             <TextInput
               placeholder="Search files..."

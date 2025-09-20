@@ -1,8 +1,20 @@
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Stack } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from "react";
 
 export default function UserLayout() {
     const colorScheme = useColorScheme() ?? 'light';
+    const [userName, setUserName] = useState('');
+
+    useEffect(() => {
+    const fetchData = async () => {
+      const name = await AsyncStorage.getItem('userName') || 'User';
+      setUserName(name);
+    };
+
+    fetchData();
+  }, []);
     
     return (
         <Stack
@@ -23,7 +35,7 @@ export default function UserLayout() {
             <Stack.Screen 
                 name="index" 
                 options={{ 
-                    title: "Dashboard",
+                    headerTitle: `Hello, ${userName || "User"} 👋`, // 👈 shown in header
                     headerShadowVisible: true,
                 }} 
             />

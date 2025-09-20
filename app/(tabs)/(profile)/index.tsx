@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { Edit3, Save, Scroll, User, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View, ScrollView } from "react-native";
+import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View, ScrollView, Platform } from "react-native";
 
 export default function OrdersScreen() {
     const [editingProfile, setEditingProfile] = useState(false);
@@ -162,7 +162,7 @@ export default function OrdersScreen() {
 
   return (
     <View className={`flex-1 ${isDark ? 'bg-gray-900' : 'bg-gray-50'} p-3`}>
-      <View className={`${cardBg} rounded-lg p-4 border ${borderColor} shadow-sm h-[89%]`}>
+      <View className={`${cardBg} rounded-lg p-4 border ${borderColor} shadow-sm ${Platform.OS === 'ios' ? 'h-[89%]' : 'h-[90%]'}`}>
         <View className="flex-row items-center justify-between mb-6">
           <View className="flex-row items-center">
             <View className="bg-blue-100 p-3 rounded-full mr-4">

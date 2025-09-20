@@ -186,13 +186,13 @@ export default function LoginScreen() {
 
         {/* Password Input with toggle */}
         <View
-          className={`flex-row items-center rounded-xl max-w-[400px] h-[51px] px-4 py-3 mb-10 ${
+          className={`flex-row items-center rounded-xl max-w-[400px] h-[51px] px-4 mb-10 ${
             isDark ? "bg-[#2a2a2a]" : "bg-gray-100"
           }`}
         >
           <TextInput
             ref={passwordRef}
-            className={`flex-1 text-xl ${isDark ? "text-white" : "text-black"}`}
+            className={`flex-1 text-xl ${isDark ? "text-white" : "text-black"} py-3`}
             placeholder="Enter Password"
             placeholderTextColor={isDark ? "#aaa" : "#999"}
             secureTextEntry={!showPassword}

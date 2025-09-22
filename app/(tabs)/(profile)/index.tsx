@@ -1,50 +1,76 @@
 import { useColorScheme } from "@/hooks/useColorScheme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { Edit3, Save, Scroll, User, X } from "lucide-react-native";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View, ScrollView, Platform } from "react-native";
+import { Edit3, Save, User, X } from "lucide-react-native";
+import { useEffect, useState, useRef } from "react";
+import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View, ScrollView, Platform, KeyboardAvoidingView } from "react-native";
 import { checkForSessionExpiry } from "@/utils/sessionHandler";
 
 export default function OrdersScreen() {
-    const [editingProfile, setEditingProfile] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [userId, setUserId] = useState("");
-    const [authToken, setAuthToken] = useState("");
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [phone, setPhone] = useState("");
-    const [address1, setAddress1] = useState("");
-    const [address2, setAddress2] = useState("");
-    const [city, setCity] = useState("");
-    const [state, setState] = useState("");
-    const [pincode, setPincode] = useState("");
-    const [country, setCountry] = useState("");
-    const [newName, setNewName] = useState("");
-    const [newEmail, setNewEmail] = useState("");
-    const [newPhone, setNewPhone] = useState("");
-    const [newAddress1, setNewAddress1] = useState("");
-    const [newAddress2, setNewAddress2] = useState("");
-    const [newCity, setNewCity] = useState("");
-    const [newState, setNewState] = useState("");
-    const [newPincode, setNewPincode] = useState("");
-    const [newCountry, setNewCountry] = useState("");
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [authToken, setAuthToken] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address1, setAddress1] = useState("");
+  const [address2, setAddress2] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [pincode, setPincode] = useState("");
+  const [country, setCountry] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newPhone, setNewPhone] = useState("");
+  const [newAddress1, setNewAddress1] = useState("");
+  const [newAddress2, setNewAddress2] = useState("");
+  const [newCity, setNewCity] = useState("");
+  const [newState, setNewState] = useState("");
+  const [newPincode, setNewPincode] = useState("");
+  const [newCountry, setNewCountry] = useState("");
 
-    const router = useRouter();
+  const router = useRouter();
 
-    const colorScheme = useColorScheme();
-    const isDark = colorScheme === "dark";
-    
-    const textColor = isDark ? "text-white" : "text-black";
-    const cardBg = isDark ? "bg-gray-800" : "bg-white";
-    const borderColor = isDark ? "border-gray-700" : "border-gray-200";
-    const subText = isDark ? "text-gray-400" : "text-gray-600";
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
-    useEffect(() => {
-        loadUserData();
-      }, []);
+  const textColor = isDark ? "text-white" : "text-black";
+  const cardBg = isDark ? "bg-gray-800" : "bg-white";
+  const borderColor = isDark ? "border-gray-700" : "border-gray-200";
+  const subText = isDark ? "text-gray-400" : "text-gray-600";
 
-    const loadUserData = async () => {
+  // Refs for auto-scroll and focus
+  const scrollViewRef = useRef<ScrollView>(null);
+  const fullNameRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
+  const emailRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
+  const mobileRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
+  const address1Ref = useRef<TextInput>(null) as React.RefObject<TextInput>;
+  const address2Ref = useRef<TextInput>(null) as React.RefObject<TextInput>;
+  const cityRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
+  const stateRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
+  const pincodeRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
+  const countryRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
+
+  // Auto-scroll function
+  const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
+    setTimeout(() => {
+      if (inputRef.current && scrollViewRef.current) {
+        inputRef.current.measure((pageY) => {
+          scrollViewRef.current?.scrollTo({
+            y: pageY - 120, // Offset to show input clearly above keyboard
+            animated: true,
+          });
+        });
+      }
+    }, 100); // Small delay to ensure the keyboard animation has started
+  };
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       const id = await AsyncStorage.getItem("userId");
@@ -70,7 +96,7 @@ export default function OrdersScreen() {
         setState(userState);
         setPincode(userPincode);
         setCountry(userCountry);
-        
+
         setNewName(userName);
         setNewEmail(userEmail);
         setNewPhone(userPhone);
@@ -182,13 +208,13 @@ export default function OrdersScreen() {
           {!editingProfile ? (
             <TouchableOpacity
               onPress={() => setEditingProfile(true)}
-              className="flex-row items-center rounded-lg min-h-[35px] bg-[#008cff] px-4 py-2"
+              className="flex-row items-center rounded-md min-h-[35px] bg-[#008cff] px-4 py-2"
             >
               <Edit3 color="white" size={16} />
               <Text className="text-white font-medium ml-2">Edit</Text>
             </TouchableOpacity>
           ) : (
-            <View className="flex-row" style={{ gap: 2 }}>
+            <View className="flex-row" style={{ gap: 6 }}>
               <TouchableOpacity
                 onPress={() => {
                   setEditingProfile(false);
@@ -202,14 +228,14 @@ export default function OrdersScreen() {
                   setNewPincode(pincode);
                   setNewCountry(country);
                 }}
-                className="flex-row items-center bg-gray-500 px-3 py-2 rounded-lg"
+                className="flex-row items-center bg-gray-500 px-3 py-2 rounded-md"
               >
                 <X color="white" size={16} />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleUpdateProfile}
                 disabled={loading}
-                className="flex-row items-center bg-green-500 px-4 py-2 rounded-lg"
+                className="flex-row items-center bg-green-500 px-4 py-2 rounded-md"
               >
                 {loading ? (
                   <ActivityIndicator size="small" color="white" />
@@ -223,181 +249,196 @@ export default function OrdersScreen() {
         </View>
 
         {/* Profile Details - Scrollable Section */}
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ gap: 10, paddingBottom: 16 }}
-          showsVerticalScrollIndicator={false}
+        <KeyboardAvoidingView
+          className="flex-1"
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <View>
-            <Text className={`${subText} text-sm font-medium mb-2`}>Full Name</Text>
-            {editingProfile ? (
+          <ScrollView
+            style={{ flex: 1 }}
+            ref={scrollViewRef}
+            contentContainerStyle={{ gap: 10, paddingBottom: 16 }}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            automaticallyAdjustKeyboardInsets={true}
+          >
+            <View>
+              <Text className={`${subText} text-md font-medium mb-2 ml-1`}>Full Name</Text>
               <TextInput
-                value={newName}
+                ref={fullNameRef}
+                value={editingProfile ? newName : name}
                 onChangeText={setNewName}
-                className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-50 text-black'} p-4 rounded-lg border ${borderColor} text-base`}
+                editable={editingProfile}
+                autoComplete="off"
+                autoCapitalize="none"
+                autoCorrect={false}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your full name"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                onFocus={() => scrollToInput(fullNameRef)}
+                onSubmitEditing={() => emailRef.current?.focus()}
+                textAlignVertical="center"
               />
-            ) : (
-              <View className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg border ${borderColor}`}>
-                <Text className={`${textColor} text-base`}>{name}</Text>
-              </View>
-            )}
-          </View>
+            </View>
 
-          <View>
-            <Text className={`${subText} text-sm font-medium mb-2`}>Email Address</Text>
-            {editingProfile ? (
+            <View>
+              <Text className={`${subText} text-md font-medium mb-2 ml-1`}>Email Address</Text>
               <TextInput
-                value={newEmail}
+                ref={emailRef}
+                value={editingProfile ? newEmail : email}
+                editable={editingProfile}
+                autoComplete="off"
+                autoCapitalize="none"
+                autoCorrect={false}
                 onChangeText={setNewEmail}
                 keyboardType="email-address"
-                className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-50 text-black'} p-4 rounded-lg border ${borderColor} text-base`}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your email address"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                onFocus={() => scrollToInput(emailRef)}
+                onSubmitEditing={() => mobileRef.current?.focus()}
+                textAlignVertical="center"
               />
-            ) : (
-              <View className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg border ${borderColor}`}>
-                <Text className={`${textColor} text-base`}>{email}</Text>
-              </View>
-            )}
-          </View>
+            </View>
 
-          <View>
-            <Text className={`${subText} text-sm font-medium mb-2`}>Phone Number</Text>
-            {editingProfile ? (
+            <View>
+              <Text className={`${subText} text-md font-medium mb-2 ml-1`}>Phone Number</Text>
               <TextInput
-                value={newPhone}
+                ref={mobileRef}
+                value={editingProfile ? newPhone : phone}
+                editable={editingProfile}
+                autoComplete="off"
+                autoCapitalize="none"
+                autoCorrect={false}
                 onChangeText={setNewPhone}
                 keyboardType="phone-pad"
-                className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-50 text-black'} p-4 rounded-lg border ${borderColor} text-base`}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your phone number"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                onFocus={() => scrollToInput(mobileRef)}
+                onSubmitEditing={() => address1Ref.current?.focus()}
+                textAlignVertical="center"
               />
-            ) : (
-              <View className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg border ${borderColor}`}>
-                <Text className={`${textColor} text-base`}>{phone}</Text>
-              </View>
-            )}
-          </View>
+            </View>
 
-          {/* Address Section */}
-          <View>
-            {/* <Text className={`${textColor} text-lg font-semibold mb-3`}>Address Information</Text> */}
-            
+            {/* Address Section */}
             <View>
-              <Text className={`${subText} text-sm font-medium mb-2`}>Address Line 1</Text>
-              {editingProfile ? (
+              <View>
+                <Text className={`${subText} text-md font-medium mb-2 ml-1`}>Address Line 1</Text>
                 <TextInput
-                  value={newAddress1}
+                  ref={address1Ref}
+                  value={editingProfile ? newAddress1 : address1}
+                  editable={editingProfile}
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  autoCorrect={false}
                   onChangeText={setNewAddress1}
-                  className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-50 text-black'} p-4 rounded-lg border ${borderColor} text-base`}
+                  className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
                   placeholder="Enter address line 1"
                   placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                  onFocus={() => scrollToInput(address1Ref)}
+                  onSubmitEditing={() => address2Ref.current?.focus()}
+                  textAlignVertical="center"
                 />
-              ) : (
-                <View className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg border ${borderColor}`}>
-                  <Text className={`${textColor} text-base`}>{address1 || "Not provided"}</Text>
-                </View>
-              )}
+              </View>
             </View>
-          </View>
 
-          <View>
-            <Text className={`${subText} text-sm font-medium mb-2`}>Address Line 2</Text>
-            {editingProfile ? (
+            <View>
+              <Text className={`${subText} text-md font-medium mb-2 ml-1`}>Address Line 2</Text>
               <TextInput
-                value={newAddress2}
+                ref={address2Ref}
+                value={editingProfile ? newAddress2 : address2}
                 onChangeText={setNewAddress2}
-                className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-50 text-black'} p-4 rounded-lg border ${borderColor} text-base`}
+                editable={editingProfile}
+                autoComplete="off"
+                autoCapitalize="none"
+                autoCorrect={false}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter address line 2 (optional)"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                onFocus={() => scrollToInput(address2Ref)}
+                onSubmitEditing={() => cityRef.current?.focus()}
+                textAlignVertical="center"
               />
-            ) : (
-              <View className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg border ${borderColor}`}>
-                <Text className={`${textColor} text-base`}>{address2 || "Not provided"}</Text>
-              </View>
-            )}
-          </View>
+            </View>
 
-          <View>
-            <Text className={`${subText} text-sm font-medium mb-2`}>City</Text>
-            {editingProfile ? (
+            <View>
+              <Text className={`${subText} text-md font-medium mb-2 ml-1`}>City</Text>
               <TextInput
-                value={newCity}
+                ref={cityRef}
+                value={editingProfile ? newCity : city}
                 onChangeText={setNewCity}
-                className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-50 text-black'} p-4 rounded-lg border ${borderColor} text-base`}
+                editable={editingProfile}
+                autoComplete="off"
+                autoCapitalize="none"
+                autoCorrect={false}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your city"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                onFocus={() => scrollToInput(cityRef)}
+                onSubmitEditing={() => stateRef.current?.focus()}
+                textAlignVertical="center"
               />
-            ) : (
-              <View className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg border ${borderColor}`}>
-                <Text className={`${textColor} text-base`}>{city || "Not provided"}</Text>
-              </View>
-            )}
-          </View>
+            </View>
 
-          <View>
-            <Text className={`${subText} text-sm font-medium mb-2`}>State</Text>
-            {editingProfile ? (
+            <View>
+              <Text className={`${subText} text-md font-medium mb-2 ml-1`}>State</Text>
               <TextInput
-                value={newState}
+                ref={stateRef}
+                value={editingProfile ? newState : state}
                 onChangeText={setNewState}
-                className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-50 text-black'} p-4 rounded-lg border ${borderColor} text-base`}
+                editable={editingProfile}
+                autoComplete="off"
+                autoCapitalize="none"
+                autoCorrect={false}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your state"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                onFocus={() => scrollToInput(stateRef)}
+                onSubmitEditing={() => pincodeRef.current?.focus()}
+                textAlignVertical="center"
               />
-            ) : (
-              <View className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg border ${borderColor}`}>
-                <Text className={`${textColor} text-base`}>{state || "Not provided"}</Text>
-              </View>
-            )}
-          </View>
+            </View>
 
-          <View>
-            <Text className={`${subText} text-sm font-medium mb-2`}>Pincode</Text>
-            {editingProfile ? (
+            <View>
+              <Text className={`${subText} text-md font-medium mb-2 ml-1`}>Pincode</Text>
               <TextInput
-                value={newPincode}
+                ref={pincodeRef}
+                value={editingProfile ? newPincode : pincode}
+                editable={editingProfile}
+                autoComplete="off"
+                autoCapitalize="none"
+                autoCorrect={false}
                 onChangeText={setNewPincode}
                 keyboardType="numeric"
-                className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-50 text-black'} p-4 rounded-lg border ${borderColor} text-base`}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your pincode"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                onFocus={() => scrollToInput(pincodeRef)}
+                onSubmitEditing={() => countryRef.current?.focus()}
+                textAlignVertical="center"
               />
-            ) : (
-              <View className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg border ${borderColor}`}>
-                <Text className={`${textColor} text-base`}>{pincode || "Not provided"}</Text>
-              </View>
-            )}
-          </View>
+            </View>
 
-          <View>
-            <Text className={`${subText} text-sm font-medium mb-2`}>Country</Text>
-            {editingProfile ? (
+            <View>
+              <Text className={`${subText} text-md font-medium mb-2 ml-1`}>Country</Text>
               <TextInput
-                value={newCountry}
+                ref={countryRef}
+                value={editingProfile ? newCountry : country}
+                editable={editingProfile}
+                autoComplete="off"
+                autoCapitalize="none"
+                autoCorrect={false}
                 onChangeText={setNewCountry}
-                className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-50 text-black'} p-4 rounded-lg border ${borderColor} text-base`}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your country"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+                onFocus={() => scrollToInput(countryRef)}
+                textAlignVertical="center"
               />
-            ) : (
-              <View className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg border ${borderColor}`}>
-                <Text className={`${textColor} text-base`}>{country || "Not provided"}</Text>
-              </View>
-            )}
-          </View>
-        </ScrollView>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </View>
-
-      {/* Logout Button */}
-      {/* <TouchableOpacity
-        onPress={handleLogout}
-        className="bg-red-500 rounded-lg p-4 mt-4"
-      >
-        <Text className="text-white font-bold text-center text-xl">Logout</Text>
-      </TouchableOpacity> */}
     </View>
   );
 }

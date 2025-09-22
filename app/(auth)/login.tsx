@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
+  Animated,
   View,
   Text,
   TextInput,
@@ -14,11 +15,12 @@ import {
   KeyboardAvoidingView,
   Platform
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { ScanFace, Fingerprint } from 'lucide-react-native';
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as LocalAuthentication from 'expo-local-authentication';
+import * as SecureStore from 'expo-secure-store';
 
 export default function LoginScreen() {
   const colorScheme = useColorScheme();
@@ -29,6 +31,17 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [hasStoredCredentials, setHasStoredCredentials] = useState(false);
+  const [biometricsAvailable, setBiometricsAvailable] = useState(false);
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, { toValue: 0.92, useNativeDriver: true, friction: 6 }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, friction: 6 }).start();
+  };
 
   // Refs for auto-scroll and focus
   const scrollViewRef = useRef<ScrollView>(null);
@@ -76,11 +89,19 @@ export default function LoginScreen() {
       }
 
       await AsyncStorage.setItem("authToken", data.data.authToken);
+      // Save credentials securely so biometric login can use them later
+      try {
+        await SecureStore.setItemAsync('stored_email', email);
+        await SecureStore.setItemAsync('stored_password', password);
+        setHasStoredCredentials(true);
+      } catch (secureErr) {
+        console.warn('Failed to save credentials securely:', secureErr);
+      }
       await AsyncStorage.setItem("userName", data.data.name);
       await AsyncStorage.setItem("userEmail", data.data.email);
       await AsyncStorage.setItem("userPhone", data.data.phone_number);
       await AsyncStorage.setItem("userId", data.data.user_id.toString());
-      
+
       // Save address fields if available
       await AsyncStorage.setItem("userAddress1", data.data.address.address1 || "");
       await AsyncStorage.setItem("userAddress2", data.data.address.address2 || "");
@@ -100,20 +121,138 @@ export default function LoginScreen() {
     }
   };
 
+  // On mount, check for stored credentials and biometric availability
+  useEffect(() => {
+    let mounted = true;
+    const checkStoredAndBiometrics = async () => {
+      try {
+        const savedEmail = await SecureStore.getItemAsync('stored_email');
+        const savedPassword = await SecureStore.getItemAsync('stored_password');
+        const hasCreds = !!(savedEmail && savedPassword);
+        if (mounted) setHasStoredCredentials(hasCreds);
+
+        const hasHardware = await LocalAuthentication.hasHardwareAsync();
+        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+        if (mounted) setBiometricsAvailable(!!(hasHardware && isEnrolled));
+      } catch (err) {
+        console.warn('Error checking biometrics or stored credentials:', err);
+      }
+    };
+
+    checkStoredAndBiometrics();
+    return () => { mounted = false; };
+  }, []);
+
+  // Biometric login: verify stored token with server after successful biometric auth
+  const handleBiometricLogin = async () => {
+    try {
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      if (!isEnrolled) {
+        Alert.alert('Biometrics Not Setup', 'No biometric authentication is set up on this device.');
+        return;
+      }
+
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Login with Biometrics',
+        cancelLabel: 'Cancel'
+      });
+
+      if (!result.success) {
+        Alert.alert('Authentication Failed', 'Biometric authentication failed or was cancelled.');
+        return;
+      }
+
+      const storedToken = await AsyncStorage.getItem('authToken');
+      const storedUserId = await AsyncStorage.getItem('userId');
+      // If token exists, try to verify it first
+      if (storedToken) {
+        setLoading(true);
+        try {
+          const body = new URLSearchParams({ authToken: storedToken, user_id: storedUserId ?? '' }).toString();
+          const resp = await fetch('https://printbot.cloud/api/v1/verify_token_api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body
+          });
+          const data = await resp.json().catch(() => null);
+          if (resp.ok && data && data.success) {
+            router.replace('/(tabs)/(home)');
+            return;
+          } else {
+            // Invalid token, remove it and fall through to credential flow
+            await AsyncStorage.removeItem('authToken');
+          }
+        } catch (err) {
+          console.error('Biometric verify error:', err);
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      // If we reach here, either there's no token or it was invalid. Try credentials stored securely.
+      try {
+        const savedEmail = await SecureStore.getItemAsync('stored_email');
+        const savedPassword = await SecureStore.getItemAsync('stored_password');
+
+        if (!savedEmail || !savedPassword) {
+          Alert.alert('No Stored Credentials', 'No stored credentials found. Please login with email and password first.');
+          return;
+        }
+
+        // Use saved credentials to call login API
+        setLoading(true);
+        const resp2 = await fetch('https://printbot.cloud/api/v1/login_api.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ loginEmail: savedEmail, loginPassword: savedPassword }).toString()
+        });
+        const loginData = await resp2.json().catch(() => null);
+        if (resp2.ok && loginData && loginData.success) {
+          // Save token and profile info as existing login flow
+          await AsyncStorage.setItem('authToken', loginData.data.authToken);
+          await AsyncStorage.setItem('userName', loginData.data.name);
+          await AsyncStorage.setItem('userEmail', loginData.data.email);
+          await AsyncStorage.setItem('userPhone', loginData.data.phone_number);
+          await AsyncStorage.setItem('userId', loginData.data.user_id.toString());
+          // Save address fields if available
+          await AsyncStorage.setItem('userAddress1', loginData.data.address.address1 || '');
+          await AsyncStorage.setItem('userAddress2', loginData.data.address.address2 || '');
+          await AsyncStorage.setItem('userCity', loginData.data.address.city || '');
+          await AsyncStorage.setItem('userState', loginData.data.address.state || '');
+          await AsyncStorage.setItem('userPincode', loginData.data.address.pincode || '');
+          await AsyncStorage.setItem('userCountry', loginData.data.address.country || '');
+
+          router.replace('/(tabs)/(home)');
+        } else {
+          Alert.alert('Stored Credentials Invalid', 'Stored credentials are no longer valid. Please login manually.');
+          // Clear stored secure credentials to avoid repeated failures
+          await SecureStore.deleteItemAsync('stored_email');
+          await SecureStore.deleteItemAsync('stored_password');
+          setHasStoredCredentials(false);
+        }
+      } catch (err) {
+        console.error('Biometric credential login error:', err);
+        Alert.alert('Login Error', 'An error occurred while logging in with saved credentials.');
+      } finally {
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error('Biometric login error:', err);
+      Alert.alert('Biometric Error', 'An error occurred during biometric authentication.');
+    }
+  };
+
   const handleSignup = () => router.push("/(auth)/signup");
   const handleForgotPassword = () => router.push("/(auth)/request_forgot");
 
   return (
-      <KeyboardAvoidingView 
-        className="flex-1" 
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <KeyboardAvoidingView
+      className="flex-1"
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View
+        style={{ flex: 1, backgroundColor: '#008cff' }}
       >
-        <LinearGradient
-          colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
-          style={{ flex: 1 }}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-        >
         {/* Loading Modal */}
         <Modal transparent={true} animationType="fade" visible={loading}>
           <View className="flex-1 justify-center items-center bg-black/40">
@@ -136,145 +275,159 @@ export default function LoginScreen() {
         {/* Login Box */}
         <ScrollView
           ref={scrollViewRef}
-          className={`flex-1 px-4 rounded-t-[58] ${
-            isDark ? "bg-[#1a1a1a]" : "bg-white"
-          }`}
+          className={`flex-1 px-4 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"
+            }`}
           contentContainerStyle={{ paddingVertical: 16 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
           <Text
-            className={`text-[30px] font-bold text-center mb-14 ${
-              isDark ? "text-white" : "text-black"
-            }`}
+            className={`text-[30px] font-bold text-center mb-14 ${isDark ? "text-white" : "text-black"
+              }`}
           >
             Login
           </Text>
 
-        {/* Error Message */}
-        {errorMessage !== "" && (
-          <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
-        )}
+          {/* Error Message */}
+          {errorMessage !== "" && (
+            <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
+          )}
 
-        <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
-                    Email Address
-                  </Text>
+          <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
+            Email Address
+          </Text>
 
-        {/* Email Input */}
-        <TextInput
-          ref={emailRef}
-          className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${
-            isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-          }`}
-          placeholder="Enter Email Address"
-          placeholderTextColor={isDark ? "#aaa" : "#999"}
-          value={email}
-          autoCapitalize="none"
-          autoCorrect={false}
-          textContentType="emailAddress"
-          autoComplete="email"
-          keyboardType="email-address"
-          returnKeyType="next"
-          onChangeText={setEmail}
-          onFocus={() => scrollToInput(emailRef)}
-          onSubmitEditing={() => passwordRef.current?.focus()}
-        />
+          {/* Email Input */}
+          <TextInput
+            ref={emailRef}
+            className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              }`}
+            placeholder="Enter Email Address"
+            placeholderTextColor={isDark ? "#aaa" : "#999"}
+            value={email}
+            autoCapitalize="none"
+            autoCorrect={false}
+            textContentType="emailAddress"
+            autoComplete="email"
+            keyboardType="email-address"
+            returnKeyType="next"
+            onChangeText={setEmail}
+            onFocus={() => scrollToInput(emailRef)}
+            onSubmitEditing={() => passwordRef.current?.focus()}
+          />
 
           <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
             Password
           </Text>
 
-        {/* Password Input with toggle */}
-        <View
-          className={`flex-row items-center rounded-xl max-w-[400px] h-[51px] px-4 mb-10 ${
-            isDark ? "bg-[#2a2a2a]" : "bg-gray-100"
-          }`}
-        >
-          <TextInput
-            ref={passwordRef}
-            className={`flex-1 text-xl ${isDark ? "text-white" : "text-black"} py-3`}
-            placeholder="Enter Password"
-            placeholderTextColor={isDark ? "#aaa" : "#999"}
-            secureTextEntry={!showPassword}
-            autoCapitalize="none"
-            autoCorrect={false}
-            textContentType="password"
-            autoComplete="password"
-            returnKeyType="done"
-            value={password}
-            onChangeText={setPassword}
-            onFocus={() => scrollToInput(passwordRef)}
-            onSubmitEditing={() => Keyboard.dismiss()}
-          />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <Ionicons
-              name={showPassword ? "eye-off" : "eye"}
-              size={24}
-              color={isDark ? "#fff" : "#000"}
+          {/* Password Input with toggle */}
+          <View
+            className={`flex-row items-center rounded-xl max-w-[400px] h-[51px] px-4 mb-10 ${isDark ? "bg-[#2a2a2a]" : "bg-gray-100"
+              }`}
+          >
+            <TextInput
+              ref={passwordRef}
+              className={`flex-1 text-xl ${isDark ? "text-white" : "text-black"} py-3`}
+              placeholder="Enter Password"
+              placeholderTextColor={isDark ? "#aaa" : "#999"}
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+              autoCorrect={false}
+              textContentType="password"
+              autoComplete="password"
+              returnKeyType="done"
+              value={password}
+              onChangeText={setPassword}
+              onFocus={() => scrollToInput(passwordRef)}
+              onSubmitEditing={() => Keyboard.dismiss()}
             />
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Ionicons
+                name={showPassword ? "eye-off" : "eye"}
+                size={24}
+                color={isDark ? "#fff" : "#000"}
+              />
+            </TouchableOpacity>
+          </View>
 
-        {/* Login Button */}
-        <TouchableOpacity
-          className="max-w-[400px] h-[51px] bg-[#008cff] rounded-xl items-center justify-center"
-          onPress={handleLogin}
-        >
-          <Text className="text-white text-center text-2xl font-bold">
-            Login
+          {/* Login Button */}
+          <TouchableOpacity
+            className="max-w-[400px] h-[51px] bg-[#008cff] rounded-xl items-center justify-center"
+            onPress={handleLogin}
+          >
+            <Text className="text-white text-center text-2xl font-bold">
+              Login
+            </Text>
+          </TouchableOpacity>
+
+          {hasStoredCredentials && biometricsAvailable && (
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPressIn={handlePressIn}
+              onPressOut={handlePressOut}
+              className="max-w-[400px] h-[51px] mt-3 border border-[#008cff] rounded-xl items-center justify-center"
+              onPress={handleBiometricLogin}
+            >
+              <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                <View className="flex-row items-center justify-center">
+                  {Platform.OS === 'ios' ? (
+                    <ScanFace color={isDark ? '#fff' : '#000'} size={20} />
+                  ) : (
+                    <Fingerprint color={isDark ? '#fff' : '#000'} size={20} />
+                  )}
+                  <Text className="text-black dark:text-white text-center text-lg font-medium ml-3">
+                    {Platform.OS === 'ios' ? 'Login with Face ID' : 'Login with Fingerprint'}
+                  </Text>
+                </View>
+              </Animated.View>
+            </TouchableOpacity>
+          )}
+
+          {/* Sign-up Link */}
+          <Text
+            className={`${isDark ? "text-gray-300" : "text-gray-500"
+              } text-[16px] text-center mt-4`}
+          >
+            Don’t have an account?{" "}
+            <TouchableOpacity onPress={handleSignup}>
+              <Text
+                className={`text-[16px] font-bold -mb-1 ${isDark ? "text-white" : "text-black"
+                  }`}
+              >
+                Sign up
+              </Text>
+            </TouchableOpacity>
           </Text>
-        </TouchableOpacity>
 
-        {/* Sign-up Link */}
-        <Text
-          className={`${
-            isDark ? "text-gray-300" : "text-gray-500"
-          } text-[16px] text-center mt-4`}
-        >
-          Don’t have an account?{" "}
-          <TouchableOpacity onPress={handleSignup}>
-            <Text
-              className={`text-[16px] font-bold -mb-1 ${
-                isDark ? "text-white" : "text-black"
-              }`}
-            >
-              Sign up
-            </Text>
-          </TouchableOpacity>
-        </Text>
-
-        {/* Forgot Password */}
-        <View className="items-center mt-4">
-          <TouchableOpacity onPress={handleForgotPassword}>
-            <Text
-              className={`text-[16px] font-bold ${
-                isDark ? "text-white" : "text-black"
-              }`}
-            >
-              Forgot Password?
-            </Text>
-          </TouchableOpacity>
-        </View>
+          {/* Forgot Password */}
+          <View className="items-center mt-4">
+            <TouchableOpacity onPress={handleForgotPassword}>
+              <Text
+                className={`text-[16px] font-bold ${isDark ? "text-white" : "text-black"
+                  }`}
+              >
+                Forgot Password?
+              </Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
 
         {/* Privacy Policy and Terms Link - Fixed at bottom */}
-        <View className={`px-10 pb-8 pt-4 ${
-            isDark ? "bg-[#1a1a1a]" : "bg-white"
+        <View className={`px-10 pb-8 pt-4 ${isDark ? "bg-[#1a1a1a]" : "bg-white"
           }`}>
           <Text
-            className={`${
-              isDark ? "text-white" : "text-gray-500"
-            } text-[14px] text-center leading-6`}
+            className={`${isDark ? "text-white" : "text-gray-500"
+              } text-[14px] text-center leading-6`}
           >
             By clicking the Login button, you agree to our{" "}
-            <Text 
+            <Text
               onPress={() => router.push("/(legal)/terms-and-conditions")}
               className="text-blue-500"
             >
               Terms and Conditions
             </Text>
             {" "}and{" "}
-            <Text 
+            <Text
               onPress={() => router.push("/(legal)/privacy-policy")}
               className="text-blue-500"
             >
@@ -283,7 +436,7 @@ export default function LoginScreen() {
             .
           </Text>
         </View>
-      </LinearGradient>
+      </View>
     </KeyboardAvoidingView>
   );
 }

@@ -15,7 +15,6 @@ import {
   Platform
 } from "react-native";
 import { router } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 
 export default function RequestForgotPassword() {
   const colorScheme = useColorScheme(); // 'light' or 'dark'
@@ -104,11 +103,8 @@ export default function RequestForgotPassword() {
       className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <LinearGradient
-        colors={['#2563eb', '#9333ea']} // from-blue-600 to-purple-600
-        style={{ flex: 1 }}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+      <View
+        style={{ flex: 1, backgroundColor: '#008cff' }}
       >
         <Modal transparent={true} visible={loading}>
           <View className="flex-1 justify-center items-center bg-black/50">
@@ -222,7 +218,7 @@ export default function RequestForgotPassword() {
             .
           </Text>
         </View>
-      </LinearGradient>
+      </View>
     </KeyboardAvoidingView>
   );
 }

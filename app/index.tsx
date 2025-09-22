@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -12,11 +12,44 @@ const MyScreen = () => {
       try {
         const authToken = await AsyncStorage.getItem("authToken");
 
-        if (authToken) {
-          // User is logged in, go to main app
-          router.replace("/(tabs)");
-        } else {
-          // User not logged in, go to login
+        if (!authToken) {
+          router.replace("/(auth)/login");
+          return;
+        }
+
+        // Verify token with server - API requires both user_id and authToken
+        try {
+          const userId = await AsyncStorage.getItem("userId");
+          if (!userId) {
+            // No userId available, force login
+            await AsyncStorage.removeItem("authToken");
+            router.replace("/(auth)/login");
+            return;
+          }
+
+          const body = new URLSearchParams({ authToken, user_id: userId }).toString();
+          const response = await fetch("https://printbot.cloud/api/v1/verify_token_api.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body
+          });
+
+          const data = await response.json().catch(() => null);
+
+          if (response.ok && data && data.success) {
+            // Token valid - go to main app
+            router.replace("/(tabs)/(home)");
+          } else {
+            // Invalid token - remove and go to login
+            await AsyncStorage.removeItem("authToken");
+            router.replace("/(auth)/login");
+          }
+        } catch (err) {
+          console.error("Token verification error:", err);
+          // On verification failure, be conservative and send to login
+          await AsyncStorage.removeItem("authToken");
           router.replace("/(auth)/login");
         }
       } catch (error) {

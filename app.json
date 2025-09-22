@@ -21,9 +21,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android/adaptive-icon.png",
         "monochromeImage": "./assets/images/android/adaptive-icon.png",
-        "backgroundColor": "#008cff"
+        "backgroundColor": "#008cff",
       },
-      "icon":  "./assets/images/android/icon-light.png",
+      "icon": "./assets/images/android/icon-light.png",
       "package": "cloud.printbot.app",
       "permissions": [
         "READ_EXTERNAL_STORAGE",
@@ -55,9 +55,18 @@
           "ios": {
             "useFrameworks": "static",
             "extraPods": [
-              { "name": "SDWebImage", "modular_headers": true },
-              { "name": "SDWebImageSVGCoder", "modular_headers": true },
-              { "name": "SDWebImageWebPCoder", "modular_headers": true }
+              {
+                "name": "SDWebImage",
+                "modular_headers": true
+              },
+              {
+                "name": "SDWebImageSVGCoder",
+                "modular_headers": true
+              },
+              {
+                "name": "SDWebImageWebPCoder",
+                "modular_headers": true
+              }
             ]
           }
         }
@@ -67,7 +76,8 @@
         {
           "iCloudContainerEnvironment": "Production"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true

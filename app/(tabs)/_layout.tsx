@@ -137,8 +137,8 @@ export default function TabLayout() {
         <TabAndroid.Screen
           name="(history)"
           options={{
-            headerTitle: 'History', // 👈 shown in header
-            tabBarLabel: 'History',     // 👈 shown in tab bar
+            headerTitle: 'Orders', // 👈 shown in header
+            tabBarLabel: 'Orders',     // 👈 shown in tab bar
             tabBarIcon: ({ color }) => <ShoppingCart size={28} color={color} />,
             headerShown: false,
             headerStyle: {

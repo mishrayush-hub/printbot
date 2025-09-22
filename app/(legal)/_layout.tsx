@@ -3,7 +3,6 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { ChevronLeft } from 'lucide-react-native';
 
 export default function LegalLayout() {

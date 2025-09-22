@@ -53,9 +53,9 @@ export default function LoginScreen() {
   const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
     setTimeout(() => {
       if (inputRef.current && scrollViewRef.current) {
-        inputRef.current.measure((x, y, width, height, pageX, pageY) => {
+        inputRef.current.measure((pageY) => {
           scrollViewRef.current?.scrollTo({
-            y: pageY - 150, // Offset to show input clearly above keyboard
+            y: pageY - 120, // Offset to show input clearly above keyboard
             animated: true,
           });
         });
@@ -257,197 +257,199 @@ export default function LoginScreen() {
   const handleForgotPassword = () => router.push("/(auth)/request_forgot");
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <View
+      style={{ flex: 1, backgroundColor: '#008cff' }}
     >
-      <View
-        style={{ flex: 1, backgroundColor: '#008cff' }}
-      >
-        {/* Loading Modal */}
-        <Modal transparent={true} animationType="fade" visible={loading}>
-          <View className="flex-1 justify-center items-center bg-black/40">
-            <ActivityIndicator size="large" color="#ffffff" />
-          </View>
-        </Modal>
-
-        {/* Header */}
-        <View className="h-56 px-6 pt-7">
-          <View className="flex items-center mt-6">
-            <Image
-              source={require("../../assets/images/splash/splash-black.png")}
-              style={{ width: 150, height: 150 }}
-              resizeMode="contain"
-            />
-            {/* <Text className="font-bold text-3xl text-white">Printbot</Text> */}
-          </View>
+      {/* Loading Modal */}
+      <Modal transparent={true} animationType="fade" visible={loading}>
+        <View className="flex-1 justify-center items-center bg-black/40">
+          <ActivityIndicator size="large" color="#ffffff" />
         </View>
+      </Modal>
 
-        {/* Login Box */}
-        <ScrollView
-          ref={scrollViewRef}
-          className={`flex-1 px-4 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"
-            }`}
-          contentContainerStyle={{ paddingVertical: 16 }}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Text
-            className={`text-[30px] font-bold text-center mb-14 ${isDark ? "text-white" : "text-black"
-              }`}
-          >
-            Login
-          </Text>
-
-          {/* Error Message */}
-          {errorMessage !== "" && (
-            <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
-          )}
-
-          <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
-            Email Address
-          </Text>
-
-          {/* Email Input */}
-          <TextInput
-            ref={emailRef}
-            className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-              }`}
-            placeholder="Enter Email Address"
-            placeholderTextColor={isDark ? "#aaa" : "#999"}
-            value={email}
-            autoCapitalize="none"
-            autoCorrect={false}
-            textContentType="emailAddress"
-            autoComplete="email"
-            keyboardType="email-address"
-            returnKeyType="next"
-            onChangeText={setEmail}
-            onFocus={() => scrollToInput(emailRef)}
-            onSubmitEditing={() => passwordRef.current?.focus()}
+      {/* Header */}
+      <View className="h-56 px-6 pt-7">
+        <View className="flex items-center mt-6">
+          <Image
+            source={require("../../assets/images/splash/splash-black.png")}
+            style={{ width: 150, height: 150 }}
+            resizeMode="contain"
           />
-
-          <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
-            Password
-          </Text>
-
-          {/* Password Input with toggle */}
-          <View
-            className={`flex-row items-center rounded-xl max-w-[400px] h-[51px] px-4 mb-10 ${isDark ? "bg-[#2a2a2a]" : "bg-gray-100"
-              }`}
-          >
-            <TextInput
-              ref={passwordRef}
-              className={`flex-1 text-xl ${isDark ? "text-white" : "text-black"} py-3`}
-              placeholder="Enter Password"
-              placeholderTextColor={isDark ? "#aaa" : "#999"}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-              autoCorrect={false}
-              textContentType="password"
-              autoComplete="password"
-              returnKeyType="done"
-              value={password}
-              onChangeText={setPassword}
-              onFocus={() => scrollToInput(passwordRef)}
-              onSubmitEditing={() => Keyboard.dismiss()}
-            />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Ionicons
-                name={showPassword ? "eye-off" : "eye"}
-                size={24}
-                color={isDark ? "#fff" : "#000"}
-              />
-            </TouchableOpacity>
-          </View>
-
-          {/* Login Button */}
-          <TouchableOpacity
-            className="max-w-[400px] h-[51px] bg-[#008cff] rounded-xl items-center justify-center"
-            onPress={handleLogin}
-          >
-            <Text className="text-white text-center text-2xl font-bold">
-              Login
-            </Text>
-          </TouchableOpacity>
-
-          {hasStoredCredentials && biometricsAvailable && (
-            <TouchableOpacity
-              activeOpacity={0.9}
-              onPressIn={handlePressIn}
-              onPressOut={handlePressOut}
-              className="max-w-[400px] h-[51px] mt-3 border border-[#008cff] rounded-xl items-center justify-center"
-              onPress={handleBiometricLogin}
-            >
-              <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-                <View className="flex-row items-center justify-center">
-                  {Platform.OS === 'ios' ? (
-                    <ScanFace color={isDark ? '#fff' : '#000'} size={20} />
-                  ) : (
-                    <Fingerprint color={isDark ? '#fff' : '#000'} size={20} />
-                  )}
-                  <Text className="text-black dark:text-white text-center text-lg font-medium ml-3">
-                    {Platform.OS === 'ios' ? 'Login with Face ID' : 'Login with Fingerprint'}
-                  </Text>
-                </View>
-              </Animated.View>
-            </TouchableOpacity>
-          )}
-
-          {/* Sign-up Link */}
-          <Text
-            className={`${isDark ? "text-gray-300" : "text-gray-500"
-              } text-[16px] text-center mt-4`}
-          >
-            Don’t have an account?{" "}
-            <TouchableOpacity onPress={handleSignup}>
-              <Text
-                className={`text-[16px] font-bold -mb-1 ${isDark ? "text-white" : "text-black"
-                  }`}
-              >
-                Sign up
-              </Text>
-            </TouchableOpacity>
-          </Text>
-
-          {/* Forgot Password */}
-          <View className="items-center mt-4">
-            <TouchableOpacity onPress={handleForgotPassword}>
-              <Text
-                className={`text-[16px] font-bold ${isDark ? "text-white" : "text-black"
-                  }`}
-              >
-                Forgot Password?
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-
-        {/* Privacy Policy and Terms Link - Fixed at bottom */}
-        <View className={`px-10 pb-8 pt-4 ${isDark ? "bg-[#1a1a1a]" : "bg-white"
-          }`}>
-          <Text
-            className={`${isDark ? "text-white" : "text-gray-500"
-              } text-[14px] text-center leading-6`}
-          >
-            By clicking the Login button, you agree to our{" "}
-            <Text
-              onPress={() => router.push("/(legal)/terms-and-conditions")}
-              className="text-blue-500"
-            >
-              Terms and Conditions
-            </Text>
-            {" "}and{" "}
-            <Text
-              onPress={() => router.push("/(legal)/privacy-policy")}
-              className="text-blue-500"
-            >
-              Privacy Policy
-            </Text>
-            .
-          </Text>
         </View>
       </View>
-    </KeyboardAvoidingView>
+
+      <View className={`flex-1 px-4 py-4 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}>
+        <Text
+          className={`text-[30px] font-bold text-center mb-6 ${isDark ? "text-white" : "text-black"
+            }`}
+        >
+          Login
+        </Text>
+
+        {/* Login Box */}
+        <KeyboardAvoidingView
+          className="flex-1"
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+          <ScrollView
+            ref={scrollViewRef}
+            className={'flex-1'}
+            contentContainerStyle={{ paddingVertical: 16 }}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            automaticallyAdjustKeyboardInsets={true}
+          >
+
+            {/* Error Message */}
+            {errorMessage !== "" && (
+              <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
+            )}
+
+            <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
+              Email Address
+            </Text>
+
+            {/* Email Input */}
+            <TextInput
+              ref={emailRef}
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+                }`}
+              placeholder="Enter Email Address"
+              placeholderTextColor={isDark ? "#aaa" : "#999"}
+              value={email}
+              autoCapitalize="none"
+              autoCorrect={false}
+              textContentType="emailAddress"
+              autoComplete="email"
+              keyboardType="email-address"
+              returnKeyType="next"
+              onChangeText={setEmail}
+              onFocus={() => scrollToInput(emailRef)}
+              onSubmitEditing={() => passwordRef.current?.focus()}
+            />
+
+            <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
+              Password
+            </Text>
+
+            {/* Password Input with toggle */}
+            <View
+              className={`flex-row items-center rounded-xl max-w-[400px] h-[51px] px-4 mb-10 ${isDark ? "bg-[#2a2a2a]" : "bg-gray-100"
+                }`}
+            >
+              <TextInput
+                ref={passwordRef}
+                className={`flex-1 text-xl ${isDark ? "text-white" : "text-black"} py-3`}
+                placeholder="Enter Password"
+                placeholderTextColor={isDark ? "#aaa" : "#999"}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+                autoCorrect={false}
+                textContentType="password"
+                autoComplete="password"
+                returnKeyType="done"
+                value={password}
+                onChangeText={setPassword}
+                onFocus={() => scrollToInput(passwordRef)}
+                onSubmitEditing={() => Keyboard.dismiss()}
+              />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                <Ionicons
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={24}
+                  color={isDark ? "#fff" : "#000"}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Login Button */}
+            <TouchableOpacity
+              className="max-w-[400px] h-[51px] bg-[#008cff] rounded-xl items-center justify-center"
+              onPress={handleLogin}
+            >
+              <Text className="text-white text-center text-2xl font-bold">
+                Login
+              </Text>
+            </TouchableOpacity>
+
+            {hasStoredCredentials && biometricsAvailable && (
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                className="max-w-[400px] h-[51px] mt-3 border border-[#008cff] rounded-xl items-center justify-center"
+                onPress={handleBiometricLogin}
+              >
+                <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                  <View className="flex-row items-center justify-center">
+                    {Platform.OS === 'ios' ? (
+                      <ScanFace color={isDark ? '#fff' : '#000'} size={20} />
+                    ) : (
+                      <Fingerprint color={isDark ? '#fff' : '#000'} size={20} />
+                    )}
+                    <Text className="text-black dark:text-white text-center text-lg font-medium ml-3">
+                      {Platform.OS === 'ios' ? 'Login with Face ID' : 'Login with Fingerprint'}
+                    </Text>
+                  </View>
+                </Animated.View>
+              </TouchableOpacity>
+            )}
+
+            {/* Sign-up Link */}
+            <Text
+              className={`${isDark ? "text-gray-300" : "text-gray-500"
+                } text-[16px] text-center mt-4`}
+            >
+              Don’t have an account?{" "}
+              <TouchableOpacity onPress={handleSignup}>
+                <Text
+                  className={`text-[16px] font-bold -mb-1 ${isDark ? "text-white" : "text-black"
+                    }`}
+                >
+                  Sign up
+                </Text>
+              </TouchableOpacity>
+            </Text>
+
+            {/* Forgot Password */}
+            <View className="items-center mt-4">
+              <TouchableOpacity onPress={handleForgotPassword}>
+                <Text
+                  className={`text-[16px] font-bold ${isDark ? "text-white" : "text-black"
+                    }`}
+                >
+                  Forgot Password?
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </View>
+
+      {/* Privacy Policy and Terms Link - Fixed at bottom */}
+      <View className={`px-10 pb-8 pt-4 ${isDark ? "bg-[#1a1a1a]" : "bg-white"
+        }`}>
+        <Text
+          className={`${isDark ? "text-white" : "text-gray-500"
+            } text-[14px] text-center leading-6`}
+        >
+          By clicking the Login button, you agree to our{" "}
+          <Text
+            onPress={() => router.push("/(legal)/terms-and-conditions")}
+            className="text-blue-500"
+          >
+            Terms and Conditions
+          </Text>
+          {" "}and{" "}
+          <Text
+            onPress={() => router.push("/(legal)/privacy-policy")}
+            className="text-blue-500"
+          >
+            Privacy Policy
+          </Text>
+          .
+        </Text>
+      </View>
+    </View>
   );
 }

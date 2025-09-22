@@ -33,9 +33,9 @@ export default function RequestForgotPassword() {
   const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
     setTimeout(() => {
       if (inputRef.current && scrollViewRef.current) {
-        inputRef.current.measure((x, y, width, height, pageX, pageY) => {
+        inputRef.current.measure((pageY) => {
           scrollViewRef.current?.scrollTo({
-            y: pageY - 150, // Offset to show input clearly above keyboard
+            y: pageY - 120, // Offset to show input clearly above keyboard
             animated: true,
           });
         });
@@ -104,100 +104,103 @@ export default function RequestForgotPassword() {
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <View
+      style={{ flex: 1, backgroundColor: '#008cff' }}
     >
-      <View
-        style={{ flex: 1, backgroundColor: '#008cff' }}
-      >
-        <Modal transparent={true} visible={loading}>
-          <View className="flex-1 justify-center items-center bg-black/50">
-            <ActivityIndicator size="large" color="#fff" />
-          </View>
-        </Modal>
-        {/* Header */}
-        <View className="h-56 px-6 pt-7">
-          <View className="flex items-center mt-6">
-            <Image
-              source={require("../../assets/images/splash/splash-black.png")}
-              style={{ width: 150, height: 150 }}
-              resizeMode="contain"
-            />
-            {/* <Text className="font-bold text-3xl text-white">Printbot</Text> */}
-          </View>
+      <Modal transparent={true} visible={loading}>
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <ActivityIndicator size="large" color="#fff" />
         </View>
-
-        {/* Forgot Password Box */}
-        <ScrollView
-          ref={scrollViewRef}
-          className={`flex-1 px-4 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"
-            }`}
-          contentContainerStyle={{ paddingVertical: 16 }}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Text
-            className={`text-[30px] font-bold text-center mb-14 ${isDark ? "text-white" : "text-black"
-              }`}
-          >
-            Reset Password
-          </Text>
-
-          {/* Error Message */}
-          {errorMessage !== "" && (
-            <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
-          )}
-
-          <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
-            Email Address
-          </Text>
-
-          {/* Email Input */}
-          <TextInput
-            ref={emailRef}
-            className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-              }`}
-            placeholder="Enter Email Address *"
-            placeholderTextColor={isDark ? "#aaa" : "#999"}
-            value={email}
-            autoCapitalize="none"
-            autoCorrect={false}
-            textContentType="emailAddress"
-            autoComplete="email"
-            keyboardType="email-address"
-            returnKeyType="done"
-            onChangeText={setEmail}
-            onFocus={() => scrollToInput(emailRef)}
-            onSubmitEditing={() => Keyboard.dismiss()}
+      </Modal>
+      {/* Header */}
+      <View className="h-56 px-6 pt-7">
+        <View className="flex items-center mt-6">
+          <Image
+            source={require("../../assets/images/splash/splash-black.png")}
+            style={{ width: 150, height: 150 }}
+            resizeMode="contain"
           />
+        </View>
+      </View>
 
-          {/* Submit Button */}
-          <TouchableOpacity
-            className="mt-4 max-w-[400px] h-[51px] bg-[#008cff] rounded-xl items-center justify-center"
-            onPress={handleRequest}
+      <View className={`flex-1 px-4 py-4 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}>
+        <Text
+          className={`text-[30px] font-bold text-center mb-6 ${isDark ? "text-white" : "text-black"
+            }`}
+        >
+          Reset Password
+        </Text>
+
+        {/* Reset Password Form */}
+        <KeyboardAvoidingView
+          className="flex-1"
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+          <ScrollView
+            ref={scrollViewRef}
+            className={`flex-1 px-4 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"
+              }`}
+            contentContainerStyle={{ paddingVertical: 16 }}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            automaticallyAdjustKeyboardInsets={true}
           >
-            <Text className="text-white text-center text-2xl font-bold">
-              Submit
+
+            {/* Error Message */}
+            {errorMessage !== "" && (
+              <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
+            )}
+
+            <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
+              Email Address
             </Text>
-          </TouchableOpacity>
 
-          {/* Login Link */}
-          <Text
-            className={`${isDark ? "text-gray-300" : "text-gray-500"
-              } text-[16px] text-center mt-4`}
-          >
-            Remembered your password?{" "}
-            <TouchableOpacity onPress={handleLogin}>
-              <Text
-                className={`text-[16px] font-bold ${isDark ? "text-white" : "text-black"
-                  } -mb-[4px]`}
-              >
-                Login
+            {/* Email Input */}
+            <TextInput
+              ref={emailRef}
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+                }`}
+              placeholder="Enter Email Address *"
+              placeholderTextColor={isDark ? "#aaa" : "#999"}
+              value={email}
+              autoCapitalize="none"
+              autoCorrect={false}
+              textContentType="emailAddress"
+              autoComplete="email"
+              keyboardType="email-address"
+              returnKeyType="done"
+              onChangeText={setEmail}
+              onFocus={() => scrollToInput(emailRef)}
+              onSubmitEditing={() => Keyboard.dismiss()}
+            />
+
+            {/* Submit Button */}
+            <TouchableOpacity
+              className="mt-4 max-w-[400px] h-[51px] bg-[#008cff] rounded-xl items-center justify-center"
+              onPress={handleRequest}
+            >
+              <Text className="text-white text-center text-2xl font-bold">
+                Submit
               </Text>
             </TouchableOpacity>
-          </Text>
-        </ScrollView>
+
+            {/* Login Link */}
+            <Text
+              className={`${isDark ? "text-gray-300" : "text-gray-500"
+                } text-[16px] text-center mt-4`}
+            >
+              Remembered your password?{" "}
+              <TouchableOpacity onPress={handleLogin}>
+                <Text
+                  className={`text-[16px] font-bold ${isDark ? "text-white" : "text-black"
+                    } -mb-[4px]`}
+                >
+                  Login
+                </Text>
+              </TouchableOpacity>
+            </Text>
+          </ScrollView>
+        </KeyboardAvoidingView>
 
         {/* Privacy Policy and Terms Link - Fixed at bottom */}
         <View className={`px-10 pb-8 pt-4 ${isDark ? "bg-[#1a1a1a]" : "bg-white"
@@ -224,6 +227,6 @@ export default function RequestForgotPassword() {
           </Text>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }

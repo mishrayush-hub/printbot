@@ -57,9 +57,9 @@ export default function SignupScreen() {
   const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
     setTimeout(() => {
       if (inputRef.current && scrollViewRef.current) {
-        inputRef.current.measure((x, y, width, height, pageX, pageY) => {
+        inputRef.current.measure((pageY) => {
           scrollViewRef.current?.scrollTo({
-            y: pageY - 150, // Offset to show input clearly above keyboard
+            y: pageY - 120, // Offset to show input clearly above keyboard
             animated: true,
           });
         });
@@ -119,20 +119,6 @@ export default function SignupScreen() {
     confirmPassword: string
   ) => {
     setLoading(true);
-
-    // console.log("Starting signup request...");
-    // console.log("Request data:", {
-    //   signupEmail: email,
-    //   signupName: fullName,
-    //   signupMobile: mobile,
-    //   address1,
-    //   address2,
-    //   city,
-    //   state,
-    //   pincode,
-    //   country,
-    // });
-
     try {
       const requestBody = new URLSearchParams({
         signupEmail: email,
@@ -148,7 +134,6 @@ export default function SignupScreen() {
         confirmPassword: confirmPassword
       }).toString();
 
-      // console.log("Request body:", requestBody);
 
       const response = await fetch(
         "https://printbot.cloud/api/v1/signup_api.php",
@@ -166,15 +151,8 @@ export default function SignupScreen() {
         return;
       }
 
-      // console.log("Response received:");
-      // console.log("Status:", response.status);
-      // console.log("Status Text:", response.statusText);
-      // console.log("Headers:", response.headers);
-
       // Check if response has content
       const responseText = await response.text();
-      // console.log("Response text length:", responseText.length);
-      // console.log("Response text:", responseText);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}. Response: ${responseText}`);
@@ -188,8 +166,6 @@ export default function SignupScreen() {
       try {
         data = JSON.parse(responseText);
       } catch (parseError) {
-        // console.error("JSON Parse Error:", parseError);
-        // console.error("Response was:", responseText);
         throw new Error(`Invalid JSON response: ${responseText.substring(0, 200)}...`);
       }
 
@@ -229,7 +205,6 @@ export default function SignupScreen() {
       );
     } catch (error) {
       setLoading(false);
-      // console.error("Signup error details:", error);
 
       let errorMessage = "An error occurred while signing up. Please try again.";
 
@@ -246,8 +221,6 @@ export default function SignupScreen() {
           errorMessage = error.message;
         }
       }
-
-      // console.error("Final error message:", errorMessage);
       Alert.alert("Signup Error", errorMessage);
       setErrorMessage(errorMessage);
     } finally {
@@ -256,44 +229,44 @@ export default function SignupScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <View
+      style={{ flex: 1, backgroundColor: '#008cff' }}
     >
-      <View
-        style={{ flex: 1, backgroundColor: '#008cff' }}
-      >
-        {/* Loading Modal */}
-        <Modal transparent={true} visible={loading}>
-          <View className="flex-1 justify-center items-center bg-black/50">
-            <ActivityIndicator size="large" color="#fff" />
-          </View>
-        </Modal>
-
-        {/* Header */}
-        <View className="h-56 px-2 pt-7">
-          <View className="flex items-center mt-6">
-            <Image
-              source={require("../../assets/images/splash/splash-black.png")}
-              style={{ width: 150, height: 150 }}
-              resizeMode="contain"
-            />
-            {/* <Text className="font-bold text-3xl text-white">Printbot</Text> */}
-          </View>
+      {/* Loading Modal */}
+      <Modal transparent={true} visible={loading}>
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <ActivityIndicator size="large" color="#fff" />
         </View>
-        <View className={`flex-1 px-4 py-4 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}>
-          <Text
-            className={`text-[30px] font-bold text-center mb-6 ${isDark ? "text-white" : "text-black"
-              }`}
-          >
-            Sign Up
-          </Text>
-          {/* Form */}
+      </Modal>
+
+      {/* Header */}
+      <View className="h-56 px-2 pt-7">
+        <View className="flex items-center mt-6">
+          <Image
+            source={require("../../assets/images/splash/splash-black.png")}
+            style={{ width: 150, height: 150 }}
+            resizeMode="contain"
+          />
+        </View>
+      </View>
+      <View className={`flex-1 px-4 py-4 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}>
+        <Text
+          className={`text-[30px] font-bold text-center mb-6 ${isDark ? "text-white" : "text-black"
+            }`}
+        >
+          Sign Up
+        </Text>
+        {/* Form */}
+        <KeyboardAvoidingView
+          className="flex-1"
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
           <ScrollView
             ref={scrollViewRef}
             contentContainerStyle={{ paddingVertical: 16 }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
+            automaticallyAdjustKeyboardInsets={true}
           >
             {errorMessage !== "" && (
               <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
@@ -523,64 +496,64 @@ export default function SignupScreen() {
               onSubmitEditing={() => Keyboard.dismiss()}
             />
           </ScrollView>
+        </KeyboardAvoidingView>
 
-          {/* Terms and Privacy Policy Acceptance */}
-          <View className="flex-row items-center justify-center py-3 mb-2 max-w-[400px]">
-            <TouchableOpacity
-              onPress={() => setAcceptedTerms(!acceptedTerms)}
-              className="mr-3 mt-2"
-            >
-              <Ionicons
-                name={acceptedTerms ? "checkbox" : "square-outline"}
-                size={20}
-                color={acceptedTerms ? "#008cff" : (isDark ? "#aaa" : "#999")}
-              />
-            </TouchableOpacity>
-            <View className="flex-1 mt-2">
-              <Text className={`text-sm leading-5 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
-                I agree to the{" "}
-                <TouchableOpacity onPress={() => router.push("/terms-and-conditions")}>
-                  <Text className="text-[#008cff] font-semibold underline -mb-1">
-                    Terms & Conditions
-                  </Text>
-                </TouchableOpacity>
-                {" "}and{" "}
-                <TouchableOpacity onPress={() => router.push("/privacy-policy")}>
-                  <Text className="text-[#008cff] font-semibold underline -mb-1">
-                    Privacy Policy
-                  </Text>
-                </TouchableOpacity>
-              </Text>
-            </View>
-          </View>
-
-          {/* Signup Button */}
+        {/* Terms and Privacy Policy Acceptance */}
+        <View className="flex-row items-center justify-center py-3 mb-2 max-w-[400px]">
           <TouchableOpacity
-            className="max-w-[400px] h-[51px] bg-[#008cff] rounded-xl items-center justify-center"
-            onPress={handleSignup}
+            onPress={() => setAcceptedTerms(!acceptedTerms)}
+            className="mr-3 mt-2"
           >
-            <Text className="text-white text-center text-2xl font-bold">
-              Sign Up
+            <Ionicons
+              name={acceptedTerms ? "checkbox" : "square-outline"}
+              size={20}
+              color={acceptedTerms ? "#008cff" : (isDark ? "#aaa" : "#999")}
+            />
+          </TouchableOpacity>
+          <View className="flex-1 mt-2">
+            <Text className={`text-sm leading-5 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+              I agree to the{" "}
+              <TouchableOpacity onPress={() => router.push("/terms-and-conditions")}>
+                <Text className="text-[#008cff] font-semibold underline -mb-1">
+                  Terms & Conditions
+                </Text>
+              </TouchableOpacity>
+              {" "}and{" "}
+              <TouchableOpacity onPress={() => router.push("/privacy-policy")}>
+                <Text className="text-[#008cff] font-semibold underline -mb-1">
+                  Privacy Policy
+                </Text>
+              </TouchableOpacity>
+            </Text>
+          </View>
+        </View>
+
+        {/* Signup Button */}
+        <TouchableOpacity
+          className="max-w-[400px] h-[51px] bg-[#008cff] rounded-xl items-center justify-center"
+          onPress={handleSignup}
+        >
+          <Text className="text-white text-center text-2xl font-bold">
+            Sign Up
+          </Text>
+        </TouchableOpacity>
+
+        {/* Login Link */}
+        <Text
+          className={`${isDark ? "text-gray-300" : "text-gray-500"
+            } text-[16px] text-center mt-4 pb-6`}
+        >
+          Already have an account?{" "}
+          <TouchableOpacity onPress={handleLogin}>
+            <Text
+              className={`text-[16px] font-bold ${isDark ? "text-white" : "text-black"
+                } -mb-[4px]`}
+            >
+              Login
             </Text>
           </TouchableOpacity>
-
-          {/* Login Link */}
-          <Text
-            className={`${isDark ? "text-gray-300" : "text-gray-500"
-              } text-[16px] text-center mt-4`}
-          >
-            Already have an account?{" "}
-            <TouchableOpacity onPress={handleLogin}>
-              <Text
-                className={`text-[16px] font-bold ${isDark ? "text-white" : "text-black"
-                  } -mb-[4px]`}
-              >
-                Login
-              </Text>
-            </TouchableOpacity>
-          </Text>
-        </View>
+        </Text>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }

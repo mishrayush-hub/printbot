@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, ActivityIndicator, Alert } from "react-native";
+import { View, ActivityIndicator, Image } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { checkForSessionExpiry } from "@/utils/sessionHandler";
@@ -72,7 +72,11 @@ const MyScreen = () => {
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center bg-blue-500">
-        <ActivityIndicator size="large" color="#ffffff" />
+        <Image 
+          source={require('@/assets/images/android/adaptive-icon.png')} 
+          className="w-[350px] h-[350px]" 
+        />
+        <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: -80 }} />
       </View>
     );
   }

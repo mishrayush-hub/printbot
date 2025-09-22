@@ -11,7 +11,7 @@ import {
   Truck,
   User
 } from "lucide-react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -24,6 +24,7 @@ import {
   Image
 } from "react-native";
 import { checkForSessionExpiry } from "@/utils/sessionHandler";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function ProfileScreen() {
   const [activeTab, setActiveTab] = useState("security");
@@ -82,13 +83,7 @@ export default function ProfileScreen() {
     }
   };
 
-  useEffect(() => {
-    if (activeTab === "payments") {
-      loadPaymentHistory();
-    }
-  }, [activeTab]);
-
-  const loadPaymentHistory = async () => {
+  const loadPaymentHistory = useCallback(async () => {
     if (!authToken || !userId) return;
 
     setPaymentLoading(true);
@@ -122,7 +117,22 @@ export default function ProfileScreen() {
     } finally {
       setPaymentLoading(false);
     }
-  };
+  }, [authToken, userId]);
+
+  useEffect(() => {
+    if (activeTab === "payments") {
+      loadPaymentHistory();
+    }
+  }, [activeTab, loadPaymentHistory]);
+
+  // Load payment history every time screen comes into focus (if payments tab is active)
+  useFocusEffect(
+    useCallback(() => {
+      if (activeTab === "payments" && authToken && userId) {
+        loadPaymentHistory();
+      }
+    }, [activeTab, authToken, userId, loadPaymentHistory])
+  );
 
   const handleChangePassword = async () => {
     setLoading(true);

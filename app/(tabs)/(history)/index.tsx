@@ -16,6 +16,7 @@ import PaymentProcessingModal from "@/components/PaymentProcessingModal";
 import { generateTransactionId } from "@/hooks/generateTransactionId";
 import { desanitizeFileName } from "@/utils/desanitizeFileName";
 import { checkForSessionExpiry } from "@/utils/sessionHandler";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function OrdersScreen() {
   const [files, setFiles] = useState<any[]>([]);
@@ -140,11 +141,14 @@ export default function OrdersScreen() {
     }
   }, [authToken, userId]);
 
-  useEffect(() => {
-    if (authToken && userId) {
-      loadOrders();
-    }
-  }, [authToken, userId, loadOrders]);
+  // Load orders every time the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      if (authToken && userId) {
+        loadOrders();
+      }
+    }, [authToken, userId, loadOrders])
+  );
 
   // Filter files based on search and status
   useEffect(() => {

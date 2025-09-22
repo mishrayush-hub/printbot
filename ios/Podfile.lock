@@ -41,7 +41,7 @@ PODS:
     - ExpoModulesCore
   - ExpoHaptics (15.0.7):
     - ExpoModulesCore
-  - ExpoHead (6.0.6):
+  - ExpoHead (6.0.7):
     - ExpoModulesCore
     - RNScreens
   - ExpoImagePicker (17.0.8):
@@ -1480,7 +1480,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-webview (13.16.0):
+  - react-native-webview (13.15.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2020,7 +2020,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNSVG (15.13.0):
+  - RNSVG (15.12.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2041,9 +2041,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNSVG/common (= 15.13.0)
+    - RNSVG/common (= 15.12.1)
     - Yoga
-  - RNSVG/common (15.13.0):
+  - RNSVG/common (15.12.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2497,7 +2497,7 @@ SPEC CHECKSUMS:
   ExpoFileSystem: 4fb06865906e781329eb67166bd64fc4749c3019
   ExpoFont: 86ceec09ffed1c99cfee36ceb79ba149074901b5
   ExpoHaptics: 807476b0c39e9d82b7270349d6487928ce32df84
-  ExpoHead: 78f14a8573ae5b882123b272c0af20a80bfa58f6
+  ExpoHead: 9cfb3370834cab0459b3f516a9b76aae944f02f4
   ExpoImagePicker: d251aab45a1b1857e4156fed88511b278b4eee1c
   ExpoKeepAwake: 1a2e820692e933c94a565ec3fbbe38ac31658ffe
   ExpoLinearGradient: a464898cb95153125e3b81894fd479bcb1c7dd27
@@ -2549,7 +2549,7 @@ SPEC CHECKSUMS:
   react-native-bottom-tabs: 22f8b0167c75ba041323e3472110760142735096
   react-native-razorpay: ab51e7be3d906f49b26198d978fc6f163e846d30
   react-native-safe-area-context: 8dc43e60dd67fd2be098486fd8195e143fb47c6f
-  react-native-webview: 6b41d44f853c7f8dd8b685d8d289fe33349e4e1b
+  react-native-webview: ea441b2e73f711c183580fb6db89aa587f0dd92a
   React-NativeModulesApple: a9464983ccc0f66f45e93558671f60fc7536e438
   React-oscompat: 73db7dbc80edef36a9d6ed3c6c4e1724ead4236d
   React-perflogger: 123272debf907cc423962adafcf4513320e43757
@@ -2586,7 +2586,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: c3831b3b1b5014c6afab7fff7e4171394a3419ab
   RNReanimated: 20c098ad6ed3cd6569263ed54d055e53e82da861
   RNScreens: 33bbd1d0f86ed957557620dc94054b71db0a94ee
-  RNSVG: ee4f4e223bce5f5d47ecff2e9ad4c8c9b3be984a
+  RNSVG: ac3047fdd9c0ebac9d0b731a352bddf216af6242
   RNVectorIcons: 1db72384402bc567e995855056b8c5d7a9888780
   RNWorklets: 76fce72926e28e304afb44f0da23b2d24f2c1fa0
   SDWebImage: 9f177d83116802728e122410fb25ad88f5c7608a

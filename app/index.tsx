@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, ActivityIndicator, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { checkForSessionExpiry } from "@/utils/sessionHandler";
 
 const MyScreen = () => {
   const router = useRouter();
@@ -35,6 +36,11 @@ const MyScreen = () => {
             },
             body
           });
+
+          // Check for 401 session expiry
+          if (checkForSessionExpiry(response)) {
+            return; // Session expired handler will take care of navigation
+          }
 
           const data = await response.json().catch(() => null);
 

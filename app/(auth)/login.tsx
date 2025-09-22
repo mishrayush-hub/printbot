@@ -21,6 +21,7 @@ import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
+import { checkForSessionExpiry } from "@/utils/sessionHandler";
 
 export default function LoginScreen() {
   const colorScheme = useColorScheme();
@@ -78,6 +79,10 @@ export default function LoginScreen() {
           }).toString()
         }
       );
+
+      if (checkForSessionExpiry(response)) {
+        return;
+      }
 
       const data = await response.json();
 
@@ -174,6 +179,9 @@ export default function LoginScreen() {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body
           });
+          if (checkForSessionExpiry(resp)) {
+            return;
+          }
           const data = await resp.json().catch(() => null);
           if (resp.ok && data && data.success) {
             router.replace('/(tabs)/(home)');
@@ -206,6 +214,9 @@ export default function LoginScreen() {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ loginEmail: savedEmail, loginPassword: savedPassword }).toString()
         });
+        if (checkForSessionExpiry(resp2)) {
+          return;
+        }
         const loginData = await resp2.json().catch(() => null);
         if (resp2.ok && loginData && loginData.success) {
           // Save token and profile info as existing login flow

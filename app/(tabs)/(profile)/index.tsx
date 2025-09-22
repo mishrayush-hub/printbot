@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { Edit3, Save, Scroll, User, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View, ScrollView, Platform } from "react-native";
+import { checkForSessionExpiry } from "@/utils/sessionHandler";
 
 export default function OrdersScreen() {
     const [editingProfile, setEditingProfile] = useState(false);
@@ -123,6 +124,11 @@ export default function OrdersScreen() {
           body: new URLSearchParams(sendData).toString()
         }
       );
+
+      // Check for 401 session expiry
+      if (checkForSessionExpiry(response)) {
+        return; // Session expired handler will take care of navigation
+      }
 
       const data = await response.json();
       if (data.success) {

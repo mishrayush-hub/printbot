@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { checkForSessionExpiry } from "@/utils/sessionHandler";
 
 
 export default function SignupScreen() {
@@ -160,6 +161,10 @@ export default function SignupScreen() {
           body: requestBody
         }
       );
+
+      if (checkForSessionExpiry(response)) {
+        return;
+      }
 
       // console.log("Response received:");
       // console.log("Status:", response.status);

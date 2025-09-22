@@ -9,6 +9,7 @@ import PaymentProcessingModal from "@/components/PaymentProcessingModal";
 import { generateTransactionId } from "@/hooks/generateTransactionId";
 import { checkAndRequestPermissions, showPermissionRequiredAlert } from "@/utils/permissionUtils";
 import { desanitizeFileName } from "@/utils/desanitizeFileName";
+import { checkForSessionExpiry } from "@/utils/sessionHandler";
 
 export default function HomeScreen() {
   const [uploadedFiles, setUploadedFiles] = useState<
@@ -175,6 +176,11 @@ export default function HomeScreen() {
         },
         body: formData,
       });
+
+      // Check for 401 session expiry
+      if (checkForSessionExpiry(response)) {
+        return; // Session expired handler will take care of navigation
+      }
 
       const text = await response.text();
       // console.log("Upload response:", text);

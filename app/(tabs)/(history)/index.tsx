@@ -15,6 +15,7 @@ import { usePaymentAPI } from "@/hooks/usePayementAPI";
 import PaymentProcessingModal from "@/components/PaymentProcessingModal";
 import { generateTransactionId } from "@/hooks/generateTransactionId";
 import { desanitizeFileName } from "@/utils/desanitizeFileName";
+import { checkForSessionExpiry } from "@/utils/sessionHandler";
 
 export default function OrdersScreen() {
   const [files, setFiles] = useState<any[]>([]);
@@ -113,6 +114,11 @@ export default function OrdersScreen() {
           }).toString()
         }
       );
+
+      // Check for 401 session expiry
+      if (checkForSessionExpiry(response)) {
+        return; // Session expired handler will take care of navigation
+      }
 
       const data = await response.json();
       console.log("Fetch files response:", data.files);

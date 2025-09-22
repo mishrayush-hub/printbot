@@ -1,5 +1,6 @@
 
 import { Alert } from "react-native";
+import { checkForSessionExpiry } from "@/utils/sessionHandler";
 
 export const callbackAPI = async (orderId: string, user_id: string, file_id: string) => {
     try {
@@ -14,6 +15,11 @@ export const callbackAPI = async (orderId: string, user_id: string, file_id: str
           fileId: file_id.toString()
         }).toString()
       });
+
+      // Check for 401 session expiry
+      if (checkForSessionExpiry(response)) {
+        return null; // Session expired handler will take care of navigation
+      }
 
       // console.log("Data: ", {
       //   orderId: orderId,

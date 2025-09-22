@@ -12,6 +12,7 @@ import {
   useColorScheme,
   View
 } from "react-native";
+import { checkForSessionExpiry } from "@/utils/sessionHandler";
 
 export default function DeleteAccount() {
   const colorScheme = useColorScheme();
@@ -46,6 +47,12 @@ export default function DeleteAccount() {
           }).toString()
         }
       );
+
+      // Check for 401 session expiry
+      if (checkForSessionExpiry(response)) {
+        return; // Session expired handler will take care of navigation
+      }
+
       const data = await response.json();
       if (!response.ok || !data.success) {
         setDeleteLoading(false);

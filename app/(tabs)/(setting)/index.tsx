@@ -23,6 +23,7 @@ import {
   View,
   Image
 } from "react-native";
+import { checkForSessionExpiry } from "@/utils/sessionHandler";
 
 export default function ProfileScreen() {
   const [activeTab, setActiveTab] = useState("security");
@@ -106,6 +107,11 @@ export default function ProfileScreen() {
         }
       );
 
+      // Check for 401 session expiry
+      if (checkForSessionExpiry(response)) {
+        return; // Session expired handler will take care of navigation
+      }
+
       const data = await response.json();
       if (data.success && data.files) {
         const paidFiles = data.files.filter((file: any) => file.payment_success);
@@ -135,6 +141,11 @@ export default function ProfileScreen() {
           }).toString()
         }
       );
+
+      // Check for 401 session expiry
+      if (checkForSessionExpiry(response)) {
+        return; // Session expired handler will take care of navigation
+      }
 
       const data = await response.json();
       if (data.success) {

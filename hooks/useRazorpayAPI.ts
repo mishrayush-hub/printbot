@@ -1,5 +1,6 @@
 import RazorpayCheckout from 'react-native-razorpay';
 import { Alert, Platform } from 'react-native';
+import { checkForSessionExpiry } from "@/utils/sessionHandler";
 
 interface PaymentOptions {
   key: string;
@@ -74,6 +75,14 @@ export const useRazorpayAPI = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
+
+      // Check for 401 session expiry
+      if (checkForSessionExpiry(response)) {
+        return {
+          success: false,
+          message: 'Session expired',
+        };
+      }
 
       const result: CreateOrderResponse = await response.json();
       
@@ -230,6 +239,14 @@ export const useRazorpayAPI = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
+
+      // Check for 401 session expiry
+      if (checkForSessionExpiry(response)) {
+        return {
+          success: false,
+          message: 'Session expired',
+        };
+      }
 
       const result: PaymentVerificationResponse = await response.json();
       

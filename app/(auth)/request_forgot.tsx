@@ -15,6 +15,7 @@ import {
   Platform
 } from "react-native";
 import { router } from "expo-router";
+import { checkForSessionExpiry } from "@/utils/sessionHandler";
 
 export default function RequestForgotPassword() {
   const colorScheme = useColorScheme(); // 'light' or 'dark'
@@ -57,6 +58,10 @@ export default function RequestForgotPassword() {
           }).toString()
         }
       );
+
+      if (checkForSessionExpiry(response)) {
+        return;
+      }
 
       const data = await response.json();
 

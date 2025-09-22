@@ -13,7 +13,6 @@ export default function LegalLayout() {
   
   const commonHeaderOptions = {
     headerShown: true,
-    headerBackVisible: true,
     headerBackTitleVisible: false,
     headerTintColor: colorScheme === 'dark' ? '#ffffff' : '#000000',
     headerTitleStyle: {

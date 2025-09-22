@@ -14,6 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usePaymentAPI } from "@/hooks/usePayementAPI";
 import PaymentProcessingModal from "@/components/PaymentProcessingModal";
 import { generateTransactionId } from "@/hooks/generateTransactionId";
+import { desanitizeFileName } from "@/utils/desanitizeFileName";
 
 export default function OrdersScreen() {
   const [files, setFiles] = useState<any[]>([]);
@@ -114,7 +115,7 @@ export default function OrdersScreen() {
       );
 
       const data = await response.json();
-
+      console.log("Fetch files response:", data.files);
       if (!response.ok || !data.success) {
         setErrorMessage(data.message || "Failed to load orders.");
         setFiles([]);
@@ -226,7 +227,7 @@ export default function OrdersScreen() {
         </View>
         <View className="flex-1 gap-1">
         <Text className={`${textColor} text-base font-semibold flex-1`} numberOfLines={2}>
-          {item.file_name.split('_').slice(2, item.file_name.length).join(' ')}
+          {desanitizeFileName(item.file_name)}
         </Text>
         <View className="flex-row items-center justify-between">
           <Text className={`${subText} text-sm`}>

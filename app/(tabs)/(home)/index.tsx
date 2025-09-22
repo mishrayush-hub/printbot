@@ -8,6 +8,7 @@ import { usePaymentAPI } from "@/hooks/usePayementAPI";
 import PaymentProcessingModal from "@/components/PaymentProcessingModal";
 import { generateTransactionId } from "@/hooks/generateTransactionId";
 import { checkAndRequestPermissions, showPermissionRequiredAlert } from "@/utils/permissionUtils";
+import { desanitizeFileName } from "@/utils/desanitizeFileName";
 
 export default function HomeScreen() {
   const [uploadedFiles, setUploadedFiles] = useState<
@@ -54,13 +55,6 @@ export default function HomeScreen() {
     getTokenDetails();
   }, []);
 
-  // Helper to sanitize filenames:
-  // - trims whitespace
-  // - replaces internal whitespace runs with single underscore
-  // - avoids leading/trailing underscores
-  // - preserves extension and avoids underscore before extension
-  // Minimal sanitize: only replace spaces with underscores and preserve extension.
-  // If `uid` provided, prefix the filename with `<uid>_`.
   const sanitizeFileName = (originalName: string | undefined, uid?: string) => {
     const name = (originalName || "").toString();
 
@@ -78,7 +72,10 @@ export default function HomeScreen() {
     // Only replace spaces with underscores in the base name
     base = base.replace(/\s+/g, '_');
 
-    const finalBase = (uid && uid.toString().trim() !== '') ? `${uid}_${base}` : base;
+    // Add timestamp
+    const timestamp = Date.now();
+    
+    const finalBase = (uid && uid.toString().trim() !== '') ? `${uid}_${base}_${timestamp}` : `${base}_${timestamp}`;
 
     return finalBase + ext;
   };
@@ -160,24 +157,14 @@ export default function HomeScreen() {
         setUploaded(false);
         return;
       }
-
-      // console.log("Uploading file:", {
-      //   uri: file.uri,
-      //   name: file.name,
-      //   type: file.type,
-      //   size: fileInfo.size
-      // });
-
       const formData = new FormData();
       formData.append("authToken", authToken);
       formData.append("user_id", userId);
 
-      // Ensure file name is sanitized before upload
-      const uploadFileName = sanitizeFileName(file.name, userId);
-
+      // Use the already sanitized filename (sanitized during file selection)
       formData.append("file", {
         uri: file.uri,
-        name: uploadFileName,
+        name: file.name, // file.name is already sanitized
         type: file.type || "application/pdf",
       } as any);
 
@@ -354,14 +341,6 @@ export default function HomeScreen() {
           Alert.alert("Invalid File", "Only PDF files are allowed.");
           return;
         }
-
-        // console.log("Selected file:", {
-        //   name: file.name,
-        //   size: file.size,
-        //   type: fileType,
-        //   uri: file.uri
-        // });
-
   // Sanitize filename and include userId prefix when available
   const sanitizedFileName = sanitizeFileName(file.name, userId);
 
@@ -483,7 +462,7 @@ export default function HomeScreen() {
                         </View>
                         <View className="flex-1 py-1">
                           <Text className={`font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-600'} ${item.fileName.length > 25 ? 'text-sm' : 'text-base'}`} numberOfLines={1}>
-                            {item.fileName.split('_').slice(1, item.fileName.length).join(' ')}
+                            {desanitizeFileName(item.fileName)}
                           </Text>
                           <Text className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                             {(item.fileSize / 1024).toFixed(0)} KB

@@ -16,9 +16,11 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { checkForSessionExpiry } from "@/utils/sessionHandler";
+import { useKeyboard } from '@react-native-community/hooks';
 
 export default function RequestForgotPassword() {
-  const colorScheme = useColorScheme(); // 'light' or 'dark'
+  const colorScheme = useColorScheme();
+  const keyboard = useKeyboard()
   const isDark = colorScheme === "dark";
 
   const [email, setEmail] = useState("");
@@ -33,7 +35,7 @@ export default function RequestForgotPassword() {
   const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
     setTimeout(() => {
       if (inputRef.current && scrollViewRef.current) {
-        inputRef.current.measure((pageY) => {
+        inputRef.current.measure((x, y, width, height, pageX, pageY) => {
           scrollViewRef.current?.scrollTo({
             y: pageY - 120, // Offset to show input clearly above keyboard
             animated: true,
@@ -140,7 +142,7 @@ export default function RequestForgotPassword() {
             ref={scrollViewRef}
             className={`flex-1 px-4 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"
               }`}
-            contentContainerStyle={{ paddingVertical: 16 }}
+            contentContainerStyle={{ paddingVertical: 16, paddingBottom: Platform.OS === 'android' && keyboard.keyboardShown ? keyboard.keyboardHeight / 2 : 0 }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets={true}

@@ -15,9 +15,11 @@ import {
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { checkForSessionExpiry } from "@/utils/sessionHandler";
+import { useKeyboard } from '@react-native-community/hooks';
 
 export default function VerifyForgotPassword() {
   const colorScheme = useColorScheme();
+  const keyboard = useKeyboard()
   const isDark = colorScheme === "dark";
 
   const handleLogin = () => {
@@ -187,7 +189,7 @@ export default function VerifyForgotPassword() {
           <ScrollView
             ref={scrollViewRef}
             className={`flex-1 px-4 rounded-t-[58] ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}
-            contentContainerStyle={{ paddingVertical: 16 }}
+            contentContainerStyle={{ paddingVertical: 16, paddingBottom: Platform.OS === 'android' && keyboard.keyboardShown ? keyboard.keyboardHeight / 2 : 0 }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets={true}

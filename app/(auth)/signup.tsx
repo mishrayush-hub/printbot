@@ -17,9 +17,10 @@ import {
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { checkForSessionExpiry } from "@/utils/sessionHandler";
-
+import { useKeyboard } from '@react-native-community/hooks';
 
 export default function SignupScreen() {
+  const keyboard = useKeyboard()
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
@@ -57,9 +58,9 @@ export default function SignupScreen() {
   const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
     setTimeout(() => {
       if (inputRef.current && scrollViewRef.current) {
-        inputRef.current.measure((pageY) => {
+        inputRef.current.measure((x, y, width, height, pageX, pageY) => {
           scrollViewRef.current?.scrollTo({
-            y: pageY - 120, // Offset to show input clearly above keyboard
+            y: y - 120, // Offset to show input clearly above keyboard
             animated: true,
           });
         });
@@ -259,11 +260,11 @@ export default function SignupScreen() {
         {/* Form */}
         <KeyboardAvoidingView
           className="flex-1"
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === "ios" ? "padding" : "position"}
         >
           <ScrollView
             ref={scrollViewRef}
-            contentContainerStyle={{ paddingVertical: 16 }}
+            contentContainerStyle={{ paddingVertical: 16, paddingBottom: Platform.OS === 'android' && keyboard.keyboardShown ? keyboard.keyboardHeight / 1.7 : 0 }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets={true}
@@ -283,7 +284,7 @@ export default function SignupScreen() {
             </Text>
             <TextInput
               ref={fullNameRef}
-              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-base font-medium mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
                 }`}
               placeholder="Enter Full Name *"
               placeholderTextColor={isDark ? "#aaa" : "#999"}
@@ -296,6 +297,7 @@ export default function SignupScreen() {
               onChangeText={setFullName}
               onFocus={() => scrollToInput(fullNameRef)}
               onSubmitEditing={() => emailRef.current?.focus()}
+              
             />
 
             <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
@@ -305,7 +307,7 @@ export default function SignupScreen() {
             {/* Email Input */}
             <TextInput
               ref={emailRef}
-              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-base font-medium mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
                 }`}
               placeholder="Enter Email Address *"
               placeholderTextColor={isDark ? "#aaa" : "#999"}
@@ -319,6 +321,7 @@ export default function SignupScreen() {
               onChangeText={setEmail}
               onFocus={() => scrollToInput(emailRef)}
               onSubmitEditing={() => mobileRef.current?.focus()}
+              
             />
 
             <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
@@ -328,7 +331,7 @@ export default function SignupScreen() {
             {/* Mobile Input */}
             <TextInput
               ref={mobileRef}
-              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-base font-medium mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
                 }`}
               placeholder="Enter Mobile Number *"
               placeholderTextColor={isDark ? "#aaa" : "#999"}
@@ -339,6 +342,7 @@ export default function SignupScreen() {
               onChangeText={setMobile}
               onFocus={() => scrollToInput(mobileRef)}
               onSubmitEditing={() => address1Ref.current?.focus()}
+              
             />
 
             <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
@@ -348,7 +352,7 @@ export default function SignupScreen() {
             {/* Address Line 1 */}
             <TextInput
               ref={address1Ref}
-              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-base font-medium mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
                 }`}
               placeholder="Enter Address Line 1 *"
               placeholderTextColor={isDark ? "#aaa" : "#999"}
@@ -358,6 +362,7 @@ export default function SignupScreen() {
               onChangeText={setAddress1}
               onFocus={() => scrollToInput(address1Ref)}
               onSubmitEditing={() => address2Ref.current?.focus()}
+              
             />
 
             <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
@@ -367,7 +372,7 @@ export default function SignupScreen() {
             {/* Address Line 2 */}
             <TextInput
               ref={address2Ref}
-              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-base font-medium mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
                 }`}
               placeholder="Enter Address Line 2"
               placeholderTextColor={isDark ? "#aaa" : "#999"}
@@ -377,6 +382,7 @@ export default function SignupScreen() {
               onChangeText={setAddress2}
               onFocus={() => scrollToInput(address2Ref)}
               onSubmitEditing={() => cityRef.current?.focus()}
+              
             />
 
             <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
@@ -386,7 +392,7 @@ export default function SignupScreen() {
             {/* City */}
             <TextInput
               ref={cityRef}
-              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-base font-medium mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
                 }`}
               placeholder="Enter City *"
               placeholderTextColor={isDark ? "#aaa" : "#999"}
@@ -396,6 +402,7 @@ export default function SignupScreen() {
               onChangeText={setCity}
               onFocus={() => scrollToInput(cityRef)}
               onSubmitEditing={() => stateRef.current?.focus()}
+              
             />
 
             <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
@@ -405,7 +412,7 @@ export default function SignupScreen() {
             {/* State */}
             <TextInput
               ref={stateRef}
-              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-base font-medium mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
                 }`}
               placeholder="Enter State *"
               placeholderTextColor={isDark ? "#aaa" : "#999"}
@@ -415,6 +422,7 @@ export default function SignupScreen() {
               onChangeText={setState}
               onFocus={() => scrollToInput(stateRef)}
               onSubmitEditing={() => pincodeRef.current?.focus()}
+              
             />
 
             <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
@@ -424,7 +432,7 @@ export default function SignupScreen() {
             {/* Pincode */}
             <TextInput
               ref={pincodeRef}
-              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-base font-medium mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
                 }`}
               placeholder="Enter Pincode *"
               placeholderTextColor={isDark ? "#aaa" : "#999"}
@@ -434,6 +442,7 @@ export default function SignupScreen() {
               onChangeText={setPincode}
               onFocus={() => scrollToInput(pincodeRef)}
               onSubmitEditing={() => countryRef.current?.focus()}
+              
             />
 
             <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
@@ -443,7 +452,7 @@ export default function SignupScreen() {
             {/* Country */}
             <TextInput
               ref={countryRef}
-              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-base font-medium mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
                 }`}
               placeholder="Enter Country *"
               placeholderTextColor={isDark ? "#aaa" : "#999"}
@@ -453,6 +462,7 @@ export default function SignupScreen() {
               onChangeText={setCountry}
               onFocus={() => scrollToInput(countryRef)}
               onSubmitEditing={() => passwordRef.current?.focus()}
+              
             />
 
             <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
@@ -462,7 +472,7 @@ export default function SignupScreen() {
             {/* Password Input */}
             <TextInput
               ref={passwordRef}
-              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-base font-medium mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
                 }`}
               placeholder="Enter Password (min 6 chars)"
               placeholderTextColor={isDark ? "#aaa" : "#999"}
@@ -474,6 +484,7 @@ export default function SignupScreen() {
               onChangeText={setPassword}
               onFocus={() => scrollToInput(passwordRef)}
               onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+              
             />
             <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
               Confirm Password
@@ -482,7 +493,7 @@ export default function SignupScreen() {
             {/* Confirm Password Input */}
             <TextInput
               ref={confirmPasswordRef}
-              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-base font-medium mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
                 }`}
               placeholder="Confirm Password"
               placeholderTextColor={isDark ? "#aaa" : "#999"}
@@ -494,6 +505,7 @@ export default function SignupScreen() {
               onChangeText={setConfirmPassword}
               onFocus={() => scrollToInput(confirmPasswordRef)}
               onSubmitEditing={() => Keyboard.dismiss()}
+              
             />
           </ScrollView>
         </KeyboardAvoidingView>

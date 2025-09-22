@@ -5,8 +5,10 @@ import { Edit3, Save, User, X } from "lucide-react-native";
 import { useEffect, useState, useRef } from "react";
 import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View, ScrollView, Platform, KeyboardAvoidingView } from "react-native";
 import { checkForSessionExpiry } from "@/utils/sessionHandler";
+import { useKeyboard } from '@react-native-community/hooks';
 
-export default function OrdersScreen() {
+export default function ProfileScreen() {
+  const keyboard = useKeyboard()
   const [editingProfile, setEditingProfile] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState("");
@@ -54,17 +56,17 @@ export default function OrdersScreen() {
 
   // Auto-scroll function
   const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
-    setTimeout(() => {
-      if (inputRef.current && scrollViewRef.current) {
-        inputRef.current.measure((pageY) => {
-          scrollViewRef.current?.scrollTo({
-            y: pageY - 120, // Offset to show input clearly above keyboard
-            animated: true,
+      setTimeout(() => {
+        if (inputRef.current && scrollViewRef.current) {
+          inputRef.current.measure((x, y, width, height, pageX, pageY) => {
+            scrollViewRef.current?.scrollTo({
+              y: pageY - 100, // Offset to show input clearly above keyboard
+              animated: true,
+            });
           });
-        });
-      }
-    }, 100); // Small delay to ensure the keyboard animation has started
-  };
+        }
+      }, 100);
+    };
 
   useEffect(() => {
     loadUserData();
@@ -194,7 +196,7 @@ export default function OrdersScreen() {
 
   return (
     <View className={`flex-1 ${isDark ? 'bg-gray-900' : 'bg-gray-50'} p-3`}>
-      <View className={`${cardBg} rounded-lg p-4 border ${borderColor} shadow-sm ${Platform.OS === 'ios' ? 'h-[89%]' : 'h-[90%]'}`}>
+      <View className={`${cardBg} rounded-lg p-4 border ${borderColor} shadow-sm ${Platform.OS === 'ios' ? 'h-[89%]' : 'h-[87%]'}`}>
         <View className="flex-row items-center justify-between mb-6">
           <View className="flex-row items-center">
             <View className="bg-blue-100 p-3 rounded-full mr-4">
@@ -256,7 +258,7 @@ export default function OrdersScreen() {
           <ScrollView
             style={{ flex: 1 }}
             ref={scrollViewRef}
-            contentContainerStyle={{ gap: 10, paddingBottom: 16 }}
+            contentContainerStyle={{ gap: 4, paddingBottom: keyboard.keyboardShown ? keyboard.keyboardHeight / 1.4 : 0 }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets={true}

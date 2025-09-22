@@ -16,15 +16,17 @@ import {
   Platform
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { ScanFace, Fingerprint } from 'lucide-react-native';
+import { ScanFace, Fingerprint, Key } from 'lucide-react-native';
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
 import { checkForSessionExpiry } from "@/utils/sessionHandler";
+import { useKeyboard } from '@react-native-community/hooks';
 
 export default function LoginScreen() {
   const colorScheme = useColorScheme();
+  const keyboard = useKeyboard()
   const isDark = colorScheme === "dark";
 
   const [email, setEmail] = useState("");
@@ -53,9 +55,9 @@ export default function LoginScreen() {
   const scrollToInput = (inputRef: React.RefObject<TextInput>) => {
     setTimeout(() => {
       if (inputRef.current && scrollViewRef.current) {
-        inputRef.current.measure((pageY) => {
+        inputRef.current.measure((x, y, width, height, pageX, pageY) => {
           scrollViewRef.current?.scrollTo({
-            y: pageY - 120, // Offset to show input clearly above keyboard
+            y: pageY - 150, // Offset to show input clearly above keyboard
             animated: true,
           });
         });
@@ -293,18 +295,11 @@ export default function LoginScreen() {
         >
           <ScrollView
             ref={scrollViewRef}
-            className={'flex-1'}
-            contentContainerStyle={{ paddingVertical: 16 }}
+            contentContainerStyle={{ paddingBottom:  Platform.OS === "android" && keyboard.keyboardShown ? keyboard.keyboardHeight / 1.4 : Platform.OS === "android" && !keyboard.keyboardShown ? 0 : 20 }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets={true}
           >
-
-            {/* Error Message */}
-            {errorMessage !== "" && (
-              <Text className="text-red-500 text-center mb-4">{errorMessage}</Text>
-            )}
-
             <Text className={`text-[18px] font-semibold ml-2 mb-2 ${isDark ? "text-white" : "text-black"}`}>
               Email Address
             </Text>
@@ -312,7 +307,7 @@ export default function LoginScreen() {
             {/* Email Input */}
             <TextInput
               ref={emailRef}
-              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
+              className={`rounded-xl max-w-[400px] h-[51px] px-4 py-3 text-xl mb-2 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
                 }`}
               placeholder="Enter Email Address"
               placeholderTextColor={isDark ? "#aaa" : "#999"}
@@ -334,7 +329,7 @@ export default function LoginScreen() {
 
             {/* Password Input with toggle */}
             <View
-              className={`flex-row items-center rounded-xl max-w-[400px] h-[51px] px-4 mb-10 ${isDark ? "bg-[#2a2a2a]" : "bg-gray-100"
+              className={`flex-row items-center rounded-xl max-w-[400px] h-[51px] px-4 mb-6 ${isDark ? "bg-[#2a2a2a]" : "bg-gray-100"
                 }`}
             >
               <TextInput
@@ -372,7 +367,7 @@ export default function LoginScreen() {
               </Text>
             </TouchableOpacity>
 
-            {hasStoredCredentials && biometricsAvailable && (
+            {!keyboard.keyboardShown && hasStoredCredentials && biometricsAvailable && (
               <TouchableOpacity
                 activeOpacity={0.9}
                 onPressIn={handlePressIn}
@@ -396,6 +391,7 @@ export default function LoginScreen() {
             )}
 
             {/* Sign-up Link */}
+            {!keyboard.keyboardShown && (
             <Text
               className={`${isDark ? "text-gray-300" : "text-gray-500"
                 } text-[16px] text-center mt-4`}
@@ -410,8 +406,10 @@ export default function LoginScreen() {
                 </Text>
               </TouchableOpacity>
             </Text>
+            )}
 
             {/* Forgot Password */}
+            {!keyboard.keyboardShown && (
             <View className="items-center mt-4">
               <TouchableOpacity onPress={handleForgotPassword}>
                 <Text
@@ -422,11 +420,13 @@ export default function LoginScreen() {
                 </Text>
               </TouchableOpacity>
             </View>
+            )}
           </ScrollView>
         </KeyboardAvoidingView>
       </View>
 
       {/* Privacy Policy and Terms Link - Fixed at bottom */}
+      {!keyboard.keyboardShown && (
       <View className={`px-10 pb-8 pt-4 ${isDark ? "bg-[#1a1a1a]" : "bg-white"
         }`}>
         <Text
@@ -450,6 +450,7 @@ export default function LoginScreen() {
           .
         </Text>
       </View>
+      )}
     </View>
   );
 }

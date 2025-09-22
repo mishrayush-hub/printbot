@@ -196,8 +196,8 @@ export default function ProfileScreen() {
 
   return (
     <View className={`flex-1 ${isDark ? 'bg-gray-900' : 'bg-gray-50'} p-3`}>
-      <View className={`${cardBg} rounded-lg p-4 border ${borderColor} shadow-sm ${Platform.OS === 'ios' ? 'h-[89%]' : 'h-[87%]'}`}>
-        <View className="flex-row items-center justify-between mb-6">
+      <View className={`${cardBg} rounded-lg py-4 border ${borderColor} shadow-sm ${Platform.OS === 'ios' ? 'h-[89%]' : 'h-[85%]'}`}>
+        <View className="flex-row items-center justify-between mb-6 px-4">
           <View className="flex-row items-center">
             <View className="bg-blue-100 p-3 rounded-full mr-4">
               <User color="#3B82F6" size={24} />
@@ -256,9 +256,8 @@ export default function ProfileScreen() {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
           <ScrollView
-            style={{ flex: 1 }}
             ref={scrollViewRef}
-            contentContainerStyle={{ gap: 4, paddingBottom: keyboard.keyboardShown ? keyboard.keyboardHeight / 1.4 : 0 }}
+            contentContainerStyle={{paddingHorizontal: 16, gap: 4, paddingBottom: keyboard.keyboardShown ? keyboard.keyboardHeight / 1.4 : 0 }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets={true}
@@ -273,7 +272,7 @@ export default function ProfileScreen() {
                 autoComplete="off"
                 autoCapitalize="none"
                 autoCorrect={false}
-                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-gray-700 text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your full name"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                 onFocus={() => scrollToInput(fullNameRef)}
@@ -293,7 +292,7 @@ export default function ProfileScreen() {
                 autoCorrect={false}
                 onChangeText={setNewEmail}
                 keyboardType="email-address"
-                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-gray-700 text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your email address"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                 onFocus={() => scrollToInput(emailRef)}
@@ -313,7 +312,7 @@ export default function ProfileScreen() {
                 autoCorrect={false}
                 onChangeText={setNewPhone}
                 keyboardType="phone-pad"
-                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-gray-700 text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your phone number"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                 onFocus={() => scrollToInput(mobileRef)}
@@ -334,7 +333,7 @@ export default function ProfileScreen() {
                   autoCapitalize="none"
                   autoCorrect={false}
                   onChangeText={setNewAddress1}
-                  className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
+                  className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-gray-700 text-white" : "bg-gray-100 text-black"}`}
                   placeholder="Enter address line 1"
                   placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                   onFocus={() => scrollToInput(address1Ref)}
@@ -354,7 +353,7 @@ export default function ProfileScreen() {
                 autoComplete="off"
                 autoCapitalize="none"
                 autoCorrect={false}
-                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-gray-700 text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter address line 2 (optional)"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                 onFocus={() => scrollToInput(address2Ref)}
@@ -373,7 +372,7 @@ export default function ProfileScreen() {
                 autoComplete="off"
                 autoCapitalize="none"
                 autoCorrect={false}
-                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-gray-700 text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your city"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                 onFocus={() => scrollToInput(cityRef)}
@@ -392,7 +391,7 @@ export default function ProfileScreen() {
                 autoComplete="off"
                 autoCapitalize="none"
                 autoCorrect={false}
-                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-gray-700 text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your state"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                 onFocus={() => scrollToInput(stateRef)}
@@ -412,7 +411,7 @@ export default function ProfileScreen() {
                 autoCorrect={false}
                 onChangeText={setNewPincode}
                 keyboardType="numeric"
-                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-gray-700 text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your pincode"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                 onFocus={() => scrollToInput(pincodeRef)}
@@ -431,7 +430,7 @@ export default function ProfileScreen() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 onChangeText={setNewCountry}
-                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"}`}
+                className={`rounded-xl max-w-[400px] h-[51px] px-2 py-2 text-md mb-4 ${isDark ? "bg-gray-700 text-white" : "bg-gray-100 text-black"}`}
                 placeholder="Enter your country"
                 placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                 onFocus={() => scrollToInput(countryRef)}

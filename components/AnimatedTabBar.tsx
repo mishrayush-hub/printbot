@@ -8,7 +8,6 @@ import {
   Platform,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -167,7 +166,7 @@ export default function AnimatedTabBar({ state, descriptors, navigation }: TabBa
           >
             {options.tabBarIcon &&
               options.tabBarIcon({
-                color: isFocused ? '#FFFFFF' : "#616161",
+                color: isFocused ? "#FFFFFF" : colorScheme === 'dark' ? '#b9b9b9ff' : '#616161',
                 size: 18,
               })}
           </Animated.View>
@@ -177,7 +176,7 @@ export default function AnimatedTabBar({ state, descriptors, navigation }: TabBa
             style={{
               fontSize: 12,
               fontWeight: isFocused ? '600' : '500',
-              color: isFocused ? '#FFFFFF' : "#616161",
+              color: isFocused ? '#FFFFFF' : colorScheme === 'dark' ? '#b9b9b9ff' : '#616161',
               textAlign: 'center',
             }}
           >
@@ -247,20 +246,11 @@ export default function AnimatedTabBar({ state, descriptors, navigation }: TabBa
           zIndex: 1,
         }}
       >
-        <LinearGradient
-          colors={['#2563eb', '#9333ea']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+        <View 
           style={{
             flex: 1,
+            backgroundColor: "#008cff",
             borderRadius: 60,
-            // shadowColor: colorScheme === 'dark' ? '#8B5CF6' : '#6366F1',
-            // shadowOffset: { width: 0, height: 4 },
-            // shadowOpacity: 0.3,
-            // shadowRadius: 8,
-            // ...(Platform.OS === 'android' && {
-            //   elevation: 8,
-            // }),
           }}
         />
       </Animated.View>

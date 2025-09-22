@@ -12,25 +12,19 @@ export const handleSessionExpired = async () => {
         text: "OK",
         onPress: async () => {
           try {
-            // Clear all AsyncStorage data
             await AsyncStorage.clear();
-            
-            // Clear secure store credentials
             try {
               await SecureStore.deleteItemAsync('stored_email');
               await SecureStore.deleteItemAsync('stored_password');
             } catch (secureErr) {
               console.warn('Error clearing secure store:', secureErr);
             }
-            
-            // Navigate to login screen
             router.replace('/(auth)/login');
           } catch (error) {
             console.error('Error during logout:', error);
-            // Still navigate to login even if clearing storage fails
             router.replace('/(auth)/login');
           }
-        }
+        },
       }
     ],
     { cancelable: false }

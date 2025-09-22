@@ -56,41 +56,41 @@ export default function TabLayout() {
   const handleDismissModal = () => {
     setShowPermissionModal(false);
   };
-    return (
-      Platform.OS === 'ios' ? (
+  return (
+    Platform.OS === 'ios' ? (
       <>
-        <TabNative 
-          hapticFeedbackEnabled={true} 
+        <TabNative
+          hapticFeedbackEnabled={true}
           initialRouteName="(home)"
-          >
-            <TabNative.Screen
-              name="(home)"
-              options={{
-                title: "Home",
-                tabBarIcon: () => require('../../assets/images/tabbar/home.svg'),
-              }}
-            />
-            <TabNative.Screen
-              name="(history)"
-              options={{
-                title: "History",
-                tabBarIcon: () => require('../../assets/images/tabbar/cart.svg'),
-              }}
-            />
-            <TabNative.Screen
-              name="(profile)"
-              options={{
-                title: "Profile",
-                tabBarIcon: () => require('../../assets/images/tabbar/profile.svg'),
-              }}
-            />
-            <TabNative.Screen
-              name="(setting)"
-              options={{
-                title: "Settings",
-                tabBarIcon: () => require('../../assets/images/tabbar/cog.svg'),
-              }}
-            />
+        >
+          <TabNative.Screen
+            name="(home)"
+            options={{
+              title: "Home",
+              tabBarIcon: () => require('../../assets/images/tabbar/home.svg'),
+            }}
+          />
+          <TabNative.Screen
+            name="(history)"
+            options={{
+              title: "History",
+              tabBarIcon: () => require('../../assets/images/tabbar/cart.svg'),
+            }}
+          />
+          <TabNative.Screen
+            name="(profile)"
+            options={{
+              title: "Profile",
+              tabBarIcon: () => require('../../assets/images/tabbar/profile.svg'),
+            }}
+          />
+          <TabNative.Screen
+            name="(setting)"
+            options={{
+              title: "Settings",
+              tabBarIcon: () => require('../../assets/images/tabbar/cog.svg'),
+            }}
+          />
         </TabNative>
 
         {/* Permission Modal */}
@@ -102,61 +102,49 @@ export default function TabLayout() {
           hasAskedBefore={permissionStatus.hasAskedBefore}
         />
       </>
-  ) : (
-    <>
-      <TabAndroid
-        initialRouteName='(home)'
-        tabBar={(props) => <AnimatedTabBar {...props} />}
-        screenOptions={{
-          headerShown: true,
-          tabBarActiveTintColor: theme.tabIconSelected,
-          tabBarInactiveTintColor: theme.tabIconDefault,
-          headerTitleStyle: {
-            fontSize: 24,
-            fontWeight: 'bold',
-            color: colorScheme === 'dark' ? 'white' : 'black',
-            marginTop: -10
-          },
-          headerTintColor: 'white',
-        }}
-      >
-        <TabAndroid.Screen
-          name="(home)"
-          options={{
-            headerTitle: `Hello, ${userName || "User"} 👋`, // 👈 shown in header
-            tabBarIcon: ({ color }) => <House size={28} color={color} />,
-            tabBarLabel: 'Home', // 👈 shown in tab bar
-            headerShown: false,
-            headerTitleAlign: 'center', // 👈 center the header title
-            headerStyle: {
-                  backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
-              },
-            headerShadowVisible: true, // 👈 remove header shadow
+    ) : (
+      <>
+        <TabAndroid
+          initialRouteName='(home)'
+          tabBar={(props) => <AnimatedTabBar {...props} />}
+          screenOptions={{
+            headerShown: true,
+            tabBarActiveTintColor: theme.tabIconSelected,
+            tabBarInactiveTintColor: theme.tabIconDefault,
+            headerTitleStyle: {
+              fontSize: 24,
+              fontWeight: 'bold',
+              color: colorScheme === 'dark' ? 'white' : 'black',
+              marginTop: -10
+            },
+            headerTintColor: 'white',
           }}
-        />
-        <TabAndroid.Screen
-          name="(history)"
-          options={{
-            headerTitle: 'Orders', // 👈 shown in header
-            tabBarLabel: 'Orders',     // 👈 shown in tab bar
-            tabBarIcon: ({ color }) => <ShoppingCart size={28} color={color} />,
-            headerShown: false,
-            headerStyle: {
-                  backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
-              },
-            headerTitleAlign: 'center', // 👈 center the header title
-          }}
-        />
+        >
           <TabAndroid.Screen
-            name="(setting)"
+            name="(home)"
             options={{
-              title: 'Settings',
-              tabBarIcon: ({ color }) => <Cog size={28} color={color} />,
+              headerTitle: `Hello, ${userName || "User"} 👋`, // 👈 shown in header
+              tabBarIcon: ({ color }) => <House size={28} color={color} />,
+              tabBarLabel: 'Home', // 👈 shown in tab bar
+              headerShown: false,
+              headerTitleAlign: 'center', // 👈 center the header title
+              headerStyle: {
+                backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+              },
+              headerShadowVisible: true, // 👈 remove header shadow
+            }}
+          />
+          <TabAndroid.Screen
+            name="(history)"
+            options={{
+              headerTitle: 'Orders', // 👈 shown in header
+              tabBarLabel: 'Orders',     // 👈 shown in tab bar
+              tabBarIcon: ({ color }) => <ShoppingCart size={28} color={color} />,
               headerShown: false,
               headerStyle: {
-                    backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
-                },
-              headerShadowVisible: false, // 👈 remove header shadow
+                backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+              },
+              headerTitleAlign: 'center', // 👈 center the header title
             }}
           />
           <TabAndroid.Screen
@@ -165,23 +153,35 @@ export default function TabLayout() {
               title: 'Profile',
               tabBarIcon: ({ color }) => <CircleUserRound size={28} color={color} />,
               headerStyle: {
-                    backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
-                },
+                backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+              },
               headerShown: false,
               headerShadowVisible: false, // 👈 remove header shadow
             }}
           />
-      </TabAndroid>
+          <TabAndroid.Screen
+            name="(setting)"
+            options={{
+              title: 'Settings',
+              tabBarIcon: ({ color }) => <Cog size={28} color={color} />,
+              headerShown: false,
+              headerStyle: {
+                backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+              },
+              headerShadowVisible: false, // 👈 remove header shadow
+            }}
+          />
+        </TabAndroid>
 
-      {/* Permission Modal */}
-      <PermissionModal
-        visible={showPermissionModal}
-        onRequestPermissions={handleRequestPermissions}
-        onOpenSettings={handleOpenSettings}
-        onDismiss={handleDismissModal}
-        hasAskedBefore={permissionStatus.hasAskedBefore}
-      />
-    </>
-  )
+        {/* Permission Modal */}
+        <PermissionModal
+          visible={showPermissionModal}
+          onRequestPermissions={handleRequestPermissions}
+          onOpenSettings={handleOpenSettings}
+          onDismiss={handleDismissModal}
+          hasAskedBefore={permissionStatus.hasAskedBefore}
+        />
+      </>
+    )
   );
 }

@@ -23,7 +23,7 @@ export default function UserLayout() {
             <Stack.Screen 
                 name="index" 
                 options={{ 
-                    title: "History",
+                    title: "Orders",
                     headerShadowVisible: false,
                 }} 
             />

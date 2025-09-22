@@ -12,7 +12,8 @@ export default function LegalLayout() {
   
   const commonHeaderOptions = {
     headerShown: true,
-    headerBackTitleVisible: false,
+    headerBackTitleVisible: true,
+    headerBackVisible: true,
     headerTintColor: colorScheme === 'dark' ? '#ffffff' : '#000000',
     headerTitleStyle: {
       fontSize: 18,
@@ -20,13 +21,10 @@ export default function LegalLayout() {
       color: colorScheme === 'dark' ? '#ffffff' : '#000000',
     },
     headerStyle: {
-      backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
-      elevation: 0,
-      shadowOpacity: 0,
-      borderBottomWidth: 0,
+      backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF'
     },
-    headerStatusBarHeight: Platform.OS === 'ios' ? undefined : 0,
     headerLeft: () => (
+      Platform.OS === 'ios' && (
       <TouchableOpacity 
         onPress={() => router.back()}
         style={{ paddingLeft: 4 }}
@@ -36,6 +34,7 @@ export default function LegalLayout() {
           color={colorScheme === 'dark' ? '#ffffff' : '#000000'} 
         />
       </TouchableOpacity>
+      )
     ),
   };
   
@@ -50,6 +49,7 @@ export default function LegalLayout() {
         name="privacy-policy" 
         options={{ 
           ...commonHeaderOptions,
+          headerTitleAlign: 'center',
           title: "Privacy Policy",
         }} 
       />
@@ -57,6 +57,7 @@ export default function LegalLayout() {
         name="terms-and-conditions" 
         options={{ 
           ...commonHeaderOptions,
+          headerTitleAlign: 'center',
           title: "Terms and Conditions",
         }} 
       />
@@ -64,6 +65,7 @@ export default function LegalLayout() {
         name="shipping-policy" 
         options={{ 
           ...commonHeaderOptions,
+          headerTitleAlign: 'center',
           title: "Shipping Policy",
         }} 
       />
@@ -71,8 +73,8 @@ export default function LegalLayout() {
         name="return-refund-exchange-policy" 
         options={{ 
           ...commonHeaderOptions,
+          headerTitleAlign: 'center',
           title: "Return, Refund & Exchange Policy",
-          headerBackButtonDisplayMode: 'minimal',
         }} 
       />
     </Stack>

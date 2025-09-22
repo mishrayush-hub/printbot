@@ -7,7 +7,8 @@ import {
   Alert,
   ActivityIndicator,
   useColorScheme,
-  TextInput
+  TextInput,
+  Platform
 } from "react-native";
 import { ShoppingCart, Search, RefreshCw, FileText, Calendar } from "lucide-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -38,7 +39,7 @@ export default function OrdersScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
-  const textColor = isDark ? "text-white" : "text-black";
+  const textColor = isDark ? "#ffffff" : "#000000";
   const cardBg = isDark ? "bg-gray-800" : "bg-white";
   const borderColor = isDark ? "border-gray-700" : "border-gray-200";
   const subText = isDark ? "text-gray-400" : "text-gray-600";
@@ -310,17 +311,25 @@ export default function OrdersScreen() {
       <View className={`${cardBg} px-4 py-4 border-b ${borderColor}`}>
         {/* Search Bar */}
         <View className="flex-row items-center mb-3" style={{ gap: 12 }}>
-          <View className={`flex-1 max-h-[40px] flex-row items-center ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg px-3 py-3`}>
+          <View className={`flex-1 h-[45px] flex-row items-center ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg px-3`}>
             <Search color={isDark ? "#9CA3AF" : "#6B7280"} size={20} />
             <TextInput
               placeholder="Search files..."
               placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
               value={searchQuery}
               onChangeText={setSearchQuery}
-              className={`flex-1 ml-3 ${textColor} text-base`}
               autoComplete="off"
+              style={{
+                flex: 1,
+                fontSize: 16,
+                color: textColor,
+                paddingHorizontal: 12,
+                paddingVertical: Platform.OS === 'android' ? 8 : 0
+              }}
               autoCorrect={false}
               autoCapitalize="none"
+              textAlignVertical='center'
+              clearButtonMode="while-editing"
             />
           </View>
 
@@ -387,7 +396,7 @@ export default function OrdersScreen() {
             <View className={`${isDark ? 'bg-gray-700' : 'bg-gray-100'} p-8 rounded-full mb-4`}>
               <ShoppingCart color={isDark ? "#9CA3AF" : "#6B7280"} size={64} />
             </View>
-            <Text className={`${textColor} text-xl font-semibold mb-2`}>
+            <Text className={`text-black dark:text-white text-xl font-semibold mb-2`}>
               {files.length === 0 ? "No Files Uploaded" : "No Results Found"}
             </Text>
             <Text className={`${subText} text-center`}>
